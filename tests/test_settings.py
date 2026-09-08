@@ -50,19 +50,21 @@ class SettingsTest(unittest.TestCase):
             self.assertIsNotNone(setting.find('default'),
                                  '%s has no <default>' % setting.get('id'))
 
-    def test_settings_read_as_numbers_default_to_one(self):
-        numeric = set(re.findall(r"int\(float\(self\._addonClass\.getSetting\('([^']+)'\)\)\)",
-                                 _source())
-                      ) | set(re.findall(r"int\(self\._addonClass\.getSetting\('([^']+)'\)\)",
-                                         _source()))
-        self.assertTrue(numeric, 'no numeric settings found - the pattern is wrong')
-        for setting in _settings():
-            if setting.get('id') in numeric:
-                default = setting.find('default')
-                self.assertTrue(
-                    (default.text or '').strip().lstrip('-').isdigit(),
-                    '%s is read as a number but defaults to %r'
-                    % (setting.get('id'), default.text))
+    def test_the_fallbacks_repeat_the_declared_defaults(self):
+        # settingsKodi._getInt carries its own copy of every default so that
+        # an unreadable setting cannot end the add-on. Two copies of the same
+        # number drift apart unless something holds them together.
+        fallbacks = dict((name, int(value)) for (name, value) in
+                         re.findall(r"self\._getInt\('([^']+)',\s*(-?\d+)\)", _source()))
+        self.assertTrue(fallbacks, 'no fallbacks found - the pattern is wrong')
+        declared = dict((setting.get('id'), (setting.find('default').text or '').strip())
+                        for setting in _settings())
+        for (name, fallback) in sorted(fallbacks.items()):
+            self.assertIn(name, declared, '%s is read but not declared' % name)
+            self.assertEqual(
+                fallback, int(float(declared[name])),
+                '%s falls back to %d but settings.xml declares %s'
+                % (name, fallback, declared[name]))
 
     def test_the_declared_ids_are_unique(self):
         ids = [setting.get('id') for setting in _settings()]

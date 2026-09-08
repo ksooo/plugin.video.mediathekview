@@ -162,6 +162,33 @@ class Settings(object):
         return self._values['databaseType']
 
 
+class Addon(object):
+    """Stands in for xbmcaddon.Addon."""
+
+    def __init__(self, strings=None, info=None):
+        self.strings = strings if strings is not None else {}
+        self.info = info if info is not None else {
+            'id': 'plugin.video.mediathekview.ksooo',
+            'name': 'MediathekView (ksooo)',
+            'version': '1.0.0',
+            'path': ADDON_PATH,
+            'profile': ADDON_PATH,
+        }
+        self.settings = {}
+
+    def getLocalizedString(self, string_id):
+        return self.strings.get(string_id, '')
+
+    def getAddonInfo(self, key):
+        return self.info.get(key, '')
+
+    def getSetting(self, key):
+        return self.settings.get(key, '')
+
+    def setSetting(self, key, value):
+        self.settings[key] = value
+
+
 class Cursor(object):
 
     def __init__(self, connection):
@@ -347,6 +374,10 @@ def install_kodi_stubs():
     """
     xbmc = sys.modules.setdefault('xbmc', types.ModuleType('xbmc'))
     xbmc.LOGDEBUG = 0
+    xbmc.LOGINFO = 1
+    xbmc.LOGWARNING = 2
+    xbmc.LOGERROR = 3
+    xbmc.LOGFATAL = 4
     xbmc.log = lambda *args, **kwargs: None
     xbmc.getInfoLabel = lambda label: '21.0'
     xbmc.executebuiltin = lambda command: None
