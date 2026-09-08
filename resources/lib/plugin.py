@@ -26,8 +26,6 @@ from resources.lib.storeSqlite import StoreSQLite
 from resources.lib.notifierKodi import NotifierKodi
 from resources.lib.downloader import Downloader
 from resources.lib.searches import RecentSearches
-from resources.lib.extendedSearch import ExtendedSearch
-import resources.lib.extendedSearchModel as ExtendedSearchModel
 import resources.lib.ui.livestreamUi as LivestreamUi
 import resources.lib.ui.channelUi as ChannelUi
 import resources.lib.ui.showUi as ShowUi
@@ -57,7 +55,6 @@ class MediathekViewPlugin(KodiPlugin):
             self.logger.warn('Unknown Database driver selected')
             self.database = None
         #
-        self.migrateExtendedSearch()
         # self.database = Store()
 
     def show_main_menu(self):
@@ -144,9 +141,6 @@ class MediathekViewPlugin(KodiPlugin):
             self.run_builtin('Container.Refresh')
             self.setViewId(self.resolveViewId('MAIN'))
             #
-        elif mode == 'extendedSearchScreen':
-            ExtendedSearch(self, self.database, self.get_arg('extendedSearchAction', None), self.get_arg('searchId', None)).show()
-            #
         elif mode == 'livestreams':
             ui = LivestreamUi.LivestreamUi(self)
             ui.generate(self.database.getLivestreams())
@@ -213,7 +207,6 @@ class MediathekViewPlugin(KodiPlugin):
             filmIdArray = self._resolveFilmIdsFromParams(
                 self.get_arg('id', None),
                 self.get_arg('search', None),
-                self.get_arg('searchId', None),
                 self.get_arg('channel', None),
                 self.get_arg('show', None)
             )
@@ -225,7 +218,6 @@ class MediathekViewPlugin(KodiPlugin):
             filmIdArray = self._resolveFilmIdsFromParams(
                 self.get_arg('id', None),
                 self.get_arg('search', None),
-                self.get_arg('searchId', None),
                 self.get_arg('channel', None),
                 self.get_arg('show', None)
             )
@@ -305,26 +297,11 @@ class MediathekViewPlugin(KodiPlugin):
             icon=os.path.join(self.path, 'resources', 'icons', 'search-m.png'),
             fanart=os.path.join(self.path, 'resources', 'icons', 'search-f.png')
         )
-        # New saved search
-        self.add_folder_item(
-            30911,
-            {'mode': "extendedSearchScreen", 'extendedSearchAction': 'NEW'},
-            icon=os.path.join(self.path, 'resources', 'icons', 'control-m.png'),
-            fanart=os.path.join(self.path, 'resources', 'icons', 'control-f.png')
-        )
         # Search history, once there is one
         if len(RecentSearches(self).load().recents) > 0:
             self.add_folder_item(
                 30907,
                 {'mode': "searchhistory"},
-                icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
-                fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
-            )
-        # Saved searches, once there are any
-        if len(ExtendedSearch(self, self.database, None, None).recents) > 0:
-            self.add_folder_item(
-                30910,
-                {'mode': "extendedSearchScreen", 'extendedSearchAction': 'SHOW'},
                 icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
                 fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
             )
@@ -366,7 +343,7 @@ class MediathekViewPlugin(KodiPlugin):
                     'The following ERROR can be ignored. It is caused by the architecture of the Kodi Plugin Engine')
                 self.end_of_directory(False, cache_to_disc=False)
 
-    def _resolveFilmIdsFromParams(self, filmId, quickSearch, searchId, channelId, showId):
+    def _resolveFilmIdsFromParams(self, filmId, quickSearch, channelId, showId):
         filmIdArray = []
         if filmId is not None:
             filmIdArray.append(filmId)
@@ -374,48 +351,8 @@ class MediathekViewPlugin(KodiPlugin):
             rs = self.database.getQuickSearch(quickSearch)
             for id in rs:
                 filmIdArray.append(id[0])
-        elif searchId is not None:
-            ex = ExtendedSearch(self, self.database, None, searchId)
-            rs = ex.getFilmData(searchId)
-            for id in rs:
-                filmIdArray.append(id[0])
         elif showId is not None:
             rs = self.database.getFilms(channelId, showId)
             for id in rs:
                 filmIdArray.append(id[0])
         return filmIdArray;
-
-    def migrateExtendedSearch(self):
-        import resources.lib.mvutils as mvutils
-        oldExtSearchFilename = os.path.join(
-            appContext.MVSETTINGS.getDatapath(),
-            'recent_ext_searches.json'
-        )
-        self.logger.debug("migrateExtendedSearch {}", mvutils.file_exists(oldExtSearchFilename))
-        if mvutils.file_exists(oldExtSearchFilename):
-            oldData = mvutils.loadJsonFile(oldExtSearchFilename)
-            self.logger.debug("Found legacy ext search entries to be migrated")
-            if (oldData != None):
-                newData = []
-                lid = int(time.time())
-                for entry in oldData:
-                    esm = ExtendedSearchModel.ExtendedSearchModel(entry.get('search'))
-                    esm.setId(lid)
-                    lid += 1
-                    esm.setTitle(entry.get('search'))
-                    esm.setDescription(entry.get('search'))
-                    esm.setWhen(int(entry.get('when')))
-                    newData.append(esm.toDict())
-                #
-                newExtSearchFilename = os.path.join(
-                    appContext.MVSETTINGS.getDatapath(),
-                    'searchConfig.json'
-                )
-                mvutils.saveJsonFile(newExtSearchFilename, newData)
-                self.logger.debug("Migrated {} legacy ext search entries to new format", len(newData))
-            #
-            oldExtSearchFilenameBackup = os.path.join(
-                appContext.MVSETTINGS.getDatapath(),
-                'recent_ext_searches.json.bk'
-            )
-            mvutils.file_rename(oldExtSearchFilename, oldExtSearchFilenameBackup)

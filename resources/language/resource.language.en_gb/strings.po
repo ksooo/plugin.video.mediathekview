@@ -283,82 +283,6 @@ msgctxt "#30351"
 msgid "DownloadQualityLow"
 msgstr "Low"
 
-#############################
-# Page 4 Extended Search
-#############################
-
-msgctxt "#30401"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "#30402"
-msgid "Title"
-msgstr "Title"
-
-msgctxt "#30403"
-msgid "Show"
-msgstr "Show"
-
-msgctxt "#30404"
-msgid "Description"
-msgstr "Description"
-
-msgctxt "#30405"
-msgid "Channel"
-msgstr "Channel"
-
-msgctxt "#30406"
-msgid "Min. Duration (min)"
-msgstr "Min. Duration (min)"
-
-msgctxt "#30407"
-msgid "No Trailer"
-msgstr "No Trailer"
-
-msgctxt "#30408"
-msgid "Blacklist"
-msgstr "Blacklist"
-
-msgctxt "#30409"
-msgid "No"
-msgstr "No"
-
-msgctxt "#30410"
-msgid "Yes"
-msgstr "Yes"
-
-msgctxt "#30411"
-msgid "Enter a show name"
-msgstr "Enter a show name"
-
-msgctxt "#30412"
-msgid "Enter a title for the episode"
-msgstr "Enter a title for the episode"
-
-msgctxt "#30413"
-msgid "Enter a part of the plot"
-msgstr "Enter a part of the plot"
-
-msgctxt "#30414"
-msgid "Choose one or multiple channels"
-msgstr "Choose one or multiple channels"
-
-msgctxt "#30415"
-msgid "Enter a showname or title which will be excluded from the results"
-msgstr "Enter a showname or title which will be excluded from the results"
-
-msgctxt "#30417"
-msgid "No future videos (usually trailers)"
-msgstr "No future videos (usually trailers)"
-
-msgctxt "#30418"
-msgid "Minimum duration in minutes"
-msgstr "Minimum duration in minutes"
-
-msgctxt "#30419"
-msgid "Enter a name for the query"
-msgstr "Enter a name for the query"
-
 ##############
 # Main Menu
 ##############
@@ -391,14 +315,6 @@ msgctxt "#30907"
 msgid "Search history"
 msgstr "Search history"
 
-msgctxt "#30910"
-msgid "Saved searches"
-msgstr "Saved searches"
-
-msgctxt "#30911"
-msgid "New saved search"
-msgstr "New saved search"
-
 msgctxt "#30908"
 msgid "Database Information"
 msgstr "Database Information"
@@ -428,14 +344,6 @@ msgstr "New Search..."
 msgctxt "#30932"
 msgid "Remove Search"
 msgstr "Remove Search"
-
-msgctxt "#30933"
-msgid "Edit Search"
-msgstr "Edit Search"
-
-msgctxt "#30934"
-msgid "Run Search"
-msgstr "Run Search"
 
 # Database status
 msgctxt "#30941"

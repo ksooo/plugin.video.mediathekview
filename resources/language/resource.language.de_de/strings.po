@@ -283,82 +283,6 @@ msgctxt "#30351"
 msgid "DownloadQualityLow"
 msgstr "Niedrig"
 
-#############################
-# Page 4 Extended Search
-#############################
-
-msgctxt "#30401"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "#30402"
-msgid "Title"
-msgstr "Titel"
-
-msgctxt "#30403"
-msgid "Show"
-msgstr "Sendung"
-
-msgctxt "#30404"
-msgid "Description"
-msgstr "Beschreibung"
-
-msgctxt "#30405"
-msgid "Channel"
-msgstr "Sender"
-
-msgctxt "#30406"
-msgid "Min. Duration (min)"
-msgstr "Min. Dauer (min)"
-
-msgctxt "#30407"
-msgid "No Trailer"
-msgstr "Keine Trailer"
-
-msgctxt "#30408"
-msgid "Blacklist"
-msgstr "Ausschluss"
-
-msgctxt "#30409"
-msgid "No"
-msgstr "Nein"
-
-msgctxt "#30410"
-msgid "Yes"
-msgstr "Ja"
-
-msgctxt "#30411"
-msgid "Enter a show name"
-msgstr "Bitte Namen der Sendung eingeben"
-
-msgctxt "#30412"
-msgid "Enter a title for the episode"
-msgstr "Bitte Titel der Folge eingeben"
-
-msgctxt "#30413"
-msgid "Enter a part of the plot"
-msgstr "Bitte Text aus der Beschreibung eingeben"
-
-msgctxt "#30414"
-msgid "Choose one or multiple channels"
-msgstr "Bitte Sender auswählen"
-
-msgctxt "#30415"
-msgid "Enter a showname or title which will be excluded from the results"
-msgstr "Bitte auszuschließenden Begriff eingeben"
-
-msgctxt "#30417"
-msgid "No future videos (usually trailers)"
-msgstr "Keine Filme aus der Zukunft (üblicherweise Trailer)"
-
-msgctxt "#30418"
-msgid "Minimum duration in minutes"
-msgstr "Minimale Länge in Minuten"
-
-msgctxt "#30419"
-msgid "Enter a name for the query"
-msgstr "Bitte Namen für die Suche eingeben"
-
 ##############
 # Main Menu
 ##############
@@ -391,14 +315,6 @@ msgctxt "#30907"
 msgid "Search history"
 msgstr "Suchverlauf"
 
-msgctxt "#30910"
-msgid "Saved searches"
-msgstr "Gespeicherte Suchen"
-
-msgctxt "#30911"
-msgid "New saved search"
-msgstr "Neue gespeicherte Suche"
-
 msgctxt "#30908"
 msgid "Database Information"
 msgstr "Datenbankinformationen"
@@ -428,14 +344,6 @@ msgstr "Neue Suche ..."
 msgctxt "#30932"
 msgid "Remove Search"
 msgstr "Suche entfernen"
-
-msgctxt "#30933"
-msgid "Edit Search"
-msgstr "Bearbeiten"
-
-msgctxt "#30934"
-msgid "Run Search"
-msgstr "Ausführen"
 
 # Database status
 msgctxt "#30941"
