@@ -13,6 +13,7 @@ from datetime import datetime
 import xbmcgui
 import xbmcplugin
 import resources.lib.appContext as appContext
+from resources.lib.ui.channelArt import artFor
 from resources.lib.model.film import Film
 from resources.lib.seasons import splitEpisode
 
@@ -177,20 +178,7 @@ class FilmlistUi(object):
             info_labels['aired'] = airedstring[:10]
             info_labels['dateadded'] = airedstring
 
-        icon = os.path.join(
-            self.plugin.path,
-            'resources',
-            'icons',
-            'sender',
-            pFilm.channel.lower() + '-i.png'
-        )
-        fanart = os.path.join(
-            self.plugin.path,
-            'resources',
-            'icons',
-            'sender',
-            pFilm.channel.lower() + '-f.png'
-        )
+        (icon, fanart) = artFor(self.plugin.path, pFilm.channel)
 
         #
         if self.plugin.get_kodi_version() > 17:

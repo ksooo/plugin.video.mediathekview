@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import time
 import resources.lib.appContext as appContext
+from resources.lib.ui.channelArt import artFor
 import os
 import xbmcgui
 import xbmcplugin
@@ -60,20 +61,7 @@ class ChannelUi(object):
             else:
                 list_item = xbmcgui.ListItem(label=labelname)
             #
-            icon = os.path.join(
-                self.plugin.path,
-                'resources',
-                'icons',
-                'sender',
-                channelModel.channelId.lower() + '-i.png'
-            )
-            fanart = os.path.join(
-                self.plugin.path,
-                'resources',
-                'icons',
-                'sender',
-                channelModel.channelId.lower() + '-f.png'
-            )
+            (icon, fanart) = artFor(self.plugin.path, channelModel.channelId)
             list_item.setArt({
                 'thumb': icon,
                 'icon': icon,

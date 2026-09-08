@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import time
 import resources.lib.appContext as appContext
+from resources.lib.ui.channelArt import artFor
 import os
 import xbmcgui
 import xbmcplugin
@@ -51,20 +52,7 @@ class ShowUi(object):
             #
             if element[1].find(',') == -1:
                 nameLabel = element[2];
-                icon = os.path.join(
-                    self.plugin.path,
-                    'resources',
-                    'icons',
-                    'sender',
-                    element[1].lower() + '-i.png'
-                )
-                fanart = os.path.join(
-                    self.plugin.path,
-                    'resources',
-                    'icons',
-                    'sender',
-                    element[1].lower() + '-f.png'
-                )
+                (icon, fanart) = artFor(self.plugin.path, element[1])
             else:
                 nameLabel = element[2] + ' [' + element[3] + ']';
                 icon = os.path.join(

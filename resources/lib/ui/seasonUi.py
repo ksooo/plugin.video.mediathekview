@@ -5,10 +5,10 @@ The season UI module
 SPDX-License-Identifier: MIT
 """
 
-import os
 # pylint: disable=import-error
 import xbmcgui
 import resources.lib.appContext as appContext
+from resources.lib.ui.channelArt import artFor
 
 # Where the channel sits in a row of the film query.
 CHANNEL = 3
@@ -57,23 +57,13 @@ class SeasonUi(object):
             'season': number,
             'mediatype': 'season'
         })
-        # The icon of the channel the season was broadcast on, taken from the
-        # films rather than from the listing: a show can run on more than one.
-        icon = self._icon(films)
+        # The artwork of the channel the season was broadcast on, taken from
+        # the films rather than from the listing: a show can run on more than
+        # one channel.
+        (icon, fanart) = artFor(self.plugin.path, films[0][CHANNEL] if films else '')
         listitem.setArt({
             'thumb': icon,
             'icon': icon,
-            'fanart': self._icon(films, '-f.png')
+            'fanart': fanart
         })
         return listitem
-
-    def _icon(self, films, suffix='-i.png'):
-        if not films:
-            return ''
-        return os.path.join(
-            self.plugin.path,
-            'resources',
-            'icons',
-            'sender',
-            films[0][CHANNEL].lower() + suffix
-        )

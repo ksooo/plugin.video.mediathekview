@@ -96,11 +96,19 @@ terms with the fact that `filmliste-v3.db` will still be v3.
 
 ## Channel icons
 
-`resources/lib/ui/channelUi.py` builds the icon path from the channel name:
+`resources/lib/ui/channelArt.py` builds the path from the channel name:
 `resources/icons/sender/<channel lowercased>-i.png` for the icon and `-f.png`
-for the fanart. There are 29 channels covered. A channel MediathekView adds or
-renames gets no icon, and nothing reports it - the list entry simply appears
-blank.
+for the fanart. All 31 channels the film list currently names are covered. A
+channel MediathekView adds or renames falls back to the generic
+`broadcast-m.png`, and says so in the log - it used to turn up blank and
+unmentioned, which is how tagesschau24, ZDFinfo and ZDFneo went unnoticed
+across 13447 films while their artwork sat in the livestream folder under a
+different spelling.
+
+The two folders hold the same kind of file and some of the same files, but
+are keyed differently: `sender` by the channel name as the film list writes
+it, `livestream` by the name `livestreamUi.py` maps each stream to. `ZDFinfo`
+and `zdf.info` are the same logo under both rules.
 
 Livestreams work the same way from `resources/icons/livestream/`, covering 12
 streams.
