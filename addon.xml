@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.mediathekview.ksooo"
 	name="MediathekView (ksooo)"
-	version="1.0.1"
+	version="1.1.0"
 	provider-name="MediathekView.de, Leo Moll, Kai Sommerfeld">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0"/>
@@ -28,7 +28,13 @@
 		<summary lang="en_GB">Public service video-platforms</summary>
 		<description lang="de_DE">Dieses Add-on basiert auf dem Code von https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>
 		<description lang="en_GB">This add-on is based on the code of https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>
-		<news>v1.0.1
+		<news>v1.1.0
+- Updating the film database no longer gets in the way. The downloaded file is unpacked several times faster, the progress is shown, and it can be interrupted.
+- Searching is behind one menu entry instead of two. "Quick Search" and "Search" were the same search with a different number of fields.
+- Saved searches have been removed. Searches saved with an earlier version are no longer offered.
+- The search history keeps the last 25 terms instead of growing for as long as the add-on is used.
+
+v1.0.1
 - Fixed: after a fresh installation the add-on did not start at all. Neither the user interface nor the background update would come up.
 - An unreadable setting no longer stops the add-on. It falls back to the intended default and notes that in the log.
 

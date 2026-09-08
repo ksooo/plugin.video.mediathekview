@@ -1,3 +1,9 @@
+v1.1.0
+- Updating the film database no longer gets in the way. The downloaded file is unpacked several times faster, the progress is shown, and it can be interrupted.
+- Searching is behind one menu entry instead of two. "Quick Search" and "Search" were the same search with a different number of fields.
+- Saved searches have been removed. Searches saved with an earlier version are no longer offered.
+- The search history keeps the last 25 terms instead of growing for as long as the add-on is used.
+
 v1.0.1
 - Fixed: after a fresh installation the add-on did not start at all. Neither the user interface nor the background update would come up.
 - An unreadable setting no longer stops the add-on. It falls back to the intended default and notes that in the log.
