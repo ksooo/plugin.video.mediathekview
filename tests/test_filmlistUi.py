@@ -56,6 +56,18 @@ class GenerateTest(unittest.TestCase):
         self._generate([row()])
         self.assertIn(self.xbmcplugin.SORT_METHOD_EPISODE, self.xbmcplugin.sort_methods)
 
+    def test_a_listing_of_one_show_is_offered_in_episode_order_first(self):
+        # A whole season is published at one timestamp, so the date the query
+        # sorts by cannot tell the episodes apart.
+        FilmlistUi(self.plugin, pLongTitle=False).generate([row()])
+        self.assertEqual(self.xbmcplugin.sort_methods[0],
+                         self.xbmcplugin.SORT_METHOD_EPISODE)
+
+    def test_a_listing_of_many_shows_keeps_the_sort_method_from_the_settings(self):
+        self._generate([row()])
+        self.assertEqual(self.xbmcplugin.sort_methods[0],
+                         self.xbmcplugin.SORT_METHOD_UNSORTED)
+
     def test_a_film_without_any_url_does_not_take_the_list_with_it(self):
         # A record whose Url field is empty reaches the database unfiltered.
         # It used to make _generateListItem return a bare None, and unpacking

@@ -180,7 +180,12 @@ class StoreQuery(object):
             sql += " AND " + recentOnlyCondition
             params.extend(recentParams)
         #
-        sql += ' ORDER BY aired DESC '
+        # Newest first, and then something rather than nothing: a whole season
+        # is published at one timestamp, so the date alone leaves sixteen
+        # films in whatever order they happen to be found in - which changes
+        # with every update. The show and title settle it, and put a film next
+        # to its audio described twin.
+        sql += ' ORDER BY aired DESC, showname ASC, title ASC '
         #
         maxRowsCondition = esModel.generateMaxRows()
         if (maxRowsCondition != ''):

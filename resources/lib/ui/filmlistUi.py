@@ -83,6 +83,12 @@ class FilmlistUi(object):
         method = allSortMethods[0]
         allSortMethods[0] = allSortMethods[self.settings.getFilmSortMethod()]
         allSortMethods[self.settings.getFilmSortMethod()] = method
+        if not pLongTitle:
+            # This is the listing of a single show, and a show is watched in
+            # its own order. Where no episode numbers were found they are all
+            # zero, and the list stays as the query delivered it.
+            allSortMethods.remove(xbmcplugin.SORT_METHOD_EPISODE)
+            allSortMethods.insert(0, xbmcplugin.SORT_METHOD_EPISODE)
         self.sortmethods = allSortMethods
         self.labelMask = LABEL_MASK_LONG if pLongTitle else LABEL_MASK_SHORT
         #

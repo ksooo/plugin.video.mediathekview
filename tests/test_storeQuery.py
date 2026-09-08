@@ -66,6 +66,25 @@ class GetStatusTest(unittest.TestCase):
                         'the reason has to reach the log')
 
 
+class FilmOrderTest(unittest.TestCase):
+    """What order the films come back in.
+
+    MediathekView publishes a whole season at one timestamp, so the broadcast
+    date alone leaves sixteen films in whatever order the database happens to
+    find them - and that order changes with every update.
+    """
+
+    def setUp(self):
+        support.init_app_context(settings=support.Settings(caching=False))
+
+    def test_the_order_is_settled_beyond_the_date(self):
+        import resources.lib.extendedSearchModel as extendedSearchModel
+        (store, connection) = _store(results=[[]])
+        store.extendedSearchQuery(extendedSearchModel.ExtendedSearchModel(''))
+        statement = connection.statements[0]
+        self.assertIn('ORDER BY aired DESC, showname ASC, title ASC', statement)
+
+
 class RetrieveFilmInfoTest(unittest.TestCase):
 
     def setUp(self):
