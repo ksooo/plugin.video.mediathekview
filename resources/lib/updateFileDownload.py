@@ -140,13 +140,18 @@ class UpdateFileDownload(object):
         self.logger.debug('renamed {} to {} in {} sec', self._filename, self._Dbfilename, (time.time() - start))
 
     def _getExtension(self):
+        # Ordered by what unpacking costs, not by download size. Unpacking is
+        # the part that runs while the user waits, so the largest archive of
+        # the three wins by being roughly ten times cheaper to unpack than
+        # bzip2 and six times cheaper than xz.
+        # Keep this in step with the chain in _download().
         ext = ""
-        if self.use_xz is True or UPD_CAN_XZ is True:
+        if UPD_CAN_GZ is True:
+            ext = '.gz'
+        elif self.use_xz is True or UPD_CAN_XZ is True:
             ext = '.xz'
         elif UPD_CAN_BZ2 is True:
             ext = '.bz2'
-        elif UPD_CAN_GZ is True:
-            ext = '.gz'
         else:
             self.logger.error('No suitable archive extractor available for this system')
             self.notifier.show_missing_extractor_error()
@@ -193,7 +198,13 @@ class UpdateFileDownload(object):
         # decompress filmliste
         start = time.time()
         try:
-            if self.use_xz is True:
+            # Mirrors the order in _getExtension(): whatever was asked for is
+            # what arrived, and it has to be unpacked with the matching tool.
+            if UPD_CAN_GZ is True:
+                self.logger.debug('Trying to decompress gz file...')
+                retval = self._decompress_gz(compressedFilename, targetFilename)
+                self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
+            elif self.use_xz is True:
                 self.logger.debug('Trying to decompress xz file...')
                 retval = subprocess.call([mvutils.find_xz(), '-d', compressedFilename])
                 self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
@@ -205,10 +216,6 @@ class UpdateFileDownload(object):
                 self.logger.debug('Trying to decompress bz2 file...')
                 retval = self._decompress_bz2(compressedFilename, targetFilename)
                 self.logger.debug('decompress bz2 {} in {} sec', retval, (time.time() - start))
-            elif UPD_CAN_GZ is True:
-                self.logger.debug('Trying to decompress gz file...')
-                retval = self._decompress_gz(compressedFilename, targetFilename)
-                self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
             else:
                 # should never reach
                 pass
@@ -246,13 +253,11 @@ class UpdateFileDownload(object):
         return 0
 
     def _decompress_gz(self, sourcefile, destfile):
-        blocksize = 8192
         # pylint: disable=broad-except
-
         try:
-            with open(destfile, 'wb') as dstfile, gzip.open(sourcefile) as srcfile:
-                for data in iter(lambda: srcfile.read(blocksize), b''):
-                    dstfile.write(data)
+            with closing(gzip.open(sourcefile, 'rb')) as srcfile, \
+                    closing(open(destfile, 'wb')) as dstfile:
+                shutil.copyfileobj(srcfile, dstfile, COPY_BUFFER_SIZE)
         except Exception as err:
             self.logger.error(
                 'gz decompression of "{}" to "{}" failed: {}', sourcefile, destfile, err)
