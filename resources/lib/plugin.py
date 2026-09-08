@@ -63,17 +63,10 @@ class MediathekViewPlugin(KodiPlugin):
     def show_main_menu(self):
         """ Creates the main menu of the plugin """
         xbmcplugin.setContent(self.addon_handle, '')
-        # quick search
-        self.add_folder_item(
-            30901,
-            {'mode': "search"},
-            icon=os.path.join(self.path, 'resources', 'icons', 'search-m.png'),
-            fanart=os.path.join(self.path, 'resources', 'icons', 'search-f.png')
-        )
-        # search
+        # Search
         self.add_folder_item(
             30902,
-            {'mode': "extendedSearchScreen", 'extendedSearchAction': 'SHOW'},
+            {'mode': "search"},
             icon=os.path.join(self.path, 'resources', 'icons', 'search-m.png'),
             fanart=os.path.join(self.path, 'resources', 'icons', 'search-f.png')
         )
@@ -131,7 +124,10 @@ class MediathekViewPlugin(KodiPlugin):
             self.show_main_menu()
             self.setViewId(self.resolveViewId('MAIN'))
         elif mode == 'search':
-            self.show_searches()
+            self.show_search_menu()
+            self.setViewId(self.resolveViewId('MAIN'))
+        elif mode == 'searchhistory':
+            self.show_search_history()
             self.setViewId(self.resolveViewId('MAIN'))
         elif mode == 'newsearch':
             self.new_search()
@@ -289,18 +285,47 @@ class MediathekViewPlugin(KodiPlugin):
             updinfo
         )
 
-    def show_searches(self):
+    def show_search_menu(self):
         """
-        Fill the search screen with "New Search..." and the
-        list of recent searches
+        The ways to search, one level below the main menu.
+
+        Everything here is a way in, so nothing on this screen is mixed with
+        the searches themselves - those are one level further down.
         """
         xbmcplugin.setContent(self.addon_handle, '')
+        # New search
         self.add_folder_item(
             30931,
             {'mode': "newsearch"},
             icon=os.path.join(self.path, 'resources', 'icons', 'search-m.png'),
             fanart=os.path.join(self.path, 'resources', 'icons', 'search-f.png')
         )
+        # New saved search
+        self.add_folder_item(
+            30911,
+            {'mode': "extendedSearchScreen", 'extendedSearchAction': 'NEW'},
+            icon=os.path.join(self.path, 'resources', 'icons', 'control-m.png'),
+            fanart=os.path.join(self.path, 'resources', 'icons', 'control-f.png')
+        )
+        # Search history
+        self.add_folder_item(
+            30907,
+            {'mode': "searchhistory"},
+            icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
+            fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
+        )
+        # Saved searches
+        self.add_folder_item(
+            30910,
+            {'mode': "extendedSearchScreen", 'extendedSearchAction': 'SHOW'},
+            icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
+            fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
+        )
+        self.end_of_directory()
+
+    def show_search_history(self):
+        """ The terms searched for before, nothing else """
+        xbmcplugin.setContent(self.addon_handle, '')
         RecentSearches(self).load().populate()
         self.end_of_directory()
 

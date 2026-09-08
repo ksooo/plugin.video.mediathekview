@@ -365,7 +365,7 @@ msgstr "Enter a name for the query"
 
 msgctxt "#30901"
 msgid "Quick Search"
-msgstr "Quick Search"
+msgstr "Enter a search term"
 
 msgctxt "#30902"
 msgid "Search"
@@ -386,6 +386,18 @@ msgstr "Browse Shows"
 msgctxt "#30906"
 msgid "All Channels"
 msgstr "All Channels"
+
+msgctxt "#30907"
+msgid "Search history"
+msgstr "Search history"
+
+msgctxt "#30910"
+msgid "Saved searches"
+msgstr "Saved searches"
+
+msgctxt "#30911"
+msgid "New saved search"
+msgstr "New saved search"
 
 msgctxt "#30908"
 msgid "Database Information"

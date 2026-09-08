@@ -198,13 +198,8 @@ class ExtendedSearch(object):
         self.logger.debug('showList')
         start = time.time()
         #
-        self.plugin.add_folder_item(
-            30931,
-            {'mode': "extendedSearchScreen", 'extendedSearchAction': 'NEW'},
-            icon=os.path.join(self.plugin.path, 'resources', 'icons', 'search-m.png'),
-            fanart=os.path.join(self.plugin.path, 'resources', 'icons', 'search-f.png')
-        )
-        #
+        # Only the saved searches themselves. Creating one has its own entry
+        # in the search menu, so nothing here sits between the real ones.
         for entry in self.recents:
             self.plugin.add_folder_item(
                 entry['name'],

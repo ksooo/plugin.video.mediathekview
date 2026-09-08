@@ -365,11 +365,11 @@ msgstr "Bitte Namen für die Suche eingeben"
 
 msgctxt "#30901"
 msgid "Quick Search"
-msgstr "Schnellsuche"
+msgstr "Bitte Suchbegriff eingeben"
 
 msgctxt "#30902"
 msgid "Search"
-msgstr "Erweiterte Suche"
+msgstr "Suche"
 
 msgctxt "#30903"
 msgid "Livestreams"
@@ -386,6 +386,18 @@ msgstr "Sendungen"
 msgctxt "#30906"
 msgid "All Channels"
 msgstr "Alle Sender"
+
+msgctxt "#30907"
+msgid "Search history"
+msgstr "Suchverlauf"
+
+msgctxt "#30910"
+msgid "Saved searches"
+msgstr "Gespeicherte Suchen"
+
+msgctxt "#30911"
+msgid "New saved search"
+msgstr "Neue gespeicherte Suche"
 
 msgctxt "#30908"
 msgid "Database Information"
