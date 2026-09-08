@@ -60,8 +60,8 @@ class Downloader(object):
         #
         film = self.database.retrieve_film_info(filmid)
         if film is None:
-            self.logger.error("no film for download " + self.plugin.language(30991))
-            self.notifier.show_error(30990, self.plugin.language(30991))
+            self.logger.error('No film with id {} in the database', filmid)
+            self.notifier.show_error(30988, self.plugin.language(30989))
             return
         ttmname = os.path.join(self.settings.getDatapath(), 'subtitle.ttml')
         srtname = os.path.join(self.settings.getDatapath(), 'subtitle.srt')
