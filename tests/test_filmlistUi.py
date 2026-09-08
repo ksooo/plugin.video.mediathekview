@@ -92,6 +92,21 @@ class GenerateListItemTest(unittest.TestCase):
         self.assertEqual(item.label, 'Tagesschau')
         self.assertEqual(item.info['title'], 'Tagesschau')
 
+    def test_hd_is_a_resolution_rather_than_a_word_in_the_title(self):
+        support.init_app_context(settings=support.Settings(preferHd=True))
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(title='Tagesschau', url_video_hd='https://example.org/hd.mp4'))
+        self.assertEqual(item.label, 'Sendung: Tagesschau')
+        self.assertEqual(item.info['title'], 'Tagesschau')
+        self.assertIn(('video', {'width': 1280, 'height': 720}), item.streams)
+
+    def test_nothing_is_claimed_about_a_stream_that_is_not_hd(self):
+        # The film list says nothing about the other streams either, and a
+        # made-up size would be a claim.
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(url_video_sd='https://example.org/sd.mp4'))
+        self.assertEqual([kind for (kind, _) in item.streams], [])
+
     def test_the_channel_is_the_studio(self):
         # It reached the screen only as an icon, which is no help to anyone
         # whose skin does not show one, and nothing to search or sort by.

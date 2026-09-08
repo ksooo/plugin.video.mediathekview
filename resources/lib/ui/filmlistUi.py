@@ -18,6 +18,9 @@ from resources.lib.model.film import Film
 # The film list carries subtitles for German public service broadcasters, and
 # says nothing about their language.
 SUBTITLE_LANGUAGE = 'de'
+# What Kodi is told about a stream the film list calls HD. It gives no
+# resolution of its own, so this says no more than "high definition".
+HD_STREAM = {'width': 1280, 'height': 720}
 
 
 class FilmlistUi(object):
@@ -98,10 +101,10 @@ class FilmlistUi(object):
 
     def _generateListItem(self, pFilm):
         #
-        videohds = ""
+        isHd = False
         if (pFilm.url_video_hd != "" and self.settings.getPreferHd()):
             videourl = pFilm.url_video_hd
-            videohds = " (HD)"
+            isHd = True
         elif (pFilm.url_video_sd != ""):
             videourl = pFilm.url_video_sd
         else:
@@ -115,9 +118,9 @@ class FilmlistUi(object):
         videourl = videourl + self.settings.getUserAgentString()
 
         if self.useLongTitle:
-            resultingtitle = pFilm.show + ': ' + pFilm.title + videohds
+            resultingtitle = pFilm.show + ': ' + pFilm.title
         else:
-            resultingtitle = pFilm.title + videohds
+            resultingtitle = pFilm.title
 
         # The label is what the list shows; the title is what everything else
         # reads, the player included. Putting the composed line in both left
@@ -170,6 +173,13 @@ class FilmlistUi(object):
         # of the few things the film list tells us for certain.
         if pFilm.url_sub:
             listitem.addStreamInfo('subtitle', {'language': SUBTITLE_LANGUAGE})
+        if isHd:
+            # " (HD)" used to be appended to the title. The film list does not
+            # say what the HD stream actually measures, so this is the
+            # smallest size that still counts as high definition rather than
+            # a claim about this particular film - enough for Kodi to derive
+            # a resolution from, and nothing is claimed for the other streams.
+            listitem.addStreamInfo('video', dict(HD_STREAM))
         listitem.setArt({
             'thumb': icon,
             'icon': icon,
