@@ -20,6 +20,7 @@ class ExtendedSearchModel(object):
         self.name = pName
         self.channel = []
         self.title = []
+        self.mixedSearch = []
         self.setShow(pName)
         self.showId = []
         self.showStartLetter = []
@@ -66,6 +67,7 @@ class ExtendedSearchModel(object):
         self.name = ''
         self.channel = []
         self.title = []
+        self.mixedSearch = []
         self.show = []
         self.showId = []
         self.showStartLetter = []
@@ -101,6 +103,9 @@ class ExtendedSearchModel(object):
 
     def getTitle(self):
         return self.title
+
+    def getMixedSearch(self):
+        return self.mixedSearch
 
     def getDescription(self):
         return self.description
@@ -144,6 +149,9 @@ class ExtendedSearchModel(object):
 
     def getShowStartLetterAsString(self):
         return '|'.join(self.showStartLetter)
+
+    def getMixedSearchAsString(self):
+        return "|".join(self.mixedSearch)
 
     def getTitleAsString(self):
         return '|'.join(self.title)
@@ -205,6 +213,13 @@ class ExtendedSearchModel(object):
         else:
             pValue = pValue.split('|')
         self.showStartLetter = pValue
+
+    def setMixedSearch(self, pValue):
+        if pValue is None or pValue == "":
+            pValue = []
+        else:
+            pValue = pValue.split('|')
+        self.mixedSearch = pValue
 
     def setTitle(self, pValue):
         if pValue is None or pValue == "":
@@ -350,46 +365,55 @@ class ExtendedSearchModel(object):
         return (sql, params)
 
     #
-    def generateShowTitleDescription(self):
+    def _generateLike(self, values, columns):
+        """
+        Builds `( col like ? or col like ? ... )` over the given values.
+
+        Everything inside one condition is joined by `or`: several values in
+        one field, and several columns for one value, both widen the search.
+        Narrowing is the job of the caller, which joins the conditions of the
+        separate fields with `and`.
+        """
         sql = ""
         params = []
-        if (len(self.getShow()) > 0 and not(self.isExactMatchForShow())) or len(self.getTitle()) > 0 or len(self.getDescription()) > 0:
+        if len(values) > 0:
             sql += ' ('
-            if (len(self.getShow()) > 0 and not(self.isExactMatchForShow())):
-                for conditionString in self.getShow():
-                    exp = '%' + conditionString + '%'
-                    params.append(exp)
-                    sql += ' showname like ? or'
-            #
-            if (len(self.getTitle()) > 0):
-                for conditionString in self.getTitle():
-                    exp = '%' + conditionString + '%'
-                    params.append(exp)
-                    sql += ' title like ? or'
-            #
-            if (len(self.getDescription()) > 0):
-                for conditionString in self.getDescription():
-                    exp = '%' + conditionString + '%'
-                    params.append(exp)
-                    sql += ' description like ? or'
-            #
+            for conditionString in values:
+                for column in columns:
+                    params.append('%' + conditionString + '%')
+                    sql += ' {} like ? or'.format(column)
             if sql[-2:] == 'or':
                 sql = sql[0:(len(sql) - 2)]
             sql += ')'
         return (sql, params)
 
     #
+    def generateMixedSearch(self):
+        """ One term looked for in either the show name or the title """
+        return self._generateLike(self.getMixedSearch(), ('showname', 'title'))
+
+    #
     def generateShow(self):
-        sql = ""
-        params = []
-        if (len(self.getShow()) > 0 and self.isExactMatchForShow()):
-            sql += '( showname in ('
-            for conditionString in self.getShow():
-                sql += '?,'
-                params.append(conditionString)
-            sql = sql[0:-1]
-            sql += '))'
-        return (sql, params)
+        if self.isExactMatchForShow():
+            sql = ""
+            params = []
+            if len(self.getShow()) > 0:
+                sql += '( showname in ('
+                for conditionString in self.getShow():
+                    sql += '?,'
+                    params.append(conditionString)
+                sql = sql[0:-1]
+                sql += '))'
+            return (sql, params)
+        return self._generateLike(self.getShow(), ('showname',))
+
+    #
+    def generateTitle(self):
+        return self._generateLike(self.getTitle(), ('title',))
+
+    #
+    def generateDescription(self):
+        return self._generateLike(self.getDescription(), ('description',))
 
     #
     def generateShowId(self):
@@ -424,6 +448,7 @@ class ExtendedSearchModel(object):
     #
     def getCacheKey(self):
         return 'C' + self.getChannelAsString() + \
+            'Q' + self.getMixedSearchAsString() + \
             'S' + self.getShowAsString() + \
             'SID' + self.getShowIdAsString() + \
             'L' + self.getShowStartLetterAsString() + \

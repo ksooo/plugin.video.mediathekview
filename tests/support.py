@@ -97,6 +97,7 @@ class Settings(object):
         'groupShow': True,
         'caching': True,
         'userAgentString': '',
+        'blacklist': '',
         'lastUpdate': 0,
         'lastFullUpdate': 0,
         'databaseStatus': 'IDLE',
@@ -149,6 +150,9 @@ class Settings(object):
 
     def getUserAgentString(self):
         return self._values['userAgentString']
+
+    def getBlacklist(self):
+        return self._values['blacklist']
 
     def getLastUpdate(self):
         return self._values['lastUpdate']

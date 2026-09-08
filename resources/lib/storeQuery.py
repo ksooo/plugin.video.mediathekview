@@ -122,10 +122,22 @@ class StoreQuery(object):
         sql = self.sql_query_films
         sql += ' WHERE (1=1)'
         #
-        (mixedSearchCondition, mixedSearchParams) = esModel.generateShowTitleDescription()
+        # Every condition below narrows the result. Widening happens only
+        # inside a single condition, over the values of one field.
+        (mixedSearchCondition, mixedSearchParams) = esModel.generateMixedSearch()
         if (mixedSearchCondition != ''):
             sql += ' AND ' + mixedSearchCondition
             params.extend(mixedSearchParams)
+        #
+        (titleCondition, titleParams) = esModel.generateTitle()
+        if (titleCondition != ''):
+            sql += ' AND ' + titleCondition
+            params.extend(titleParams)
+        #
+        (descriptionCondition, descriptionParams) = esModel.generateDescription()
+        if (descriptionCondition != ''):
+            sql += ' AND ' + descriptionCondition
+            params.extend(descriptionParams)
         #
         (excludeCondition, excludeParams) = esModel.generateExclude()
         if (excludeCondition != ''):
@@ -202,8 +214,7 @@ class StoreQuery(object):
         self.logger.debug('getQuickSearch')
         #
         esModel = ExtendedSearchModel.ExtendedSearchModel('')
-        esModel.setShow(searchTerm)
-        esModel.setTitle(searchTerm)
+        esModel.setMixedSearch(searchTerm)
         #cacheKey = searchTerm + esModel.generateMinLength() + esModel.generateIgnoreTrailer() + esModel.generateMaxRows()
         cacheKey = esModel.getCacheKey()
         cached_data = self._cache.load_cache('quickSearch', cacheKey)
