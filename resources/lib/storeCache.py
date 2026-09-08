@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-The local SQlite database module
+The query result cache
 
 Copyright 2017-2019, Leo Moll
 SPDX-License-Identifier: MIT
@@ -11,28 +11,39 @@ SPDX-License-Identifier: MIT
 import os
 import json
 import time
-
-import resources.lib.appContext as appContext
+import hashlib
 
 from contextlib import closing
 from codecs import open
 
 import resources.lib.mvutils as mvutils
-
 import resources.lib.appContext as appContext
 
 
 class StoreCache(object):
     """
-    The local SQlite database class
+    Caches query results as JSON files, one per request type and condition.
 
+    Everything cached here is void as soon as the film database is updated, so
+    the whole directory is dropped by purge() when that happens.
     """
+
+    CACHE_DIRECTORY = 'cache'
 
     def __init__(self):
         self.logger = appContext.MVLOGGER.get_new_logger('StoreCache')
         self.notifier = appContext.MVNOTIFIER
         self.settings = appContext.MVSETTINGS
-        # internals
+
+    def _cacheDirectory(self):
+        return os.path.join(self.settings.getDatapath(), self.CACHE_DIRECTORY)
+
+    def _filename(self, reqtype, condition):
+        # The condition holds whole SQL statements, so it is hashed rather
+        # than used as a name. The file records it as well, and load_cache
+        # compares it, so a collision cannot serve the wrong result.
+        digest = hashlib.md5(condition.encode('utf-8')).hexdigest()[:16]
+        return os.path.join(self._cacheDirectory(), '{}-{}.cache'.format(reqtype, digest))
 
     def load_cache(self, reqtype, condition):
         start = time.time()
@@ -40,7 +51,7 @@ class StoreCache(object):
             self.logger.debug('loading cache is disabled')
             return None
         #
-        filename = os.path.join(self.settings.getDatapath() , reqtype + '.cache')
+        filename = self._filename(reqtype, condition)
         if not mvutils.file_exists(filename):
             self.logger.debug('no cache file request "{}" and condition "{}"', reqtype, condition)
             return None
@@ -85,7 +96,7 @@ class StoreCache(object):
             self.logger.debug('not a proper instance for caching')
             return None
         start = time.time()
-        filename = os.path.join(self.settings.getDatapath() , reqtype + '.cache')
+        filename = self._filename(reqtype, condition)
         dbLastUpdate = self.settings.getLastUpdate()
         cache = {
             "type": reqtype,
@@ -94,9 +105,36 @@ class StoreCache(object):
             "data": data
         }
         try:
+            directory = self._cacheDirectory()
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             with closing(open(filename, 'w', encoding='utf-8')) as json_file:
                 json.dump(cache, json_file)
+        # pylint: disable=broad-except
         except Exception as err:
             self.logger.error('Failed to write cache file {}: {}', filename, err)
             raise
         self.logger.debug('cache saved after {} sec for request "{}" and condition "{}"', (time.time() - start), reqtype, condition)
+
+    def purge(self):
+        """ Drops every cached result. To be called when the database changed """
+        start = time.time()
+        removed = 0
+        directory = self._cacheDirectory()
+        # pylint: disable=broad-except
+        try:
+            names = os.listdir(directory) if os.path.isdir(directory) else []
+            for name in names:
+                if name.endswith('.cache'):
+                    mvutils.file_remove(os.path.join(directory, name))
+                    removed += 1
+            # Before the cache moved into its own directory it wrote one file
+            # per request type next to the database.
+            for name in os.listdir(self.settings.getDatapath()):
+                if name.endswith('.cache'):
+                    mvutils.file_remove(os.path.join(self.settings.getDatapath(), name))
+                    removed += 1
+        except Exception as err:
+            self.logger.error('Failed to purge the cache: {}', err)
+            return
+        self.logger.debug('purged {} cache files in {} sec', removed, time.time() - start)

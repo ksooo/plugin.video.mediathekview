@@ -508,6 +508,10 @@ class StoreQuery(object):
             self.settings.setLastFullUpdate(pLastFullUpdate)
         if pVersion is not None:
             self.settings.setDatabaseVersion(pVersion)
+        # A new update timestamp means every cached result describes the
+        # previous contents of the database
+        if pLastupdate is not None:
+            self._cache.purge()
         # DB status table
         try:
             sqlStmt = 'UPDATE status SET status = COALESCE(?,status), lastupdate = COALESCE(?,lastupdate), lastFullUpdate = COALESCE(?,lastFullUpdate), filmupdate = COALESCE(?,filmupdate), version = COALESCE(?,version)'
