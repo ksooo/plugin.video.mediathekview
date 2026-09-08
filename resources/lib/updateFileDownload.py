@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
 # -- Imports ------------------------------------------------
 import os
+import shutil
 import time
 import subprocess
 import resources.lib.appContext as appContext
@@ -29,8 +30,15 @@ import resources.lib.mvutils as mvutils
 from resources.lib.exceptions import ExitRequested
 
 # -- Unpacker support ---------------------------------------
+UPD_CAN_XZ = False
 UPD_CAN_BZ2 = False
 UPD_CAN_GZ = False
+
+try:
+    import lzma
+    UPD_CAN_XZ = True
+except ImportError:
+    pass
 
 try:
     import bz2
@@ -54,6 +62,10 @@ DATABASE_URL = 'https://liste.mediathekview.de/'
 # DATABASE_URL = 'http://192.168.137.100/content/'
 # DATABASE_URL = 'http://192.168.137.100/content/test/'
 DATABASE_DBF = 'filmliste-v3.db'
+# Read this much at a time while unpacking. The archive runs to hundreds of
+# megabytes, and every chunk boundary is a trip back into Python, which holds
+# up the plugin the user is looking at.
+COPY_BUFFER_SIZE = 1024 * 1024
 # DATABASE_AKT = 'filmliste-v2.db.update'
 
 # -- Classes ------------------------------------------------
@@ -129,7 +141,7 @@ class UpdateFileDownload(object):
 
     def _getExtension(self):
         ext = ""
-        if self.use_xz is True:
+        if self.use_xz is True or UPD_CAN_XZ is True:
             ext = '.xz'
         elif UPD_CAN_BZ2 is True:
             ext = '.bz2'
@@ -185,6 +197,10 @@ class UpdateFileDownload(object):
                 self.logger.debug('Trying to decompress xz file...')
                 retval = subprocess.call([mvutils.find_xz(), '-d', compressedFilename])
                 self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
+            elif UPD_CAN_XZ is True:
+                self.logger.debug('Trying to decompress xz file...')
+                retval = self._decompress_xz(compressedFilename, targetFilename)
+                self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
             elif UPD_CAN_BZ2 is True:
                 self.logger.debug('Trying to decompress bz2 file...')
                 retval = self._decompress_bz2(compressedFilename, targetFilename)
@@ -204,6 +220,17 @@ class UpdateFileDownload(object):
 
         self.notifier.close_download_progress()
         return retval == 0 and mvutils.file_exists(targetFilename)
+
+    def _decompress_xz(self, sourcefile, destfile):
+        # pylint: disable=broad-except
+        try:
+            with closing(lzma.open(sourcefile, 'rb')) as srcfile, \
+                    closing(open(destfile, 'wb')) as dstfile:
+                shutil.copyfileobj(srcfile, dstfile, COPY_BUFFER_SIZE)
+        except Exception as err:
+            self.logger.error('xz decompression failed: {}', err)
+            raise
+        return 0
 
     def _decompress_bz2(self, sourcefile, destfile):
         blocksize = 8192

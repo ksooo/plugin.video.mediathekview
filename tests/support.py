@@ -388,7 +388,20 @@ def install_mysql_stub(connect):
     return connector
 
 
-def init_app_context(settings=None, notifier=None):
+class Monitor(object):
+    """Stands in for Kodi's monitor; never asks for an abort."""
+
+    def __init__(self, abort=False):
+        self.abort = abort
+
+    def abort_requested(self):
+        return self.abort
+
+    def wait_for_abort(self, seconds):
+        return self.abort
+
+
+def init_app_context(settings=None, notifier=None, monitor=None):
     """Fills the global application context the addon modules read from."""
     install_kodi_stubs()
     import resources.lib.appContext as app_context
@@ -396,4 +409,5 @@ def init_app_context(settings=None, notifier=None):
     app_context.initLogger(Logger())
     app_context.initSettings(settings if settings is not None else Settings())
     app_context.initNotifier(notifier if notifier is not None else Notifier())
+    app_context.initMonitor(monitor if monitor is not None else Monitor())
     return app_context
