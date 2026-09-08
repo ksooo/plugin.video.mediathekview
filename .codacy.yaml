@@ -1,7 +1,0 @@
----
-engines:
-  duplication:
-    enabled: true
-    exclude_paths:
-      - resources/lib/storemysql.py
-      - resources/lib/storesqlite.py
