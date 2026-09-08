@@ -381,7 +381,7 @@ msgstr "Zuletzt hinzugefügt"
 
 msgctxt "#30905"
 msgid "Browse Shows"
-msgstr "Sendungen durchsuchen"
+msgstr "Sendungen"
 
 msgctxt "#30906"
 msgid "All Channels"
