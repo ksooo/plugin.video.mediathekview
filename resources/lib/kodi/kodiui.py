@@ -215,6 +215,7 @@ class KodiProgressDialog(object):
     def __init__(self):
         self.language = appContext.ADDONCLASS.getLocalizedString
         self.pgdialog = None
+        self.shownPercent = -1
 
     def __del__(self):
         self.close()
@@ -234,6 +235,7 @@ class KodiProgressDialog(object):
             heading, int) else heading
         message = self.language(message) if isinstance(
             message, int) else message
+        self.shownPercent = -1
         if self.pgdialog is None:
             self.pgdialog = xbmcgui.DialogProgressBG()
             self.pgdialog.create(heading, message)
@@ -271,14 +273,22 @@ class KodiProgressDialog(object):
 
             totalsize(int): Total size of the file
         """
-        downloaded = blockcount * blocksize
-        if totalsize > 0:
-            percent = int((downloaded * 100) / totalsize)
-            if self.pgdialog is not None:
-                self.pgdialog.update(percent)
+        if totalsize <= 0:
+            return
+        percent = int((blockcount * blocksize * 100) / totalsize)
+        # Called once per chunk, which is thousands of times for a download of
+        # a few hundred megabytes, and almost every one of those would repaint
+        # the same number. Each call crosses into the GUI thread from the
+        # service, so only a changed percentage is worth one.
+        if percent == self.shownPercent:
+            return
+        self.shownPercent = percent
+        if self.pgdialog is not None:
+            self.pgdialog.update(percent)
 
     def close(self):
         """ Closes a progress dialog """
+        self.shownPercent = -1
         if self.pgdialog is not None:
             self.pgdialog.close()
             del self.pgdialog
