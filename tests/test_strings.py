@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 import os
 import re
 import unittest
+from xml.etree import ElementTree
 
 from tests import support
 
@@ -64,7 +65,39 @@ def _referenced_ids():
     return found
 
 
+def _xml_ids():
+    """String ids the XML files point at: labels, helps and control headings."""
+    found = {}
+    for name in ('addon.xml', os.path.join('resources', 'settings.xml')):
+        path = os.path.join(support.ADDON_PATH, name)
+        tree = ElementTree.parse(path)
+        for element in tree.getroot().iter():
+            values = [element.get('label'), element.get('help')]
+            if element.tag in ('label', 'heading'):
+                values.append((element.text or '').strip())
+            for value in values:
+                if value and value.isdigit():
+                    string_id = int(value)
+                    if _FIRST_ID <= string_id <= _LAST_ID:
+                        found.setdefault(string_id, []).append(name)
+    return found
+
+
 class StringsTest(unittest.TestCase):
+
+    def test_every_id_used_in_the_xml_files_exists_in_every_language(self):
+        # The EPG context menu takes its label from addon.xml, and every
+        # setting takes its label and help from settings.xml. Kodi shows a
+        # blank entry for an id no language file defines.
+        referenced = _xml_ids()
+        self.assertTrue(referenced, 'no string ids found in the xml files')
+        for (language, path) in _language_files():
+            missing = sorted(set(referenced) - _defined_ids(path))
+            self.assertEqual(
+                missing, [],
+                '%s lacks %s, used in %s' % (
+                    language, missing,
+                    '; '.join(place for i in missing for place in referenced[i])))
 
     def test_every_referenced_id_exists_in_every_language(self):
         # play_movie_with_subs used to ask for 30991, which exists in no

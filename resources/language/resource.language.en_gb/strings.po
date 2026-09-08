@@ -33,8 +33,8 @@ msgid "Advanced Settings"
 msgstr "Advanced Settings"
 
 msgctxt "#30005"
-msgid "Jump to Mediathekview"
-msgstr "Jump to Mediathekview"
+msgid "Search in MediathekView (ksooo)"
+msgstr "Search in MediathekView (ksooo)"
 
 # Settings Page 1
 msgctxt "#30110"
