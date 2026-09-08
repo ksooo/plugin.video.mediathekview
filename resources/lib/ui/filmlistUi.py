@@ -126,6 +126,9 @@ class FilmlistUi(object):
             'title': pFilm.title,
             'sorttitle': resultingtitle,
             'tvshowtitle': pFilm.show,
+            # The channel is the broadcaster, and until now it reached the
+            # screen only as an icon.
+            'studio': pFilm.channel,
             'plot': pFilm.description
         }
 

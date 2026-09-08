@@ -92,6 +92,12 @@ class GenerateListItemTest(unittest.TestCase):
         self.assertEqual(item.label, 'Tagesschau')
         self.assertEqual(item.info['title'], 'Tagesschau')
 
+    def test_the_channel_is_the_studio(self):
+        # It reached the screen only as an icon, which is no help to anyone
+        # whose skin does not show one, and nothing to search or sort by.
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(_film(channel='ZDF'))
+        self.assertEqual(item.info['studio'], 'ZDF')
+
     def test_a_subtitle_is_announced_as_a_stream(self):
         # Whether a film has subtitles was only findable by opening the
         # context menu.
