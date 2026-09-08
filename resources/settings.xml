@@ -331,11 +331,6 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="staticViewIds" type="boolean" label="30343">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
             </group>
             <!-- Internal state, written by the addon and never shown.
                  Level 4 is SettingLevel::Internal, which is what lets these

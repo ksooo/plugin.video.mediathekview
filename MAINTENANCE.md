@@ -122,11 +122,12 @@ raised.
 
 ## Kodi's side
 
-`resources/lib/kodi/kodiaddon.py` maps view names onto **numeric view ids** per
-skin: Estuary 55 and 500, Estouchy 500 and 550, Confluence 51, 504 and 500.
-These are skin internals, not API. A skin reworking its views leaves the addon
-selecting an unrelated one. The `staticViewIds` setting exists to switch the
-whole mechanism off, which is the answer when it misbehaves.
+The addon does not choose the view any more. It used to force one after every
+listing, by numeric view id per skin - Estuary 55 and 500, Estouchy 500 and
+550, Confluence 51, 504 and 500 - which are skin internals rather than API,
+covered three skins out of all of them, and overruled the view Kodi remembers
+for each path, so a view the user picked never survived going back. Kodi
+keeps that memory itself; leave it alone.
 
 `settingsKodi.py` and `kodiaddon.py` both branch on the Kodi major version to
 choose between `xbmc.translatePath` and `xbmcvfs.translatePath`. The first was

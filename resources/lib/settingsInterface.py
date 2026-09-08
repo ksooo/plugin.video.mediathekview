@@ -55,8 +55,6 @@ class SettingsInterface(object):
     def getBlacklist(self):
         return ''
 
-    def getUseStaticViewId(self):
-        return True
 
     # Database
 

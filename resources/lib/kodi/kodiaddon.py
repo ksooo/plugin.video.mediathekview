@@ -103,54 +103,6 @@ class KodiAddon(object):
     def getCaption(self, msgid):
         return self.language(msgid);
 
-    def getSkinName(self):
-        return xbmc.getSkinDir();
-
-    def getCurrentViewId(self):
-        window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-        return window.getFocusId()
-
-    def setViewId(self, viewId):
-        if viewId > -1:
-            # xbmc.sleep(1000)
-            self.run_builtin('Container.SetViewMode({})'.format(viewId))
-            self.run_builtin('Container.SetViewMode({})'.format(viewId))
-
-    def resolveViewId(self, pViewname):
-        skinName = self.getSkinName()
-        viewId = -1
-        # Kill switch
-        self.logger.debug('static View Id {}', self.addon.getSetting('staticViewIds'))
-        if self.addon.getSetting('staticViewIds') == False or self.addon.getSetting('staticViewIds') == 'false':
-            return viewId
-
-        if skinName == 'skin.estuary' and pViewname == 'MAIN':
-            viewId = 55
-        elif skinName == 'skin.estuary' and pViewname == 'SHOWS':
-            viewId = 55
-        elif skinName == 'skin.estuary' and pViewname == 'LIST':
-            viewId = 55
-        elif skinName == 'skin.estuary' and pViewname == 'THUMBNAIL':
-            viewId = 500
-        elif skinName == 'skin.estouchy' and pViewname == 'MAIN':
-            viewId = 500
-        elif skinName == 'skin.estouchy' and pViewname == 'SHOWS':
-            viewId = 500
-        elif skinName == 'skin.estouchy' and pViewname == 'LIST':
-            viewId = 550
-        elif skinName == 'skin.estouchy' and pViewname == 'THUMBNAIL':
-            viewId = 55
-        elif skinName == 'skin.confluence' and pViewname == 'MAIN':
-            viewId = 51
-        elif skinName == 'skin.confluence' and pViewname == 'SHOWS':
-            viewId = 51
-        elif skinName == 'skin.confluence' and pViewname == 'LIST':
-            viewId = 504
-        elif skinName == 'skin.confluence' and pViewname == 'THUMBNAIL':
-            viewId = 500
-        self.logger.debug('proposed view id {} for {} in mode {}', viewId, skinName, pViewname)
-        return viewId;
-
 
 class KodiService(KodiAddon):
     """ The Kodi service addon class """

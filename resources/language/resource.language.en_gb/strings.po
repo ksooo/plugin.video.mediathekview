@@ -247,9 +247,6 @@ msgctxt "#30342"
 msgid "Enriched NFO File"
 msgstr "Enriched NFO File"
 
-msgctxt "#30343"
-msgid "staticViewId"
-msgstr "Use predefined views"
 
 msgctxt "#30344"
 msgid "DownloadActionOnExists"

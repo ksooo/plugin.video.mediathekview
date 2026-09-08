@@ -115,19 +115,14 @@ class MediathekViewPlugin(KodiPlugin):
         self.settings.user_activity()
         # process operation
         self.logger.info("Plugin invoked with parameters {}", self.args)
-        self.logger.debug("start View id {}", self.getCurrentViewId())
-        self.logger.debug("start Skin {}", self.getSkinName())
         #
         mode = self.get_arg('mode', None)
         if mode is None:
             self.show_main_menu()
-            self.setViewId(self.resolveViewId('MAIN'))
         elif mode == 'search':
             self.show_search_menu()
-            self.setViewId(self.resolveViewId('MAIN'))
         elif mode == 'searchhistory':
             self.show_search_history()
-            self.setViewId(self.resolveViewId('MAIN'))
         elif mode == 'newsearch':
             self.new_search()
         elif mode == 'research':
@@ -141,7 +136,6 @@ class MediathekViewPlugin(KodiPlugin):
             search = self.get_arg('search', '')
             RecentSearches(self).load().delete(search).save().populate()
             self.run_builtin('Container.Refresh')
-            self.setViewId(self.resolveViewId('MAIN'))
             #
         elif mode == 'livestreams':
             ui = LivestreamUi.LivestreamUi(self)
@@ -245,8 +239,6 @@ class MediathekViewPlugin(KodiPlugin):
         #
         self.logger.info('request processed: {} sec', time.time() - start)
         #
-        self.logger.debug(" View id {}", self.getCurrentViewId())
-        self.logger.debug(" Skin {}", self.getSkinName())
 
     def exit(self):
         """ Shutdown of the application """

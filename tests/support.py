@@ -273,7 +273,6 @@ class Plugin(object):
         self.path = ADDON_PATH
         self.strings = strings if strings is not None else {}
         self.database = database
-        self.view_ids = []
 
     def language(self, string_id):
         return self.strings.get(string_id, '')
@@ -285,11 +284,6 @@ class Plugin(object):
     def get_kodi_version(self):
         return 21
 
-    def resolveViewId(self, name):
-        return -1
-
-    def setViewId(self, view_id):
-        self.view_ids.append(view_id)
 
 
 class ListItem(object):
