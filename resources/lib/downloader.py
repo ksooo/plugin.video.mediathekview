@@ -232,8 +232,8 @@ class Downloader(object):
                 if match and match.groups():
                     if sequence <= int(match.group(1)):
                         sequence = int(match.group(1)) + 1
-        else:
-            xbmcvfs.mkdir(pathname)
+        elif not self._ensure_directory(pathname):
+            return
 
         filename = showname + ' - ' + fninfo + \
             namestem + (u' - (%04d)' % sequence)
@@ -245,8 +245,8 @@ class Downloader(object):
     def _download_files(self, film, filmurl, pathname, filename, extension):
         self.logger.debug('_download_files url {} to ' , filmurl)
         # make sure the destination directory exists
-        if not xbmcvfs.exists(pathname):
-            xbmcvfs.mkdir(pathname)
+        if not self._ensure_directory(pathname):
+            return False
         # prepare resulting filenames
         movname = pathname + filename + extension
         srtname = pathname + filename + u'.srt'
@@ -275,6 +275,23 @@ class Downloader(object):
             self.download_subtitle(film, ttmname, srtname, filename)
 
         return True
+
+    def _ensure_directory(self, pathname):
+        """
+        Makes sure the directory exists, creating it if necessary.
+
+        Args:
+            pathname(str): the directory to create
+
+        Returns `False` and tells the user if it could not be created.
+        """
+        if xbmcvfs.exists(pathname):
+            return True
+        if xbmcvfs.mkdir(pathname):
+            return True
+        self.logger.error('Failed to create download directory {}', pathname)
+        self.notifier.show_error(30952, self.plugin.language(30959).format(pathname))
+        return False
 
     def _test_download_path(self, downloadpath):
         if not downloadpath:

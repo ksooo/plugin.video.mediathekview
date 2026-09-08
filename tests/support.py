@@ -219,10 +219,11 @@ class Connection(object):
 class Plugin(object):
     """Stands in for MediathekViewPlugin where a UI class needs one."""
 
-    def __init__(self, strings=None):
+    def __init__(self, strings=None, database=None):
         self.addon_handle = 1
         self.path = ADDON_PATH
         self.strings = strings if strings is not None else {}
+        self.database = database
         self.view_ids = []
 
     def language(self, string_id):
@@ -268,6 +269,34 @@ class ListItem(object):
 
     def setSubtitles(self, subtitles):
         self.subtitles = subtitles
+
+
+class _Dialog(object):
+    """The xbmcgui.Dialog stub: records instead of showing."""
+
+    calls = []
+
+    def notification(self, heading, message, icon=None, time=0, sound=True):
+        _Dialog.calls.append(('notification', heading, message))
+
+    def ok(self, heading, message):
+        _Dialog.calls.append(('ok', heading, message))
+
+    def textviewer(self, heading, text):
+        _Dialog.calls.append(('textviewer', heading, text))
+
+
+class _DialogProgressBG(object):
+    """The xbmcgui.DialogProgressBG stub: accepts and forgets."""
+
+    def create(self, heading, message=''):
+        pass
+
+    def update(self, percent=0, heading=None, message=None):
+        pass
+
+    def close(self):
+        pass
 
 
 class _Plugin(object):
@@ -324,6 +353,11 @@ def install_kodi_stubs():
 
     gui = sys.modules.setdefault('xbmcgui', types.ModuleType('xbmcgui'))
     gui.ListItem = ListItem
+    gui.NOTIFICATION_INFO = 'info'
+    gui.NOTIFICATION_WARNING = 'warning'
+    gui.NOTIFICATION_ERROR = 'error'
+    gui.Dialog = _Dialog
+    gui.DialogProgressBG = _DialogProgressBG
 
     sys.modules.setdefault('xbmcaddon', types.ModuleType('xbmcaddon'))
     sys.modules.setdefault('xbmcvfs', types.ModuleType('xbmcvfs'))
