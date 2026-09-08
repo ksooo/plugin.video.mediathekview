@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 import time
 import os
 from datetime import datetime
-from datetime import timedelta
 # pylint: disable=import-error
 import xbmcgui
 import xbmcplugin
@@ -46,8 +45,6 @@ class FilmlistUi(object):
         self.sortmethods = allSortMethods
         #
         self.startTime = 0
-        self.tzDiff = datetime.now() - datetime.utcnow()
-        self.tzBase = datetime.fromtimestamp(0)
 
     def generate(self, databaseRs):
         #
@@ -129,7 +126,7 @@ class FilmlistUi(object):
             info_labels['duration'] = pFilm.seconds
 
         if pFilm.aired is not None and pFilm.aired != 0:
-            ndate = self.tzBase + timedelta(seconds=(pFilm.aired))
+            ndate = datetime.fromtimestamp(pFilm.aired)
             airedstring = ndate.isoformat().replace('T', ' ')
             info_labels['date'] = airedstring[:10]
             info_labels['aired'] = airedstring[:10]
