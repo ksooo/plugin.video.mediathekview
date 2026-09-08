@@ -502,3 +502,7 @@ msgstr "Die Sendung wurde nicht gefunden"
 msgctxt "#30990"
 msgid "Airdate: {0:s}[CR][CR]"
 msgstr "Ausgestrahlt: {0:s}[CR][CR]"
+
+msgctxt "#30991"
+msgid "Unpack Database Update"
+msgstr "Datenbank-Update wird entpackt"

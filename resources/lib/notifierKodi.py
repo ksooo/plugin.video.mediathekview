@@ -68,6 +68,20 @@ class NotifierKodi(NotifierInterface):
         """ Hides the UI for a download in progress """
         self.kodiUi.close_progress_dialog()
 
+    def show_unpack_progress(self, message=None):
+        """
+        Turns the download progress into unpack progress
+
+        The same dialog carries on with a new heading and the bar back at
+        zero. It used to sit at "downloading, 100%" for as long as the
+        unpacking took, which on Android is the longer half of an update.
+        """
+        self.kodiUi.show_progress_dialog(30991, message)
+
+    def update_unpack_progress(self, percent):
+        """ Update UI odometer for an unpack in progress """
+        self.kodiUi.update_progress_dialog(percent)
+
     def show_update_progress(self):
         """ Display UI for a database update in progress """
         self.kodiUi.show_progress_dialog(30956)

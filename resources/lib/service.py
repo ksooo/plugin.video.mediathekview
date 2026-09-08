@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import unicode_literals
 
 from resources.lib.kodi.kodiaddon import KodiService
-from resources.lib.monitorKodi import MonitorKodi
 
 from resources.lib.notifierKodi import NotifierKodi
 from resources.lib.updater import MediathekViewUpdater
@@ -28,8 +27,7 @@ class MediathekViewService(KodiService):
         self.logger = appContext.MVLOGGER.get_new_logger('MediathekViewService')
         self.settings = appContext.MVSETTINGS
         self.notifier = appContext.MVNOTIFIER
-        self.monitor = MonitorKodi()
-        appContext.initMonitor(self.monitor)
+        self.monitor = appContext.MVMONITOR
         self.updater = MediathekViewUpdater()
         self._lastDatabaseType = self.settings.getDatabaseType()
 

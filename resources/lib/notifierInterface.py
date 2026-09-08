@@ -43,6 +43,12 @@ class NotifierInterface(object):
     def close_download_progress(self):
         pass
 
+    def show_unpack_progress(self, message=None):
+        pass
+
+    def update_unpack_progress(self, percent):
+        pass
+
     def show_update_progress(self):
         pass
 

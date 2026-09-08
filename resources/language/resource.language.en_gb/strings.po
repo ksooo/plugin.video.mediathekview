@@ -501,4 +501,8 @@ msgstr "Cannot retrieve Movie Information"
 
 msgctxt "#30990"
 msgid "Airdate: {0:s}[CR][CR]"
-msgstr "Ausgestrahlt: {0:s}[CR][CR]"
+msgstr "Airdate: {0:s}[CR][CR]"
+
+msgctxt "#30991"
+msgid "Unpack Database Update"
+msgstr "Unpack Database Update"

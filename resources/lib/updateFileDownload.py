@@ -26,6 +26,7 @@ from codecs import open
 import resources.lib.mvutils as mvutils
 
 # from resources.lib.utils import *
+from resources.lib.backgroundWork import run_in_background
 from resources.lib.exceptions import ExitRequested
 
 # -- Unpacker support ---------------------------------------
@@ -69,6 +70,7 @@ class UpdateFileDownload(object):
         self.settings = appContext.MVSETTINGS
         self.monitor = appContext.MVMONITOR
         self.database = None
+        self.shownPercent = -1
         self.use_xz = mvutils.find_xz() is not None
 
     def getTargetFilename(self):
@@ -155,12 +157,12 @@ class UpdateFileDownload(object):
             self.logger.debug('Trying to download {} from {}...',
                              os.path.basename(compressedFilename), url)
             self.notifier.update_download_progress(0, url)
-            mvutils.url_retrieve(
+            run_in_background(lambda: mvutils.url_retrieve(
                 url,
                 filename=compressedFilename,
                 reporthook=self.notifier.hook_download_progress,
                 aborthook=self.monitor.abort_requested
-            )
+            ), name='Download')
             self.logger.debug('downloaded {} in {} sec', compressedFilename, (time.time() - start))
         except URLError as err:
             self.logger.error('Failure downloading {} - {}', url, err)
@@ -179,23 +181,10 @@ class UpdateFileDownload(object):
             self.notifier.show_download_error(url, err)
             raise
         # decompress filmliste
-        start = time.time()
         try:
-            if self.use_xz is True:
-                self.logger.debug('Trying to decompress xz file...')
-                retval = subprocess.call([mvutils.find_xz(), '-d', compressedFilename])
-                self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
-            elif UPD_CAN_BZ2 is True:
-                self.logger.debug('Trying to decompress bz2 file...')
-                retval = self._decompress_bz2(compressedFilename, targetFilename)
-                self.logger.debug('decompress bz2 {} in {} sec', retval, (time.time() - start))
-            elif UPD_CAN_GZ is True:
-                self.logger.debug('Trying to decompress gz file...')
-                retval = self._decompress_gz(compressedFilename, targetFilename)
-                self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
-            else:
-                # should never reach
-                pass
+            retval = run_in_background(
+                lambda: self._decompress(compressedFilename, targetFilename, url),
+                name='Unpack')
         except Exception as err:
             self.logger.error('Failure decompress {}', err)
             self.notifier.close_download_progress()
@@ -205,13 +194,57 @@ class UpdateFileDownload(object):
         self.notifier.close_download_progress()
         return retval == 0 and mvutils.file_exists(targetFilename)
 
+    def _decompress(self, compressedFilename, targetFilename, sourceUrl=None):
+        """ Unpacks with the tool that matches what _getExtension() asked for """
+        start = time.time()
+        self.shownPercent = -1
+        # The dialog keeps saying where the update came from; only the heading
+        # and the bar change. The name on disk is the download's own scratch
+        # file and means nothing to anybody.
+        self.notifier.show_unpack_progress(sourceUrl)
+        if self.use_xz is True:
+            self.logger.debug('Trying to decompress xz file...')
+            retval = subprocess.call([mvutils.find_xz(), '-d', compressedFilename])
+            self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
+        elif UPD_CAN_BZ2 is True:
+            self.logger.debug('Trying to decompress bz2 file...')
+            retval = self._decompress_bz2(compressedFilename, targetFilename)
+            self.logger.debug('decompress bz2 {} in {} sec', retval, (time.time() - start))
+        elif UPD_CAN_GZ is True:
+            self.logger.debug('Trying to decompress gz file...')
+            retval = self._decompress_gz(compressedFilename, targetFilename)
+            self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
+        else:
+            # _getExtension() has already reported this and asked for nothing,
+            # so there is nothing to unpack.
+            retval = 1
+        return retval
+
+    def _reportUnpackProgress(self, read, total):
+        """
+        Moves the bar, but only when the number on it changes.
+
+        The unpacking reads in 8 KB blocks, so a hundred megabytes would
+        otherwise ask for twelve thousand repaints.
+        """
+        if total <= 0:
+            return
+        percent = int(read * 100 / total)
+        if percent != self.shownPercent:
+            self.shownPercent = percent
+            self.notifier.update_unpack_progress(percent)
+
     def _decompress_bz2(self, sourcefile, destfile):
         blocksize = 8192
+        total = mvutils.file_size(sourcefile)
+        read = 0
         try:
             with open(destfile, 'wb') as dstfile, open(sourcefile, 'rb') as srcfile:
                 decompressor = bz2.BZ2Decompressor()
                 for data in iter(lambda: srcfile.read(blocksize), b''):
                     dstfile.write(decompressor.decompress(data))
+                    read += len(data)
+                    self._reportUnpackProgress(read, total)
                 # pylint: disable=broad-except
         except Exception as err:
             self.logger.error('bz2 decompression failed: {}'.format(err))
@@ -220,12 +253,17 @@ class UpdateFileDownload(object):
 
     def _decompress_gz(self, sourcefile, destfile):
         blocksize = 8192
+        total = mvutils.file_size(sourcefile)
         # pylint: disable=broad-except
 
         try:
-            with open(destfile, 'wb') as dstfile, gzip.open(sourcefile) as srcfile:
-                for data in iter(lambda: srcfile.read(blocksize), b''):
-                    dstfile.write(data)
+            # Read through a handle of our own: how far the compressed side
+            # has come is what the progress can be measured against.
+            with open(destfile, 'wb') as dstfile, open(sourcefile, 'rb') as rawfile:
+                with gzip.GzipFile(fileobj=rawfile) as srcfile:
+                    for data in iter(lambda: srcfile.read(blocksize), b''):
+                        dstfile.write(data)
+                        self._reportUnpackProgress(rawfile.tell(), total)
         except Exception as err:
             self.logger.error(
                 'gz decompression of "{}" to "{}" failed: {}', sourcefile, destfile, err)

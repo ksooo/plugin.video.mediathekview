@@ -12,6 +12,7 @@ import xbmcaddon
 
 import resources.lib.appContext as appContext
 from resources.lib.loggerKodi import LoggerKodi
+from resources.lib.monitorKodi import MonitorKodi
 from resources.lib.notifierKodi import NotifierKodi
 from resources.lib.settingsKodi import SettingsKodi
 
@@ -26,6 +27,10 @@ def _init_app_context():
         appContext.ADDONCLASS.getAddonInfo('version')))
     appContext.initSettings(SettingsKodi(appContext.ADDONCLASS))
     appContext.initNotifier(NotifierKodi(appContext.ADDONCLASS))
+    # The plugin needs one as much as the service does: a Monitor registers
+    # itself with the script it belongs to, and it is the only way to hear
+    # that Kodi wants that script gone.
+    appContext.initMonitor(MonitorKodi())
 
 
 def run_plugin():
