@@ -71,6 +71,34 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(sorted(ids), sorted(set(ids)))
 
 
+class ChangelogTest(unittest.TestCase):
+    """What Kodi shows as the changelog.
+
+    <news> is what the add-on browser displays. The addon.xml schema allows
+    exactly one of them - a second, language tagged one fails validation with
+    "/extension/news[2]" - so there is one, in English. changelog.txt is what
+    Kodi falls back to when <news> is empty and holds the same text.
+    """
+
+    def _addon(self):
+        return ElementTree.parse(os.path.join(support.ADDON_PATH, 'addon.xml')).getroot()
+
+    def _news(self):
+        entries = list(self._addon().iter('news'))
+        self.assertEqual(len(entries), 1, 'addon.xml allows exactly one <news>')
+        return entries[0].text or ''
+
+    def test_the_news_covers_the_declared_version(self):
+        version = self._addon().get('version')
+        self.assertIn('v' + version, self._news(),
+                      'the news does not mention v%s' % version)
+
+    def test_the_changelog_file_repeats_the_news(self):
+        with open(os.path.join(support.ADDON_PATH, 'changelog.txt'),
+                  encoding='utf-8') as handle:
+            self.assertEqual(handle.read().strip(), self._news().strip())
+
+
 def _source():
     with open(os.path.join(support.ADDON_PATH, 'resources', 'lib',
                            'settingsKodi.py'), encoding='utf-8') as handle:

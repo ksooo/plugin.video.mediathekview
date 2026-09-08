@@ -1,0 +1,6 @@
+v1.0.1
+- Fixed: after a fresh installation the add-on did not start at all. Neither the user interface nor the background update would come up.
+- An unreadable setting no longer stops the add-on. It falls back to the intended default and notes that in the log.
+
+v1.0.0
+- First release of this fork.
