@@ -256,7 +256,12 @@ class MediathekViewPlugin(KodiPlugin):
 
     def show_db_info(self):
         """ Displays current information about the database """
-        info = self.database.get_status()
+        # pylint: disable=broad-except
+        try:
+            info = self.database.get_status()
+        except Exception as err:
+            self.notifier.show_database_error(err)
+            return
         heading = self.language(30908)
         infostr = self.language({
             'NONE': 30941,

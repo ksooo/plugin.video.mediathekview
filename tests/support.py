@@ -162,6 +162,60 @@ class Settings(object):
         return self._values['databaseType']
 
 
+class Cursor(object):
+
+    def __init__(self, connection):
+        self._connection = connection
+        self._rows = []
+        self.rowcount = 0
+
+    def execute(self, statement, params=None):
+        self._connection.executed.append((statement, params))
+        if self._connection.error is not None:
+            raise self._connection.error
+        self._rows = self._connection.next_result()
+        self.rowcount = len(self._rows)
+
+    def executemany(self, statement, params):
+        self._connection.executed.append((statement, params))
+        if self._connection.error is not None:
+            raise self._connection.error
+        self.rowcount = len(list(params))
+
+    def fetchall(self):
+        return self._rows
+
+    def close(self):
+        pass
+
+
+class Connection(object):
+    """A database connection that records statements instead of running them.
+
+    ``results`` is handed out one entry per execute, so a test can line up the
+    answers a method expects. ``error`` makes every execute raise.
+    """
+
+    def __init__(self, results=None, error=None):
+        self.executed = []
+        self.results = list(results) if results else []
+        self.error = error
+        self.commits = 0
+
+    def next_result(self):
+        return self.results.pop(0) if self.results else []
+
+    def cursor(self):
+        return Cursor(self)
+
+    def commit(self):
+        self.commits += 1
+
+    @property
+    def statements(self):
+        return [statement for (statement, _) in self.executed]
+
+
 class Plugin(object):
     """Stands in for MediathekViewPlugin where a UI class needs one."""
 

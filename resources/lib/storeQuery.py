@@ -492,9 +492,11 @@ class StoreQuery(object):
 
             #
         except Exception as err:
-            pass
-            # self.logger.error('getStatus {}', err)
-            # self.settings.setDatabaseStatus('UNINIT')
+            # Never report a failure as an empty database: the caller cannot
+            # tell the two apart, and treating a failure as empty makes the
+            # updater discard a database it just downloaded.
+            self.logger.error('Failed to read the database status: {}', err)
+            raise
         return status
 
     def set_status(self, pStatus=None, pLastupdate=None, pLastFullUpdate=None, pFilmupdate=None, pVersion=None):
