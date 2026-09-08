@@ -291,6 +291,11 @@ class MediathekViewPlugin(KodiPlugin):
 
         Everything here is a way in, so nothing on this screen is mixed with
         the searches themselves - those are one level further down.
+
+        A list that would be empty is not offered at all: opening one leads to
+        a window holding nothing, which cannot be left other than by going
+        back, since Kodi only puts a ".." in front of a list when the user
+        asked for parent folder items.
         """
         xbmcplugin.setContent(self.addon_handle, '')
         # New search
@@ -307,20 +312,22 @@ class MediathekViewPlugin(KodiPlugin):
             icon=os.path.join(self.path, 'resources', 'icons', 'control-m.png'),
             fanart=os.path.join(self.path, 'resources', 'icons', 'control-f.png')
         )
-        # Search history
-        self.add_folder_item(
-            30907,
-            {'mode': "searchhistory"},
-            icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
-            fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
-        )
-        # Saved searches
-        self.add_folder_item(
-            30910,
-            {'mode': "extendedSearchScreen", 'extendedSearchAction': 'SHOW'},
-            icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
-            fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
-        )
+        # Search history, once there is one
+        if len(RecentSearches(self).load().recents) > 0:
+            self.add_folder_item(
+                30907,
+                {'mode': "searchhistory"},
+                icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
+                fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
+            )
+        # Saved searches, once there are any
+        if len(ExtendedSearch(self, self.database, None, None).recents) > 0:
+            self.add_folder_item(
+                30910,
+                {'mode': "extendedSearchScreen", 'extendedSearchAction': 'SHOW'},
+                icon=os.path.join(self.path, 'resources', 'icons', 'results-m.png'),
+                fanart=os.path.join(self.path, 'resources', 'icons', 'results-f.png')
+            )
         self.end_of_directory()
 
     def show_search_history(self):
