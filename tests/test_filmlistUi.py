@@ -69,6 +69,29 @@ class GenerateListItemTest(unittest.TestCase):
         result = FilmlistUi(self.plugin)._generateListItem(_film(url_video=''))
         self.assertEqual(result, (None, None))
 
+    def test_the_show_stays_out_of_the_films_own_title(self):
+        # The label carries "Show: Title" because a flat list has to show
+        # both; the title infolabel is the film's, and the show is where a
+        # show belongs.
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(title='Tagesschau', show='ARD aktuell'))
+        self.assertEqual(item.label, 'ARD aktuell: Tagesschau')
+        self.assertEqual(item.info['title'], 'Tagesschau')
+        self.assertEqual(item.info['tvshowtitle'], 'ARD aktuell')
+
+    def test_the_list_sorts_by_what_it_shows(self):
+        # Sorting used to be told a lowercased copy of the label, which Kodi
+        # compares case-insensitively anyway.
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(title='Tagesschau', show='ARD aktuell'))
+        self.assertEqual(item.info['sorttitle'], 'ARD aktuell: Tagesschau')
+
+    def test_the_short_title_leaves_the_show_out_of_the_label(self):
+        (_, item) = FilmlistUi(self.plugin, pLongTitle=False)._generateListItem(
+            _film(title='Tagesschau', show='ARD aktuell'))
+        self.assertEqual(item.label, 'Tagesschau')
+        self.assertEqual(item.info['title'], 'Tagesschau')
+
     def test_prefers_sd_over_the_plain_url(self):
         (url, _) = FilmlistUi(self.plugin)._generateListItem(
             _film(url_video='https://example.org/a.mp4',

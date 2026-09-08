@@ -115,9 +115,12 @@ class FilmlistUi(object):
         else:
             resultingtitle = pFilm.title + videohds
 
+        # The label is what the list shows; the title is what everything else
+        # reads, the player included. Putting the composed line in both left
+        # the show name inside the film's own title.
         info_labels = {
-            'title': resultingtitle,
-            'sorttitle': resultingtitle.lower(),
+            'title': pFilm.title,
+            'sorttitle': resultingtitle,
             'tvshowtitle': pFilm.show,
             'plot': pFilm.description
         }
