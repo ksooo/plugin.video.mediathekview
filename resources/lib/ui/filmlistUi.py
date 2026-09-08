@@ -6,7 +6,6 @@ Copyright 2017-2019, Leo Moll and Dominik Schlösser
 SPDX-License-Identifier: MIT
 """
 
-import re
 import time
 import os
 from datetime import datetime
@@ -15,13 +14,8 @@ import xbmcgui
 import xbmcplugin
 import resources.lib.appContext as appContext
 from resources.lib.model.film import Film
+from resources.lib.seasons import splitEpisode
 
-# MediathekView leaves the season and episode inside the title, in the one
-# shape it is consistent about: "(S01/E11)" or "(S2024E80)". 57150 of 715993
-# films carry it. The other forms it uses - "Folge 6", "(1/4)", "Teil 2" -
-# are fewer and ambiguous, "(1/4)" as often meaning part one of four, so they
-# are left where they are.
-EPISODE_MARKER = re.compile(r'\s*\(\s*S(\d{1,4})\s*/?\s*E(\d{1,4})\s*\)\s*', re.I)
 # Kodi rebuilds the label of a plugin item from the label mask of the sort
 # method in force - only an item that calls its label preformatted is left
 # alone, and a plugin item does not. So this, rather than the label handed to
@@ -37,20 +31,6 @@ SUBTITLE_LANGUAGE = 'de'
 # What Kodi is told about a stream the film list calls HD. The list itself
 # gives no resolution; this is what those streams measure.
 HD_STREAM = {'width': 1920, 'height': 1080}
-
-
-def splitEpisode(title):
-    """
-    Takes the season and episode out of a title that carries them.
-
-    Returns the title without the marker and the two numbers, or the title as
-    it came and no numbers.
-    """
-    match = EPISODE_MARKER.search(title)
-    if match is None:
-        return (title, None, None)
-    return (EPISODE_MARKER.sub(' ', title).strip(),
-            int(match.group(1)), int(match.group(2)))
 
 
 class FilmlistUi(object):
@@ -94,7 +74,7 @@ class FilmlistUi(object):
         #
         self.startTime = 0
 
-    def generate(self, databaseRs):
+    def generate(self, databaseRs, pLeadingItems=None):
         #
         # 0 - idhash, 1 - title, 2 - showname, 3 - channel,
         # 4 - description, 5 - duration, 6 - aired,
@@ -107,7 +87,9 @@ class FilmlistUi(object):
             xbmcplugin.addSortMethod(self.handle, method, self.labelMask)
         #
         aFilm = Film()
-        listOfElements = []
+        # Seasons, where the show has any, share the listing with the films
+        # that name none. Kodi puts folders first by itself.
+        listOfElements = list(pLeadingItems) if pLeadingItems else []
         for element in databaseRs:
             #
             aFilm.init(element[0], element[1], element[2], element[3], element[4], element[5],

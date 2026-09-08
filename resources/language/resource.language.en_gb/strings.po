@@ -498,3 +498,7 @@ msgstr "Play Error"
 msgctxt "#30989"
 msgid "Cannot retrieve Movie Information"
 msgstr "Cannot retrieve Movie Information"
+
+msgctxt "#30992"
+msgid "Season %d"
+msgstr "Season %d"

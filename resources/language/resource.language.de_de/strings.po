@@ -498,3 +498,7 @@ msgstr "Fehler beim Abspielen"
 msgctxt "#30989"
 msgid "Cannot retrieve Movie Information"
 msgstr "Die Sendung wurde nicht gefunden"
+
+msgctxt "#30992"
+msgid "Season %d"
+msgstr "Staffel %d"

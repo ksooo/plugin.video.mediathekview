@@ -31,6 +31,8 @@ import resources.lib.ui.channelUi as ChannelUi
 import resources.lib.ui.showUi as ShowUi
 import resources.lib.ui.letterUi as LetterUi
 import resources.lib.ui.filmlistUi as FilmlistUi
+import resources.lib.ui.seasonUi as SeasonUi
+import resources.lib.seasons as Seasons
 
 import resources.lib.appContext as appContext
 
@@ -199,9 +201,17 @@ class MediathekViewPlugin(KodiPlugin):
             show = "" if show == "0" else show
             channel = self.get_arg('channel', "")
             channel = "" if channel == "0" else channel
-            # self.database.get_films(show, FilmUI(self))
+            season = self.get_arg('season', "")
+            films = self.database.getFilms(channel, show)
             ui = FilmlistUi.FilmlistUi(self, pLongTitle=False)
-            ui.generate(self.database.getFilms(channel, show))
+            if season:
+                ui.generate(Seasons.ofSeason(films, int(season)))
+            else:
+                # A show earns a season level or it does not; where it does
+                # not, this is the flat listing it has always been.
+                (seasons, loose) = Seasons.group(films)
+                ui.generate(loose, SeasonUi.SeasonUi(self).generateItems(
+                    seasons, channel, show))
             #
         elif mode == 'downloadmv':
             filmIdArray = self._resolveFilmIdsFromParams(
