@@ -359,7 +359,6 @@ msgctxt "#30419"
 msgid "Enter a name for the query"
 msgstr "Ein Name für die Suche"
 
-
 ##############
 # Main Menu
 ##############
@@ -488,22 +487,6 @@ msgctxt "#30960"
 msgid "Download Successful"
 msgstr "Download Erfolgreich"
 
-msgctxt "#30961"
-msgid "Welcome to MediathekView"
-msgstr "Willkommen"
-
-msgctxt "#30962"
-msgid "This Kodi addon allows access to most video-platforms from German public service "
-"broadcasters using the database provided by the popular project of MediathekView.\n\n"
-"Without the endless effort of the MediathekView contributors, addons like this would not "
-"exist.\n\n"
-"Please consider donating to this awesome project! Visit MediathekView at https://mediathekview.de/"
-msgstr "Dieses Kodi Addon Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der "
-"öffentlich Rechtlichen basierend auf der Datenbank des beliebten MediathekView Projektes.\n\n"
-"Ohne den unermüdlichen Einsatz des MediathekView-Teams wäre ein solches Addon nicht möglich.\n\n"
-"Um das Projekt zu unterstützen, besteht die Möglichkeit auf https://mediathekview.de/ eine "
-"Spende zu hinterlassen."
-
 msgctxt "#30963"
 msgid "Update Database"
 msgstr "Datenbank Aktualisierung"
@@ -547,10 +530,6 @@ msgstr "Fehler beim Herunterladen von {}: {}"
 msgctxt "#30976"
 msgid "Video {} has been downloaded"
 msgstr "Video {} wurde heruntergeladen"
-
-msgctxt "#30977"
-msgid "Video Already Exists"
-msgstr "Das Video existiert bereits"
 
 msgctxt "#30978"
 msgid "Downloading Subtitles"
