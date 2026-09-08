@@ -66,5 +66,42 @@ class GetStatusTest(unittest.TestCase):
                         'the reason has to reach the log')
 
 
+class RetrieveFilmInfoTest(unittest.TestCase):
+
+    def setUp(self):
+        support.init_app_context(settings=support.Settings(caching=False))
+
+    def test_passes_the_film_id_as_a_parameter(self):
+        # The id arrives from the plugin url, so it must not be pasted into
+        # the statement.
+        (store, connection) = _store(results=[
+            [('d41d8cd9', 'Titel', 'Sendung', 'ARD', '', 60, 0, '', 'u', '', '')],
+        ])
+        store.retrieve_film_info('d41d8cd9')
+        (statement, params) = connection.executed[0]
+        self.assertNotIn('d41d8cd9', statement)
+        self.assertEqual(params, ('d41d8cd9',))
+
+    def test_an_id_holding_a_quote_does_not_reach_the_statement(self):
+        (store, connection) = _store(results=[[]])
+        store.retrieve_film_info("' OR '1'='1")
+        (statement, params) = connection.executed[0]
+        self.assertEqual(statement.count('?'), 1)
+        self.assertNotIn('OR', statement)
+        self.assertEqual(params, ("' OR '1'='1",))
+
+    def test_returns_the_film(self):
+        (store, _) = _store(results=[
+            [('hash', 'Titel', 'Sendung', 'ARD', 'Text', 60, 0, '', 'u', '', '')],
+        ])
+        film = store.retrieve_film_info('hash')
+        self.assertEqual(film.title, 'Titel')
+        self.assertEqual(film.channel, 'ARD')
+
+    def test_returns_none_when_the_film_is_gone(self):
+        (store, _) = _store(results=[[]])
+        self.assertIsNone(store.retrieve_film_info('missing'))
+
+
 if __name__ == '__main__':
     unittest.main()
