@@ -68,7 +68,6 @@ class Downloader(object):
         subs = []
         if self.download_subtitle(film, ttmname, srtname, 'subtitle'):
             subs.append(srtname)
-        # (_, listitem) = FilmUI(self.plugin).get_list_item(None, film)
         (_, listitem) = FilmlistUi(self.plugin)._generateListItem(film)
         self.logger.debug('SUBTITLE FOUND {} from url {}' , subs, film.url_sub)
         if listitem:

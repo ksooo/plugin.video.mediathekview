@@ -70,6 +70,10 @@ class FilmlistUi(object):
             #
             (targetUrl, list_item) = self._generateListItem(aFilm)
             #
+            if list_item is None:
+                self.logger.warn('Skipping film without video url: {} - {}', aFilm.channel, aFilm.title)
+                continue
+            #
             list_item.addContextMenuItems(self._generateContextMenu(aFilm))
             #
             if self.settings.getAutoSub() and aFilm.url_sub:
@@ -102,9 +106,10 @@ class FilmlistUi(object):
         else:
             videourl = pFilm.url_video
 
-        # exit if no url supplied
+        # exit if no url supplied. Both callers unpack the result, so the
+        # failure has to keep the shape of the success.
         if videourl == "":
-            return None
+            return (None, None)
 
         videourl = videourl + self.settings.getUserAgentString()
 
