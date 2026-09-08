@@ -6,6 +6,7 @@ Copyright 2017-2019, Leo Moll and Dominik Schlösser
 SPDX-License-Identifier: MIT
 """
 
+import re
 import time
 import os
 from datetime import datetime
@@ -15,12 +16,32 @@ import xbmcplugin
 import resources.lib.appContext as appContext
 from resources.lib.model.film import Film
 
+# MediathekView leaves the season and episode inside the title, in the one
+# shape it is consistent about: "(S01/E11)" or "(S2024E80)". 57150 of 715993
+# films carry it. The other forms it uses - "Folge 6", "(1/4)", "Teil 2" -
+# are fewer and ambiguous, "(1/4)" as often meaning part one of four, so they
+# are left where they are.
+EPISODE_MARKER = re.compile(r'\s*\(\s*S(\d{1,4})\s*/?\s*E(\d{1,4})\s*\)\s*', re.I)
 # The film list carries subtitles for German public service broadcasters, and
 # says nothing about their language.
 SUBTITLE_LANGUAGE = 'de'
 # What Kodi is told about a stream the film list calls HD. It gives no
 # resolution of its own, so this says no more than "high definition".
 HD_STREAM = {'width': 1280, 'height': 720}
+
+
+def splitEpisode(title):
+    """
+    Takes the season and episode out of a title that carries them.
+
+    Returns the title without the marker and the two numbers, or the title as
+    it came and no numbers.
+    """
+    match = EPISODE_MARKER.search(title)
+    if match is None:
+        return (title, None, None)
+    return (EPISODE_MARKER.sub(' ', title).strip(),
+            int(match.group(1)), int(match.group(2)))
 
 
 class FilmlistUi(object):
@@ -117,16 +138,18 @@ class FilmlistUi(object):
 
         videourl = videourl + self.settings.getUserAgentString()
 
+        (filmtitle, season, episode) = splitEpisode(pFilm.title)
+
         if self.useLongTitle:
-            resultingtitle = pFilm.show + ': ' + pFilm.title
+            resultingtitle = pFilm.show + ': ' + filmtitle
         else:
-            resultingtitle = pFilm.title
+            resultingtitle = filmtitle
 
         # The label is what the list shows; the title is what everything else
         # reads, the player included. Putting the composed line in both left
         # the show name inside the film's own title.
         info_labels = {
-            'title': pFilm.title,
+            'title': filmtitle,
             'sorttitle': resultingtitle,
             'tvshowtitle': pFilm.show,
             # The channel is the broadcaster, and until now it reached the
@@ -134,6 +157,13 @@ class FilmlistUi(object):
             'studio': pFilm.channel,
             'plot': pFilm.description
         }
+
+        if season is not None:
+            info_labels['season'] = season
+            info_labels['episode'] = episode
+            # Only where both were found: it is what makes a skin show them,
+            # and calling everything else an episode would be a guess.
+            info_labels['mediatype'] = 'episode'
 
         if pFilm.seconds is not None and pFilm.seconds > 0:
             info_labels['duration'] = pFilm.seconds

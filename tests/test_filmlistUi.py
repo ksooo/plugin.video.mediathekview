@@ -15,7 +15,7 @@ from tests import support
 
 support.init_app_context()
 
-from resources.lib.ui.filmlistUi import FilmlistUi
+from resources.lib.ui.filmlistUi import FilmlistUi, splitEpisode
 
 
 def row(idhash='hash', title='Titel', show='Sendung', channel='ARD',
@@ -92,6 +92,21 @@ class GenerateListItemTest(unittest.TestCase):
         self.assertEqual(item.label, 'Tagesschau')
         self.assertEqual(item.info['title'], 'Tagesschau')
 
+    def test_the_episode_marker_leaves_the_title_for_its_own_fields(self):
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(title='Nordspanien von oben (S01/E11)', show='Europa von oben'))
+        self.assertEqual(item.label, 'Europa von oben: Nordspanien von oben')
+        self.assertEqual(item.info['title'], 'Nordspanien von oben')
+        self.assertEqual(item.info['season'], 1)
+        self.assertEqual(item.info['episode'], 11)
+        self.assertEqual(item.info['mediatype'], 'episode')
+
+    def test_a_film_that_is_not_an_episode_is_not_called_one(self):
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(_film(title='Tagesschau'))
+        self.assertNotIn('season', item.info)
+        self.assertNotIn('episode', item.info)
+        self.assertNotIn('mediatype', item.info)
+
     def test_hd_is_a_resolution_rather_than_a_word_in_the_title(self):
         support.init_app_context(settings=support.Settings(preferHd=True))
         (_, item) = FilmlistUi(self.plugin)._generateListItem(
@@ -129,6 +144,38 @@ class GenerateListItemTest(unittest.TestCase):
             _film(url_video='https://example.org/a.mp4',
                   url_video_sd='https://example.org/sd.mp4'))
         self.assertEqual(url, 'https://example.org/sd.mp4')
+
+
+class SplitEpisodeTest(unittest.TestCase):
+    """Season and episode live inside the title MediathekView writes.
+
+    Of 715993 films, 57150 carry the marker in one of these two shapes. The
+    other forms it uses - "Folge 6", "(1/4)", "Teil 2" - are fewer and
+    ambiguous, "(1/4)" as often meaning part one of four, so they stay put.
+    """
+
+    def test_the_usual_shape(self):
+        self.assertEqual(splitEpisode('Nordspanien von oben (S01/E11)'),
+                         ('Nordspanien von oben', 1, 11))
+
+    def test_the_shape_without_a_slash(self):
+        self.assertEqual(splitEpisode('Kulturzeit vom 30.04.2024 (S2024E80)'),
+                         ('Kulturzeit vom 30.04.2024', 2024, 80))
+
+    def test_a_year_is_a_season_like_any_other(self):
+        self.assertEqual(splitEpisode('37: Wir wollten nur raus (S2022/E12)')[1], 2022)
+
+    def test_what_follows_the_marker_stays(self):
+        self.assertEqual(splitEpisode('Du bist mehr! (S2024/E52) (Gebärdensprache)'),
+                         ('Du bist mehr! (Gebärdensprache)', 2024, 52))
+
+    def test_a_title_without_a_marker_is_handed_back_as_it_came(self):
+        self.assertEqual(splitEpisode('Tagesschau'), ('Tagesschau', None, None))
+
+    def test_the_ambiguous_forms_are_left_alone(self):
+        for title in ('Abenteuer Linienbus (1/4)', 'Davos 1917 (Folge 3)',
+                      'Die wilden Philippinen - Teil 1', 'Vier Saiten (9)'):
+            self.assertEqual(splitEpisode(title), (title, None, None))
 
 
 class AiredDateTest(unittest.TestCase):
