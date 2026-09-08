@@ -364,7 +364,7 @@ msgstr "Bitte Namen für die Suche eingeben"
 ##############
 
 msgctxt "#30901"
-msgid "Quick Search"
+msgid "Enter a search term"
 msgstr "Bitte Suchbegriff eingeben"
 
 msgctxt "#30902"
