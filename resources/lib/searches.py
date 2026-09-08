@@ -16,6 +16,11 @@ from codecs import open
 # pylint: disable=import-error
 import xbmcplugin
 
+# How many searched terms to remember. A history that never forgets stops
+# being a history: it can only be thinned out one entry at a time through the
+# context menu, and it grows for as long as the addon is used.
+MAX_RECENT_SEARCHES = 25
+
 
 class RecentSearches(object):
     """
@@ -100,6 +105,13 @@ class RecentSearches(object):
             'search':            search,
             'when':              int(time.time())
         })
+        if len(self.recents) > MAX_RECENT_SEARCHES:
+            # Position breaks the tie: the timestamps count whole seconds, so
+            # several searches in the same second are indistinguishable by
+            # time alone, and the later one is the more recent.
+            ordered = sorted(enumerate(self.recents),
+                             key=lambda pair: (pair[1]['when'], pair[0]), reverse=True)
+            self.recents = [entry for (_, entry) in ordered[:MAX_RECENT_SEARCHES]]
         self.logger.debug('added search: {} sec', time.time() - start)
         return self
 
