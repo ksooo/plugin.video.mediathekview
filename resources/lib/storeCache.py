@@ -76,9 +76,11 @@ class StoreCache(object):
                         return data
         # pylint: disable=broad-except
         except Exception as err:
+            # An unreadable cache file is not worth failing a query over: it
+            # is gone by the time we return, and the caller reads the database.
             self.logger.error('Failed to load cache file {}: {}', filename, err)
             mvutils.file_remove(filename)
-            raise
+            return None
         self.logger.debug('no cache found')
         return None
 

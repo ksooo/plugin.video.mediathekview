@@ -68,6 +68,25 @@ class StoreCacheTest(unittest.TestCase):
     def test_purge_survives_a_missing_directory(self):
         self.cache.purge()
 
+    def test_a_truncated_file_is_a_miss_not_an_error(self):
+        # It used to delete the file and re-raise, and no caller catches that,
+        # so the first request after a half-written file failed outright.
+        self.cache.save_cache('films', 'channel=ARD', [['ard']])
+        filename = self.cache._filename('films', 'channel=ARD')
+        with open(filename, 'w', encoding='utf-8') as handle:
+            handle.write('{"type": "films", "data": [[')
+        self.assertIsNone(self.cache.load_cache('films', 'channel=ARD'))
+        self.assertFalse(os.path.exists(filename), 'the broken file has to go')
+
+    def test_the_query_after_a_truncated_file_works(self):
+        filename = self.cache._filename('films', 'channel=ARD')
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, 'w', encoding='utf-8') as handle:
+            handle.write('not json at all')
+        self.cache.load_cache('films', 'channel=ARD')
+        self.cache.save_cache('films', 'channel=ARD', [['ard']])
+        self.assertEqual(self.cache.load_cache('films', 'channel=ARD'), [['ard']])
+
     def test_caching_switched_off_stores_nothing(self):
         support.init_app_context(
             settings=support.Settings(datapath=self.datapath, caching=False))
