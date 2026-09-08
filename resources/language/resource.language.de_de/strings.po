@@ -39,7 +39,7 @@ msgstr "In MediathekView (ksooo) suchen"
 # Settings Page 1
 msgctxt "#30110"
 msgid "Prefer HD streams"
-msgstr "HD Streams bevorzugen"
+msgstr "HD-Streams bevorzugen"
 
 msgctxt "#30111"
 msgid "Autoplay Subtitles"
@@ -59,23 +59,23 @@ msgstr "Sendungen verschiedener Sender zusammenfassen"
 
 msgctxt "#30115"
 msgid "Limit search results"
-msgstr "Suchergebnisse eingrenzen"
+msgstr "Max. Treffer"
 
 msgctxt "#30116"
 msgid "Max age of recents in days"
-msgstr "Maximales Alter der Neuigkeiten in Tagen"
+msgstr "Maximales Alter der Neuheiten in Tagen"
 
 msgctxt "#30117"
 msgid "Recent calculated by"
-msgstr "Neuigkeit berechnet ab"
+msgstr "Neuheiten bestimmen nach"
 
 msgctxt "#30118"
 msgid "Up-to-Date check interval [sec]"
-msgstr "Nach Updates suchen alle [sec]"
+msgstr "Prüfintervall in Sekunden"
 
 msgctxt "#30119"
 msgid "Default Sort Method for film list"
-msgstr "Standard Sortierung der Filmliste"
+msgstr "Standardsortierung der Filmliste"
 
 msgctxt "#30120"
 msgid "Sort by title"
@@ -95,31 +95,31 @@ msgstr "Dauer"
 
 msgctxt "#30125"
 msgid "Blacklist"
-msgstr "Ignoriere Titel mit"
+msgstr "Titel ausschließen, die enthalten"
 
 msgctxt "#30130"
 msgid "Content Type Movie list"
-msgstr "Content Type Filmliste"
+msgstr "Inhaltstyp der Filmliste"
 
 msgctxt "#30131"
 msgid "none"
-msgstr "none"
+msgstr "Keiner"
 
 msgctxt "#30132"
 msgid "videos"
-msgstr "videos"
+msgstr "Videos"
 
 msgctxt "#30133"
 msgid "movies"
-msgstr "movies"
+msgstr "Filme"
 
 msgctxt "#30134"
 msgid "episodes"
-msgstr "episodes"
+msgstr "Episoden"
 
 msgctxt "#30135"
 msgid "tvshows"
-msgstr "tvshows"
+msgstr "Serien"
 
 msgctxt "#30171"
 msgid "Aired Date"
@@ -131,32 +131,32 @@ msgstr "Hinzugefügt zur Datenbank"
 
 msgctxt "#30173"
 msgid "Default"
-msgstr "Default"
+msgstr "Standard"
 
 # Settings Page 2
 msgctxt "#30210"
 msgid "Database type"
-msgstr "Datenbank Typ"
+msgstr "Datenbanktyp"
 
 msgctxt "#30211"
 msgid "Database hostname"
-msgstr "Datenbank Hostname"
+msgstr "Datenbank-Hostname"
 
 msgctxt "#30212"
 msgid "Database port"
-msgstr "Datenbank Portnummer"
+msgstr "Datenbank-Port"
 
 msgctxt "#30213"
 msgid "Database username"
-msgstr "Datenbank Benutzername"
+msgstr "Datenbank-Benutzername"
 
 msgctxt "#30214"
 msgid "Database password"
-msgstr "Datenbank Passwort"
+msgstr "Datenbank-Passwort"
 
 msgctxt "#30215"
 msgid "Database name"
-msgstr "Datenbank Name"
+msgstr "Datenbankname"
 
 msgctxt "#30221"
 msgid "Internal (sqlite)"
@@ -184,7 +184,7 @@ msgstr "Abfragen zwischenspeichern"
 
 msgctxt "#30235"
 msgid "Update Batch Size"
-msgstr "Update Batch Size"
+msgstr "Datensätze pro Schreibvorgang"
 
 msgctxt "#30241"
 msgid "Disabled"
@@ -209,11 +209,11 @@ msgstr "Zeitgesteuert"
 # Settings Page 3
 msgctxt "#30310"
 msgid "Series download directory"
-msgstr "Serien Download-Verzeichnis"
+msgstr "Download-Verzeichnis für Serien"
 
 msgctxt "#30311"
 msgid "Movie download directory"
-msgstr "Filme Download-Verzeichnis"
+msgstr "Download-Verzeichnis für Filme"
 
 msgctxt "#30312"
 msgid "Download movies in separate folders"
@@ -237,19 +237,19 @@ msgstr "Metadaten generieren"
 
 msgctxt "#30340"
 msgid "No NFO File"
-msgstr "Keine NFO Datei"
+msgstr "Keine NFO-Datei"
 
 msgctxt "#30341"
 msgid "Basic NFO File"
-msgstr "Einfache NFO Datei"
+msgstr "Einfache NFO-Datei"
 
 msgctxt "#30342"
 msgid "Enriched NFO File"
-msgstr "Angereicherte  NFO Datei"
+msgstr "Erweiterte NFO-Datei"
 
 msgctxt "#30343"
 msgid "staticViewId"
-msgstr "Vordefinierte Views verwenden"
+msgstr "Vordefinierte Ansichten verwenden"
 
 msgctxt "#30344"
 msgid "DownloadActionOnExists"
@@ -257,11 +257,11 @@ msgstr "Datei existiert beim Download"
 
 msgctxt "#30345"
 msgid "DownloadActionOnExistsPrompt"
-msgstr "Umbennen"
+msgstr "Umbenennen"
 
 msgctxt "#30346"
 msgid "DownloadActionOnExistsIgnore"
-msgstr "Nicht runterladen"
+msgstr "Nicht herunterladen"
 
 msgctxt "#30347"
 msgid "DownloadActionOnExistsOverwrite"
@@ -269,7 +269,7 @@ msgstr "Überschreiben"
 
 msgctxt "#30348"
 msgid "DownloadQuality"
-msgstr "Download Qualität"
+msgstr "Download-Qualität"
 
 msgctxt "#30349"
 msgid "DownloadQualityHigh"
@@ -288,8 +288,8 @@ msgstr "Niedrig"
 #############################
 
 msgctxt "#30401"
-msgid "Id"
-msgstr "Id"
+msgid "Name"
+msgstr "Name"
 
 msgctxt "#30402"
 msgid "Title"
@@ -297,7 +297,7 @@ msgstr "Titel"
 
 msgctxt "#30403"
 msgid "Show"
-msgstr "Show"
+msgstr "Sendung"
 
 msgctxt "#30404"
 msgid "Description"
@@ -316,8 +316,8 @@ msgid "No Trailer"
 msgstr "Keine Trailer"
 
 msgctxt "#30408"
-msgid "Backlist"
-msgstr "Backlist"
+msgid "Blacklist"
+msgstr "Ausschluss"
 
 msgctxt "#30409"
 msgid "No"
@@ -329,23 +329,23 @@ msgstr "Ja"
 
 msgctxt "#30411"
 msgid "Enter a show name"
-msgstr "Name der Sendung"
+msgstr "Bitte Namen der Sendung eingeben"
 
 msgctxt "#30412"
 msgid "Enter a title for the episode"
-msgstr "Titel der folge"
+msgstr "Bitte Titel der Folge eingeben"
 
 msgctxt "#30413"
 msgid "Enter a part of the plot"
-msgstr "Suche nach einem Text in der Beschreibung"
+msgstr "Bitte Text aus der Beschreibung eingeben"
 
 msgctxt "#30414"
 msgid "Choose one or multiple channels"
-msgstr "Senderauswahl"
+msgstr "Bitte Sender auswählen"
 
 msgctxt "#30415"
 msgid "Enter a showname or title which will be excluded from the results"
-msgstr "Suchergebnisse die diesen Begriff enthalten werden ausgeschlossen"
+msgstr "Bitte auszuschließenden Begriff eingeben"
 
 msgctxt "#30417"
 msgid "No future videos (usually trailers)"
@@ -357,7 +357,7 @@ msgstr "Minimale Länge in Minuten"
 
 msgctxt "#30419"
 msgid "Enter a name for the query"
-msgstr "Ein Name für die Suche"
+msgstr "Bitte Namen für die Suche eingeben"
 
 ##############
 # Main Menu
@@ -365,11 +365,11 @@ msgstr "Ein Name für die Suche"
 
 msgctxt "#30901"
 msgid "Quick Search"
-msgstr "Schnelle Suche"
+msgstr "Schnellsuche"
 
 msgctxt "#30902"
 msgid "Search"
-msgstr "Suche"
+msgstr "Erweiterte Suche"
 
 msgctxt "#30903"
 msgid "Livestreams"
@@ -377,11 +377,11 @@ msgstr "Livestreams"
 
 msgctxt "#30904"
 msgid "Recently Added"
-msgstr "Vor Kurzem hinzugefügt"
+msgstr "Zuletzt hinzugefügt"
 
 msgctxt "#30905"
 msgid "Browse Shows"
-msgstr "Durchsuchen"
+msgstr "Sendungen durchsuchen"
 
 msgctxt "#30906"
 msgid "All Channels"
@@ -389,7 +389,7 @@ msgstr "Alle Sender"
 
 msgctxt "#30908"
 msgid "Database Information"
-msgstr "Datenbank Informationen"
+msgstr "Datenbankinformationen"
 
 msgctxt "#30909"
 msgid "Update Database"
@@ -411,11 +411,11 @@ msgstr "Als Episode herunterladen"
 # Search Context Menu
 msgctxt "#30931"
 msgid "New Search..."
-msgstr "Neuer Suchvorgang..."
+msgstr "Neue Suche ..."
 
 msgctxt "#30932"
 msgid "Remove Search"
-msgstr "Suchvorgang Löschen"
+msgstr "Suche entfernen"
 
 msgctxt "#30933"
 msgid "Edit Search"
@@ -449,15 +449,15 @@ msgstr "Letzte Aktualisierung abgebrochen"
 # Other Strings
 msgctxt "#30951"
 msgid "Mediathek Database Error"
-msgstr "Mediathek Datenbank Fehler"
+msgstr "Fehler in der Mediathek-Datenbank"
 
 msgctxt "#30952"
 msgid "Download Error"
-msgstr "Dowload Fehler"
+msgstr "Download-Fehler"
 
 msgctxt "#30953"
 msgid "Error while downloading {}: {}"
-msgstr "Fehler beim herunterladen von {}: {}"
+msgstr "Fehler beim Herunterladen von {}: {}"
 
 msgctxt "#30954"
 msgid "Required decompression program 'xz' not found on your system"
@@ -465,7 +465,7 @@ msgstr "Der benötigte Entpacker 'xz' konnte nicht gefunden werden"
 
 msgctxt "#30955"
 msgid "Download Database Update"
-msgstr "Datenbank Update wird heruntergeladen"
+msgstr "Datenbank-Update wird heruntergeladen"
 
 msgctxt "#30956"
 msgid "Mediathek Database Update"
@@ -477,7 +477,7 @@ msgstr "Mediathek (%d): gelesen:%d, hinzugefügt:%d, aktualisiert:%d ..."
 
 msgctxt "#30958"
 msgid "Please set a download folder in the settings"
-msgstr "Bitte legen Sie das Download-Verzeichnis in den Einstellungen fest"
+msgstr "Bitte Download-Verzeichnis in den Einstellungen festlegen"
 
 msgctxt "#30959"
 msgid "Download directory could not be created: {}"
@@ -485,7 +485,7 @@ msgstr "Fehler beim Erzeugen des Download-Verzeichnisses: {}"
 
 msgctxt "#30960"
 msgid "Download Successful"
-msgstr "Download Erfolgreich"
+msgstr "Download erfolgreich"
 
 msgctxt "#30963"
 msgid "Update Database"
@@ -505,7 +505,7 @@ msgstr "Diese Datenbank wurde noch nicht aktualisiert"
 
 msgctxt "#30970"
 msgid "Filmlist: %s\nFull: %s\nIncremental: %s"
-msgstr "Filmliste : %s\nKomplettaktualisierung : %s\nTeilaktualisierung : %s"
+msgstr "Filmliste: %s\nKomplettaktualisierung: %s\nTeilaktualisierung: %s"
 
 msgctxt "#30971"
 msgid "%d channels\n%d shows\n%d movies"
@@ -541,7 +541,7 @@ msgstr "Download-Verzeichnis existiert nicht"
 
 msgctxt "#30980"
 msgid "Results Limited"
-msgstr "Ergebnisse Beschränkt"
+msgstr "Ergebnisse beschränkt"
 
 msgctxt "#30981"
 msgid "Only the first {} results are shown."
@@ -561,15 +561,15 @@ msgstr "Datenbank-Schema-Aktualisierung"
 
 msgctxt "#30985"
 msgid "Please wait while the system upgrades the database schema."
-msgstr "Bitte warten Sie, bis das Schema der Datenbank aktualisiert wurde."
+msgstr "Bitte warten, bis das Datenbankschema aktualisiert wurde"
 
 msgctxt "#30986"
 msgid "Please Review Your Download Name"
-msgstr "Bitte prüfen Sie den Dateinamen"
+msgstr "Bitte Dateinamen prüfen"
 
 msgctxt "#30987"
 msgid "File already exists! Please change the filename"
-msgstr "Datei existiert bereits. Bitte ändern Sie den Dateinamen"
+msgstr "Datei existiert bereits. Bitte Dateinamen ändern"
 
 msgctxt "#30988"
 msgid "Play Error"
@@ -577,7 +577,7 @@ msgstr "Fehler beim Abspielen"
 
 msgctxt "#30989"
 msgid "Cannot retrieve Movie Information"
-msgstr "Es war nicht möglich die Sendung zu finden"
+msgstr "Die Sendung wurde nicht gefunden"
 
 msgctxt "#30990"
 msgid "Airdate: {0:s}[CR][CR]"

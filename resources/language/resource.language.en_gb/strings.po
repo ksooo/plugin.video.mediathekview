@@ -288,8 +288,8 @@ msgstr "Low"
 #############################
 
 msgctxt "#30401"
-msgid "Id"
-msgstr "Id"
+msgid "Name"
+msgstr "Name"
 
 msgctxt "#30402"
 msgid "Title"
@@ -316,8 +316,8 @@ msgid "No Trailer"
 msgstr "No Trailer"
 
 msgctxt "#30408"
-msgid "Backlist"
-msgstr "Backlist"
+msgid "Blacklist"
+msgstr "Blacklist"
 
 msgctxt "#30409"
 msgid "No"
