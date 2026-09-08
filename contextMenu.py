@@ -20,6 +20,5 @@ except ImportError:
 if __name__ == '__main__':
     params = {"mode":"research", "doNotSave":"true", "search" : sys.listitem.getLabel()}
     utfEnsuredParams = mvutils.dict_to_utf(params)
-    cmd = 'ActivateWindow(Videos,plugin://plugin.video.mediathekview?' + urlencode(utfEnsuredParams) + ")"
-    #xbmc.executebuiltin('ActivateWindow(Videos,plugin://plugin.video.mediathekview?mode=research&doNotSave=true&search={})'.format(sys.listitem.getLabel()))
+    cmd = 'ActivateWindow(Videos,plugin://plugin.video.mediathekview.ksooo?' + urlencode(utfEnsuredParams) + ")"
     xbmc.executebuiltin(cmd)
