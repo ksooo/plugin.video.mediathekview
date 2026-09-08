@@ -337,20 +337,22 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <!-- Internal state, written by the addon and never shown. -->
+            <!-- Internal state, written by the addon and never shown.
+                 Level 4 is SettingLevel::Internal, which is what lets these
+                 leave out the <control> every other setting must have. -->
             <group id="2">
                 <setting id="updatetrigger" type="boolean">
-                    <level>0</level>
+                    <level>4</level>
                     <default>false</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="lastactivity" type="integer">
-                    <level>0</level>
+                    <level>4</level>
                     <default>0</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="lastsearch1" type="string">
-                    <level>0</level>
+                    <level>4</level>
                     <default></default>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -358,7 +360,7 @@
                     <visible>false</visible>
                 </setting>
                 <setting id="lastsearch2" type="string">
-                    <level>0</level>
+                    <level>4</level>
                     <default></default>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -366,32 +368,32 @@
                     <visible>false</visible>
                 </setting>
                 <setting id="lastUpdate" type="integer">
-                    <level>0</level>
+                    <level>4</level>
                     <default>0</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="lastFullUpdate" type="integer">
-                    <level>0</level>
+                    <level>4</level>
                     <default>0</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="databaseVersion" type="string">
-                    <level>0</level>
+                    <level>4</level>
                     <default>0</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="databaseStatus" type="string">
-                    <level>0</level>
+                    <level>4</level>
                     <default>0</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="delayStartupSec" type="integer">
-                    <level>0</level>
+                    <level>4</level>
                     <default>10</default>
                     <visible>false</visible>
                 </setting>
                 <setting id="userAgentString" type="string">
-                    <level>0</level>
+                    <level>4</level>
                     <default>|User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%3B%20rv%3A84.0%29%20Gecko%2F20100101%20Firefox%2F84.0</default>
                     <visible>false</visible>
                 </setting>
