@@ -498,7 +498,3 @@ msgstr "Fehler beim Abspielen"
 msgctxt "#30989"
 msgid "Cannot retrieve Movie Information"
 msgstr "Die Sendung wurde nicht gefunden"
-
-msgctxt "#30990"
-msgid "Airdate: {0:s}[CR][CR]"
-msgstr "Ausgestrahlt: {0:s}[CR][CR]"

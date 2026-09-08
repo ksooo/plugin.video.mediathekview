@@ -87,11 +87,20 @@ class AiredDateTest(unittest.TestCase):
 
     def setUp(self):
         support.install_kodi_stubs()
-        self.plugin = support.Plugin(strings={30990: 'Airdate: {0:s} '})
+        self.plugin = support.Plugin()
 
     def _info(self, aired):
         (_, item) = FilmlistUi(self.plugin)._generateListItem(_film(aired=aired))
         return item.info
+
+    def test_the_plot_is_the_description_alone(self):
+        # The aired date used to be pasted in front of it in an ISO format,
+        # while date, aired and dateadded were carrying it as well.
+        info = self._info(1704110400)
+        self.assertEqual(info['plot'], '')
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(description='Worum es geht.', aired=1704110400))
+        self.assertEqual(item.info['plot'], 'Worum es geht.')
 
     @unittest.skipUnless(hasattr(time, 'tzset'), 'needs a POSIX timezone')
     def test_summer_time_keeps_the_day(self):

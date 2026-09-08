@@ -131,7 +131,6 @@ class FilmlistUi(object):
             info_labels['date'] = airedstring[:10]
             info_labels['aired'] = airedstring[:10]
             info_labels['dateadded'] = airedstring
-            info_labels['plot'] = self.plugin.language(30990).format(airedstring) + info_labels['plot']
 
         icon = os.path.join(
             self.plugin.path,
