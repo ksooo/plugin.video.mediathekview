@@ -25,9 +25,9 @@ EPISODE_MARKER = re.compile(r'\s*\(\s*S(\d{1,4})\s*/?\s*E(\d{1,4})\s*\)\s*', re.
 # The film list carries subtitles for German public service broadcasters, and
 # says nothing about their language.
 SUBTITLE_LANGUAGE = 'de'
-# What Kodi is told about a stream the film list calls HD. It gives no
-# resolution of its own, so this says no more than "high definition".
-HD_STREAM = {'width': 1280, 'height': 720}
+# What Kodi is told about a stream the film list calls HD. The list itself
+# gives no resolution; this is what those streams measure.
+HD_STREAM = {'width': 1920, 'height': 1080}
 
 
 def splitEpisode(title):
@@ -204,11 +204,8 @@ class FilmlistUi(object):
         if pFilm.url_sub:
             listitem.addStreamInfo('subtitle', {'language': SUBTITLE_LANGUAGE})
         if isHd:
-            # " (HD)" used to be appended to the title. The film list does not
-            # say what the HD stream actually measures, so this is the
-            # smallest size that still counts as high definition rather than
-            # a claim about this particular film - enough for Kodi to derive
-            # a resolution from, and nothing is claimed for the other streams.
+            # " (HD)" used to be appended to the title. Nothing is claimed for
+            # the other streams: the film list does not say what they are.
             listitem.addStreamInfo('video', dict(HD_STREAM))
         listitem.setArt({
             'thumb': icon,

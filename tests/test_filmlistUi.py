@@ -113,7 +113,7 @@ class GenerateListItemTest(unittest.TestCase):
             _film(title='Tagesschau', url_video_hd='https://example.org/hd.mp4'))
         self.assertEqual(item.label, 'Sendung: Tagesschau')
         self.assertEqual(item.info['title'], 'Tagesschau')
-        self.assertIn(('video', {'width': 1280, 'height': 720}), item.streams)
+        self.assertIn(('video', {'width': 1920, 'height': 1080}), item.streams)
 
     def test_nothing_is_claimed_about_a_stream_that_is_not_hd(self):
         # The film list says nothing about the other streams either, and a
