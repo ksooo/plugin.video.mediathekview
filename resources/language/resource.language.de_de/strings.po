@@ -98,7 +98,7 @@ msgid "Blacklist"
 msgstr "Ignoriere Titel mit"
 
 msgctxt "#30130"
-msgid "Content Type Filmliste"
+msgid "Content Type Movie list"
 msgstr "Content Type Filmliste"
 
 msgctxt "#30131"
@@ -473,7 +473,7 @@ msgid "Mediathek Database Update"
 msgstr "Mediathek wird aktualisiert"
 
 msgctxt "#30957"
-msgid "Mediathek (%d): gelesen:%d, hinzugefügt:%d, aktualisiert:%d ..."
+msgid "Mediathek (%d): read:%d, insert:%d, update:%d ..."
 msgstr "Mediathek (%d): gelesen:%d, hinzugefügt:%d, aktualisiert:%d ..."
 
 msgctxt "#30958"

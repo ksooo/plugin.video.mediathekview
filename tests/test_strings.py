@@ -34,6 +34,15 @@ def _defined_ids(path):
         return set(int(i) for i in re.findall(r'msgctxt "#(\d+)"', handle.read()))
 
 
+def _msgids(path):
+    """Maps every string id to the msgid text of its entry."""
+    with open(path, encoding='utf-8') as handle:
+        entries = re.finditer(r'msgctxt "#(\d+)"\n(msgid (?:"[^\n]*"\n)+)', handle.read())
+        return dict((int(entry.group(1)),
+                     ''.join(re.findall(r'"([^"]*)"', entry.group(2))))
+                    for entry in entries)
+
+
 def _source_files():
     for name in _ROOT_SOURCES:
         yield os.path.join(support.ADDON_PATH, name)
@@ -113,6 +122,23 @@ class StringsTest(unittest.TestCase):
                 '%s lacks %s, used at %s' % (
                     language, missing,
                     '; '.join(place for i in missing for place in referenced[i])))
+
+    def test_the_languages_agree_on_the_msgid(self):
+        # The msgid is the English original and keys the entry for every
+        # gettext tool. Two entries here used to carry a German msgid,
+        # because someone edited the wrong line.
+        by_language = dict((language, _msgids(path))
+                           for (language, path) in _language_files())
+        reference_language = 'resource.language.en_gb'
+        reference = by_language[reference_language]
+        for (language, msgids) in by_language.items():
+            if language == reference_language:
+                continue
+            differing = sorted(i for i in set(msgids) & set(reference)
+                               if msgids[i] != reference[i])
+            self.assertEqual(
+                differing, [],
+                '%s has its own msgid for %s' % (language, differing))
 
     def test_the_languages_define_the_same_ids(self):
         by_language = dict((language, _defined_ids(path))
