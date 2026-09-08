@@ -28,7 +28,6 @@
 		<summary lang="en_GB">Public service video-platforms</summary>
 		<description lang="de_DE">Dieses Add-on basiert auf dem Code von https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>
 		<description lang="en_GB">This add-on is based on the code of https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>
-		<news></news>
 		<platform>all</platform>
 		<license>MIT</license>
 		<source>https://github.com/ksooo/plugin.video.mediathekview</source>
