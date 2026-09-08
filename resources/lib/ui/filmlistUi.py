@@ -22,6 +22,15 @@ from resources.lib.model.film import Film
 # are fewer and ambiguous, "(1/4)" as often meaning part one of four, so they
 # are left where they are.
 EPISODE_MARKER = re.compile(r'\s*\(\s*S(\d{1,4})\s*/?\s*E(\d{1,4})\s*\)\s*', re.I)
+# Kodi rebuilds the label of a plugin item from the label mask of the sort
+# method in force - only an item that calls its label preformatted is left
+# alone, and a plugin item does not. So this, rather than the label handed to
+# the ListItem, is what the list actually shows, and it is built out of the
+# fields rather than out of a composed string: %Z is the show, %H the season
+# and episode as "1x11", %T the title. Each bracketed part disappears when
+# its field is empty, so a film with neither show nor episode is its title.
+LABEL_MASK_LONG = '[%Z: ][%H. ]%T'
+LABEL_MASK_SHORT = '[%H. ]%T'
 # The film list carries subtitles for German public service broadcasters, and
 # says nothing about their language.
 SUBTITLE_LANGUAGE = 'de'
@@ -65,12 +74,17 @@ class FilmlistUi(object):
             xbmcplugin.SORT_METHOD_TITLE,
             xbmcplugin.SORT_METHOD_DATE,
             xbmcplugin.SORT_METHOD_DATEADDED,
-            xbmcplugin.SORT_METHOD_DURATION
+            xbmcplugin.SORT_METHOD_DURATION,
+            # Only films whose title carried a marker have an episode number,
+            # but for a series that is the order they belong in. It sits at
+            # the end so that the settings keep addressing the same methods.
+            xbmcplugin.SORT_METHOD_EPISODE
         ]
         method = allSortMethods[0]
         allSortMethods[0] = allSortMethods[self.settings.getFilmSortMethod()]
         allSortMethods[self.settings.getFilmSortMethod()] = method
         self.sortmethods = allSortMethods
+        self.labelMask = LABEL_MASK_LONG if pLongTitle else LABEL_MASK_SHORT
         #
         self.startTime = 0
 
@@ -84,7 +98,7 @@ class FilmlistUi(object):
         #
         xbmcplugin.setContent(self.handle, self.settings.getContentType())
         for method in self.sortmethods:
-            xbmcplugin.addSortMethod(self.handle, method)
+            xbmcplugin.addSortMethod(self.handle, method, self.labelMask)
         #
         aFilm = Film()
         listOfElements = []

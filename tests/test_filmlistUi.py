@@ -15,7 +15,8 @@ from tests import support
 
 support.init_app_context()
 
-from resources.lib.ui.filmlistUi import FilmlistUi, splitEpisode
+from resources.lib.ui.filmlistUi import (FilmlistUi, splitEpisode,
+                                         LABEL_MASK_LONG, LABEL_MASK_SHORT)
 
 
 def row(idhash='hash', title='Titel', show='Sendung', channel='ARD',
@@ -39,6 +40,21 @@ class GenerateTest(unittest.TestCase):
         items = self._generate([row(title='Tagesschau')])
         self.assertEqual(len(items), 1)
         self.assertEqual(items[0][1].label, 'Sendung: Tagesschau')
+
+    def test_the_list_is_told_how_to_build_its_labels(self):
+        # Kodi rebuilds the label of a plugin item from the mask of the sort
+        # method in force, so this is what the list shows - not the label the
+        # item was given.
+        self._generate([row()])
+        self.assertEqual(set(self.xbmcplugin.label_masks), {LABEL_MASK_LONG})
+
+    def test_a_listing_of_one_show_leaves_the_show_out_of_the_labels(self):
+        FilmlistUi(self.plugin, pLongTitle=False).generate([row()])
+        self.assertEqual(set(self.xbmcplugin.label_masks), {LABEL_MASK_SHORT})
+
+    def test_episodes_can_be_sorted_by_their_number(self):
+        self._generate([row()])
+        self.assertIn(self.xbmcplugin.SORT_METHOD_EPISODE, self.xbmcplugin.sort_methods)
 
     def test_a_film_without_any_url_does_not_take_the_list_with_it(self):
         # A record whose Url field is empty reaches the database unfiltered.

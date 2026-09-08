@@ -369,11 +369,13 @@ class _Plugin(object):
     SORT_METHOD_DATE = 2
     SORT_METHOD_DATEADDED = 3
     SORT_METHOD_DURATION = 4
+    SORT_METHOD_EPISODE = 5
 
     def __init__(self):
         self.items = []
         self.content = None
         self.sort_methods = []
+        self.label_masks = []
         self.ended = False
 
     def reset(self):
@@ -382,8 +384,9 @@ class _Plugin(object):
     def setContent(self, handle, content):
         self.content = content
 
-    def addSortMethod(self, handle, method):
+    def addSortMethod(self, handle, method, labelMask='', label2Mask=''):
         self.sort_methods.append(method)
+        self.label_masks.append(labelMask)
 
     def addDirectoryItems(self, handle, items, totalItems=0):
         self.items.extend(items)
