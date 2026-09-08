@@ -46,6 +46,22 @@ class Notifier(object):
         self.errors = []
         self.notifications = []
         self.limit_results = []
+        self.progress = []
+
+    def show_download_progress(self):
+        self.progress = []
+
+    def update_download_progress(self, percent, message=None):
+        self.progress.append(percent)
+
+    def hook_download_progress(self, blockcount, blocksize, totalsize):
+        pass
+
+    def close_download_progress(self):
+        pass
+
+    def show_download_error(self, url, err):
+        self.errors.append((url, err))
 
     def show_error(self, heading, message):
         self.errors.append((heading, message))

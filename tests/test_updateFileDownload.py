@@ -17,7 +17,9 @@ from tests import support
 
 support.init_app_context()
 
+import resources.lib.appContext as appContext
 import resources.lib.updateFileDownload as updateFileDownload
+from resources.lib.exceptions import ExitRequested
 from resources.lib.updateFileDownload import UpdateFileDownload
 
 _PAYLOAD = b'{"Filmliste":["30.08.2020, 11:13"]}\n' * 4096
@@ -126,6 +128,61 @@ class DecompressTest(unittest.TestCase):
         self.assertEqual(self.download._decompress_bz2(source, target), 0)
         with open(target, 'rb') as handle:
             self.assertEqual(handle.read(), _PAYLOAD)
+
+    def test_a_gz_archive_of_several_members_arrives_whole(self):
+        # gzip allows concatenated members. Reading the compressed side with a
+        # single decompressor object would stop after the first one and leave a
+        # database that looks complete and is not.
+        (source, target) = self._paths('.gz')
+        with open(source, 'wb') as raw:
+            for part in (b'first ', b'second ', b'third'):
+                raw.write(gzip.compress(part))
+        self.download._decompress_gz(source, target)
+        with open(target, 'rb') as handle:
+            self.assertEqual(handle.read(), b'first second third')
+
+
+class AbortAndProgressTest(unittest.TestCase):
+    """Unpacking used to run to the end no matter what.
+
+    It has no abort check, so a Kodi shutdown had to sit out the unpacking of
+    a few hundred megabytes, and the progress bar stood still throughout.
+    """
+
+    def setUp(self):
+        self.notifier = support.Notifier()
+        self.monitor = support.Monitor()
+        support.init_app_context(notifier=self.notifier, monitor=self.monitor)
+        self.download = UpdateFileDownload()
+        self.directory = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.directory)
+        self.source = os.path.join(self.directory, 'archive.gz')
+        self.target = os.path.join(self.directory, 'archive')
+        with gzip.open(self.source, 'wb') as handle:
+            handle.write(_PAYLOAD * 64)
+
+    def test_reports_progress_while_unpacking(self):
+        self.download._decompress_gz(self.source, self.target)
+        self.assertTrue(self.notifier.progress, 'the bar has to move')
+        self.assertEqual(self.notifier.progress, sorted(self.notifier.progress))
+        self.assertLessEqual(max(self.notifier.progress), 100)
+
+    def test_an_abort_stops_the_unpacking(self):
+        self.monitor.abort = True
+        with self.assertRaises(ExitRequested):
+            self.download._decompress_gz(self.source, self.target)
+
+    def test_an_abort_is_not_mistaken_for_a_broken_archive(self):
+        # The gz path falls back to the gzip binary when unpacking fails.
+        # A requested shutdown is not a failure and must not start that.
+        self.monitor.abort = True
+        try:
+            self.download._decompress_gz(self.source, self.target)
+        except ExitRequested:
+            pass
+        errors = [text for (level, text) in appContext.MVLOGGER.messages
+                  if level == 'error']
+        self.assertEqual(errors, [])
 
 
 if __name__ == '__main__':

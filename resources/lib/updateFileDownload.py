@@ -8,7 +8,6 @@ SPDX-License-Identifier: MIT
 
 # -- Imports ------------------------------------------------
 import os
-import shutil
 import time
 import subprocess
 import resources.lib.appContext as appContext
@@ -228,36 +227,56 @@ class UpdateFileDownload(object):
         self.notifier.close_download_progress()
         return retval == 0 and mvutils.file_exists(targetFilename)
 
+    def _decompress_stream(self, sourcefile, destfile, wrap):
+        """
+        Unpacks an archive through the reader `wrap` puts around the raw file.
+
+        The compressed file is opened here rather than by the reader, so that
+        its position gives the progress against a size known up front, and so
+        that an abort is noticed once per buffer instead of only at the end.
+        """
+        totalsize = mvutils.file_size(sourcefile)
+        with closing(open(sourcefile, 'rb')) as rawfile:
+            with closing(wrap(rawfile)) as srcfile, closing(open(destfile, 'wb')) as dstfile:
+                while True:
+                    if self.monitor.abort_requested():
+                        raise ExitRequested('Decompression interrupted.')
+                    data = srcfile.read(COPY_BUFFER_SIZE)
+                    if not data:
+                        break
+                    dstfile.write(data)
+                    if totalsize > 0:
+                        self.notifier.update_download_progress(
+                            int(rawfile.tell() * 100 / totalsize))
+        return 0
+
     def _decompress_xz(self, sourcefile, destfile):
         # pylint: disable=broad-except
         try:
-            with closing(lzma.open(sourcefile, 'rb')) as srcfile, \
-                    closing(open(destfile, 'wb')) as dstfile:
-                shutil.copyfileobj(srcfile, dstfile, COPY_BUFFER_SIZE)
+            return self._decompress_stream(sourcefile, destfile, lzma.LZMAFile)
+        except ExitRequested:
+            raise
         except Exception as err:
             self.logger.error('xz decompression failed: {}', err)
             raise
-        return 0
 
     def _decompress_bz2(self, sourcefile, destfile):
-        blocksize = 8192
+        # pylint: disable=broad-except
         try:
-            with open(destfile, 'wb') as dstfile, open(sourcefile, 'rb') as srcfile:
-                decompressor = bz2.BZ2Decompressor()
-                for data in iter(lambda: srcfile.read(blocksize), b''):
-                    dstfile.write(decompressor.decompress(data))
-                # pylint: disable=broad-except
-        except Exception as err:
-            self.logger.error('bz2 decompression failed: {}'.format(err))
+            return self._decompress_stream(sourcefile, destfile, bz2.BZ2File)
+        except ExitRequested:
             raise
-        return 0
+        except Exception as err:
+            self.logger.error('bz2 decompression failed: {}', err)
+            raise
 
     def _decompress_gz(self, sourcefile, destfile):
         # pylint: disable=broad-except
         try:
-            with closing(gzip.open(sourcefile, 'rb')) as srcfile, \
-                    closing(open(destfile, 'wb')) as dstfile:
-                shutil.copyfileobj(srcfile, dstfile, COPY_BUFFER_SIZE)
+            return self._decompress_stream(
+                sourcefile, destfile, lambda raw: gzip.GzipFile(fileobj=raw))
+        except ExitRequested:
+            raise
         except Exception as err:
             self.logger.error(
                 'gz decompression of "{}" to "{}" failed: {}', sourcefile, destfile, err)
