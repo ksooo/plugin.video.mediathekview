@@ -406,11 +406,18 @@ def install_kodi_stubs():
     return plugin
 
 
-def install_mysql_stub(connect):
+def _no_connection(**kwargs):
+    return None
+
+
+def install_mysql_stub(connect=_no_connection):
     """Registers a mysql.connector whose connect() is the given callable.
 
     The addon imports it at module level, and the real package is not a
-    dependency of the tests.
+    dependency of the tests, so anything reaching storeMySql - the updater and
+    the plugin both do - needs it present. init_app_context() installs one that
+    connects to nothing, which is why no test module has to remember to; call
+    this afterwards to put a recording one in its place.
     """
     package = sys.modules.setdefault('mysql', types.ModuleType('mysql'))
     connector = types.ModuleType('mysql.connector')
@@ -426,6 +433,7 @@ def install_mysql_stub(connect):
 def init_app_context(settings=None, notifier=None):
     """Fills the global application context the addon modules read from."""
     install_kodi_stubs()
+    install_mysql_stub()
     import resources.lib.appContext as app_context
     app_context.init()
     app_context.initLogger(Logger())

@@ -29,3 +29,13 @@ jobs:
 
       - name: Run tests
         run: python -m unittest discover -s tests -t . -v
+
+      - name: Run each test module on its own
+        # A module that passes only inside the full run depends on some other
+        # module having imported something first.
+        run: |
+          for path in tests/test_*.py; do
+            module=$(basename "$path" .py)
+            echo "== tests.$module"
+            python -m unittest "tests.$module"
+          done
