@@ -297,15 +297,20 @@ class ListItem(object):
 
     def __init__(self, label='', label2='', path='', offscreen=False):
         self.label = label
+        self.label2 = label2
         self.path = path
         self.info = {}
         self.art = {}
         self.properties = {}
         self.context_menu = []
         self.subtitles = []
+        self.streams = []
 
     def setInfo(self, type, infoLabels):
         self.info = infoLabels
+
+    def addStreamInfo(self, type, values):
+        self.streams.append((type, values))
 
     def setArt(self, art):
         self.art = art

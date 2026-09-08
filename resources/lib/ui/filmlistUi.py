@@ -15,6 +15,10 @@ import xbmcplugin
 import resources.lib.appContext as appContext
 from resources.lib.model.film import Film
 
+# The film list carries subtitles for German public service broadcasters, and
+# says nothing about their language.
+SUBTITLE_LANGUAGE = 'de'
+
 
 class FilmlistUi(object):
     """
@@ -158,6 +162,11 @@ class FilmlistUi(object):
         #
         listitem.setInfo(type='video', infoLabels=info_labels)
         listitem.setProperty('IsPlayable', 'true')
+        # That a subtitle exists was only findable in the context menu. As a
+        # stream it becomes something a skin can put a flag on, and it is one
+        # of the few things the film list tells us for certain.
+        if pFilm.url_sub:
+            listitem.addStreamInfo('subtitle', {'language': SUBTITLE_LANGUAGE})
         listitem.setArt({
             'thumb': icon,
             'icon': icon,

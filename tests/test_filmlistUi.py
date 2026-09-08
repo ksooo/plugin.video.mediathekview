@@ -92,6 +92,17 @@ class GenerateListItemTest(unittest.TestCase):
         self.assertEqual(item.label, 'Tagesschau')
         self.assertEqual(item.info['title'], 'Tagesschau')
 
+    def test_a_subtitle_is_announced_as_a_stream(self):
+        # Whether a film has subtitles was only findable by opening the
+        # context menu.
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(
+            _film(url_sub='https://example.org/a.ttml'))
+        self.assertEqual(item.streams, [('subtitle', {'language': 'de'})])
+
+    def test_a_film_without_subtitles_announces_none(self):
+        (_, item) = FilmlistUi(self.plugin)._generateListItem(_film(url_sub=''))
+        self.assertEqual(item.streams, [])
+
     def test_prefers_sd_over_the_plain_url(self):
         (url, _) = FilmlistUi(self.plugin)._generateListItem(
             _film(url_video='https://example.org/a.mp4',
