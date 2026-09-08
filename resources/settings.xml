@@ -1,65 +1,401 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-	<category label="30001">
-		<setting id="quality"			type="bool"		label="30110"	default="true"										/>
-		<setting id="autosub"			type="bool"		label="30111"	default="false"										/>
-		<setting id="nofuture"			type="bool"		label="30112"	default="true"										/>
-		<setting id="minlength"			type="slider"	label="30113"	default="0"		range="0,30"						/>
-		<setting id="maxresults"		type="slider"	label="30115"	default="1000"	range="100,100,3000" option="int"	/>
-		<setting id="maxage"			type="slider"	label="30116"	default="2"		range="1,30" option="int"			/>
-		<setting id="blacklist"         type="text"     label="30125"   default=""                                          />
-	</category>
-	<category label="30002">
-		<setting id="dbtype"			type="enum"		label="30210"	default="0"	lvalues="30221|30222"					/>
-		<setting id="dbhost"			type="text"		label="30211"	default="localhost"			visible="eq(-1,1)"		/>
-		<setting id="dbport"			type="number"	label="30212"	default="3306"				visible="eq(-2,1)"		/>
-		<setting id="dbuser"			type="text"		label="30213"	default="mediathekview"		visible="eq(-3,1)"		/>
-		<setting id="dbpass"			type="text"		label="30214"	default=""	option="hidden"	visible="eq(-4,1)"		/>
-		<setting id="dbdata"			type="text"		label="30215"	default="mediathekview"		visible="eq(-5,1)"		/>
-		<setting id="updnative"			type="bool"		label="30233"	default="true"				visible="eq(-6,0)"		/>
-		<setting id="updmode"			type="enum"		label="30231"	default="3"	lvalues="30241|30242|30243|30244|30245"	/>
-		<setting id="updinterval"		type="slider"	label="30232"	default="2"	range="1,24"	visible="gt(-1,2)"		/>
-		<setting id="updateBatchSize"   type="slider"   label="30235"   default="10000" range="1000,100000" option="int"    />
-	</category>
-	<category label="30003">
-		<setting id="downloadpathep"	type="folder"	label="30310"	source="auto"	option="writeable"					/>
-		<setting id="downloadpathmv"	type="folder"	label="30311"	source="auto"	option="writeable"					/>
-		<setting id="moviefolders"		type="bool"		label="30312"	default="true"										/>
-		<setting id="movienamewithshow"	type="bool"		label="30313"	default="true"										/>
-		<setting id="reviewname"		type="bool"		label="30314"	default="false"										/>
-		<setting id="downloadsrt"		type="bool"		label="30315"	default="true"										/>
-		<setting id="makenfo"			type="enum"		label="30316"	default="2"		lvalues="30340|30341|30342"			/>
-		<setting id="fileExistsAction"  type="enum"     label="30344"   default="0"     lvalues="30345|30346|30347"         />
-		<setting id="downloadQuality"   type="enum"     label="30348"   default="0"     lvalues="30351|30350|30349"         />
-		
-    </category>
-    <category label="30004">
-        <setting id="updateCheckInterval" type="slider" label="30118"   default="30"    range="10,60" option="int"          />
-        <setting id="contentType"       type="enum"     label="30130"   default="30131" lvalues="30131|30132|30133|30134|30135"/>
-        <setting id="caching"           type="bool"     label="30234"   default="true"                                      />
-        <setting id="filmuisortmethod"  type="enum"     label="30119"   default="0"     lvalues="30173|30120|30121|30122|30124" />        
-        <setting id="groupshows"        type="bool"     label="30114"   default="true"                                      />
-        <setting id="recentmode"        type="enum"     label="30117"   default="0"     lvalues="30171|30172"               />
-        <setting id="staticViewIds"     type="bool"     label="30343"   default="true"                                      />                        
-		<!-- setting						type="action"	label="30238"	action="RunScript(plugin.video.mediathekview, downloadreport)"/ -->
-
-		<!-- INTERNAL STUFF USED FOR STATE STORAGE                                                                         -->
-		<!-- do update trigger from UI to update service                                                                   -->
-		<setting id="updatetrigger"		type="bool"						default="false"	visible="false"						/>
-		<!-- set on UI click to handle update logic automatic                                                              -->
-		<setting id="lastactivity"		type="number"					default="0"		visible="false"						/>
-		<!-- used to handle quick search logic                                                                             -->
-		<setting id="lastsearch1"		type="text"						default=""		visible="false"						/>
-		<setting id="lastsearch2"		type="text"						default=""		visible="false"						/>
-		<!-- copy of the database status table to avoid DB access for SQLite                                               -->
-		<setting id="lastUpdate"	    type="number"					default="0"		visible="false"						/>
-		<setting id="lastFullUpdate"	type="number"					default="0"		visible="false"						/>
-		<setting id="databaseVersion"	type="text"					    default="0"		visible="false"						/>
-		<setting id="databaseStatus"	type="text"					    default="0"		visible="false"						/>
-		<!--  delay startup by x secs to avoid issue with missing network connections -->
-		<setting id="delayStartupSec"   type="number"                   default="10"     visible="false"                     />
-		<setting id="userAgentString"   type="text"                     default="|User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%3B%20rv%3A84.0%29%20Gecko%2F20100101%20Firefox%2F84.0"     visible="false" />
-        
-        
-	</category>
+<settings version="1">
+    <section id="plugin.video.mediathekview.ksooo">
+        <category id="general" label="30001">
+            <group id="1">
+                <setting id="quality" type="boolean" label="30110">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="autosub" type="boolean" label="30111">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="nofuture" type="boolean" label="30112">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="minlength" type="integer" label="30113">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>1</step>
+                        <maximum>30</maximum>
+                    </constraints>
+                    <control type="slider" format="integer"/>
+                </setting>
+                <setting id="maxresults" type="integer" label="30115">
+                    <level>0</level>
+                    <default>1000</default>
+                    <constraints>
+                        <minimum>100</minimum>
+                        <step>100</step>
+                        <maximum>3000</maximum>
+                    </constraints>
+                    <control type="slider" format="integer"/>
+                </setting>
+                <setting id="maxage" type="integer" label="30116">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>30</maximum>
+                    </constraints>
+                    <control type="slider" format="integer"/>
+                </setting>
+                <setting id="blacklist" type="string" label="30125">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30125</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="database" label="30002">
+            <group id="1">
+                <setting id="dbtype" type="integer" label="30210">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30221">0</option>
+                            <option label="30222">1</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="dbhost" type="string" label="30211">
+                    <level>0</level>
+                    <default>localhost</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="dbtype">1</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>30211</heading>
+                    </control>
+                </setting>
+                <setting id="dbport" type="integer" label="30212">
+                    <level>0</level>
+                    <default>3306</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="dbtype">1</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="integer">
+                        <heading>30212</heading>
+                    </control>
+                </setting>
+                <setting id="dbuser" type="string" label="30213">
+                    <level>0</level>
+                    <default>mediathekview</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="dbtype">1</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>30213</heading>
+                    </control>
+                </setting>
+                <setting id="dbpass" type="string" label="30214">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="dbtype">1</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>30214</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+                <setting id="dbdata" type="string" label="30215">
+                    <level>0</level>
+                    <default>mediathekview</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="dbtype">1</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>30215</heading>
+                    </control>
+                </setting>
+                <setting id="updnative" type="boolean" label="30233">
+                    <level>0</level>
+                    <default>true</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="dbtype">0</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="updmode" type="integer" label="30231">
+                    <level>0</level>
+                    <default>3</default>
+                    <constraints>
+                        <options>
+                            <option label="30241">0</option>
+                            <option label="30242">1</option>
+                            <option label="30243">2</option>
+                            <option label="30244">3</option>
+                            <option label="30245">4</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="updinterval" type="integer" label="30232">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>24</maximum>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="gt" setting="updmode">2</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="slider" format="integer"/>
+                </setting>
+                <setting id="updateBatchSize" type="integer" label="30235">
+                    <level>0</level>
+                    <default>10000</default>
+                    <constraints>
+                        <minimum>1000</minimum>
+                        <step>1</step>
+                        <maximum>100000</maximum>
+                    </constraints>
+                    <control type="slider" format="integer"/>
+                </setting>
+            </group>
+        </category>
+        <category id="downloads" label="30003">
+            <group id="1">
+                <setting id="downloadpathep" type="path" label="30310">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                        <writable>true</writable>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>30310</heading>
+                    </control>
+                </setting>
+                <setting id="downloadpathmv" type="path" label="30311">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                        <writable>true</writable>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>30311</heading>
+                    </control>
+                </setting>
+                <setting id="moviefolders" type="boolean" label="30312">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="movienamewithshow" type="boolean" label="30313">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="reviewname" type="boolean" label="30314">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="downloadsrt" type="boolean" label="30315">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="makenfo" type="integer" label="30316">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <options>
+                            <option label="30340">0</option>
+                            <option label="30341">1</option>
+                            <option label="30342">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="fileExistsAction" type="integer" label="30344">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30345">0</option>
+                            <option label="30346">1</option>
+                            <option label="30347">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="downloadQuality" type="integer" label="30348">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30351">0</option>
+                            <option label="30350">1</option>
+                            <option label="30349">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+            </group>
+        </category>
+        <category id="advanced" label="30004">
+            <group id="1">
+                <setting id="updateCheckInterval" type="integer" label="30118">
+                    <level>0</level>
+                    <default>30</default>
+                    <constraints>
+                        <minimum>10</minimum>
+                        <step>1</step>
+                        <maximum>60</maximum>
+                    </constraints>
+                    <control type="slider" format="integer"/>
+                </setting>
+                <setting id="contentType" type="integer" label="30130">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30131">0</option>
+                            <option label="30132">1</option>
+                            <option label="30133">2</option>
+                            <option label="30134">3</option>
+                            <option label="30135">4</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="caching" type="boolean" label="30234">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="filmuisortmethod" type="integer" label="30119">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30173">0</option>
+                            <option label="30120">1</option>
+                            <option label="30121">2</option>
+                            <option label="30122">3</option>
+                            <option label="30124">4</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="groupshows" type="boolean" label="30114">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="recentmode" type="integer" label="30117">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30171">0</option>
+                            <option label="30172">1</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="staticViewIds" type="boolean" label="30343">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+            <!-- Internal state, written by the addon and never shown. -->
+            <group id="2">
+                <setting id="updatetrigger" type="boolean">
+                    <level>0</level>
+                    <default>false</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="lastactivity" type="integer">
+                    <level>0</level>
+                    <default>0</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="lastsearch1" type="string">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <visible>false</visible>
+                </setting>
+                <setting id="lastsearch2" type="string">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <visible>false</visible>
+                </setting>
+                <setting id="lastUpdate" type="integer">
+                    <level>0</level>
+                    <default>0</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="lastFullUpdate" type="integer">
+                    <level>0</level>
+                    <default>0</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="databaseVersion" type="string">
+                    <level>0</level>
+                    <default>0</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="databaseStatus" type="string">
+                    <level>0</level>
+                    <default>0</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="delayStartupSec" type="integer">
+                    <level>0</level>
+                    <default>10</default>
+                    <visible>false</visible>
+                </setting>
+                <setting id="userAgentString" type="string">
+                    <level>0</level>
+                    <default>|User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%3B%20rv%3A84.0%29%20Gecko%2F20100101%20Firefox%2F84.0</default>
+                    <visible>false</visible>
+                </setting>
+            </group>
+        </category>
+    </section>
 </settings>
