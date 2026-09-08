@@ -384,8 +384,8 @@ msgid "Required decompression program 'xz' not found on your system"
 msgstr "Required decompression program 'xz' not found on your system"
 
 msgctxt "#30955"
-msgid "Download Database Update"
-msgstr "Download Database Update"
+msgid "Database update in progress"
+msgstr "Database update in progress"
 
 msgctxt "#30956"
 msgid "Mediathek Database Update"
@@ -502,7 +502,3 @@ msgstr "Cannot retrieve Movie Information"
 msgctxt "#30990"
 msgid "Airdate: {0:s}[CR][CR]"
 msgstr "Airdate: {0:s}[CR][CR]"
-
-msgctxt "#30991"
-msgid "Unpack Database Update"
-msgstr "Unpack Database Update"

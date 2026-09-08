@@ -52,23 +52,18 @@ class Notifier(object):
 
     def show_download_progress(self):
         self.headings.append('download')
+        self.progress = []
 
     def update_download_progress(self, percent, message=None):
         self.progress.append(percent)
+        if message is not None:
+            self.messages.append(message)
 
     def hook_download_progress(self, blockcount, blocksize, totalsize):
         pass
 
     def close_download_progress(self):
         self.headings.append('closed')
-
-    def show_unpack_progress(self, message=None):
-        self.headings.append('unpack')
-        self.messages.append(message)
-        self.progress = []
-
-    def update_unpack_progress(self, percent):
-        self.progress.append(percent)
 
     def show_error(self, heading, message):
         self.errors.append((heading, message))

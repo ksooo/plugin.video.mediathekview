@@ -384,8 +384,8 @@ msgid "Required decompression program 'xz' not found on your system"
 msgstr "Der benötigte Entpacker 'xz' konnte nicht gefunden werden"
 
 msgctxt "#30955"
-msgid "Download Database Update"
-msgstr "Datenbank-Update wird heruntergeladen"
+msgid "Database update in progress"
+msgstr "Datenbank-Update läuft"
 
 msgctxt "#30956"
 msgid "Mediathek Database Update"
@@ -502,7 +502,3 @@ msgstr "Die Sendung wurde nicht gefunden"
 msgctxt "#30990"
 msgid "Airdate: {0:s}[CR][CR]"
 msgstr "Ausgestrahlt: {0:s}[CR][CR]"
-
-msgctxt "#30991"
-msgid "Unpack Database Update"
-msgstr "Datenbank-Update wird entpackt"

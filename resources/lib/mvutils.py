@@ -179,28 +179,6 @@ def file_rename(srcname, dstname):
     return False
 
 
-def find_gzip():
-    """
-    Return the full pathname to the gzip decompressor
-    executable
-    """
-    for gzbin in ['/bin/gzip', '/usr/bin/gzip', '/usr/local/bin/gzip', '/system/bin/gzip']:
-        if file_exists(gzbin):
-            return gzbin
-    return None
-
-
-def find_xz():
-    """
-    Return the full pathname to the xz decompressor
-    executable
-    """
-    for xzbin in ['/bin/xz', '/usr/bin/xz', '/usr/local/bin/xz', '/system/bin/xz']:
-        if file_exists(xzbin):
-            return xzbin
-    return None
-
-
 def make_search_string(val):
     """
     Reduces a string to a simplified representation

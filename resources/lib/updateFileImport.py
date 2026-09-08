@@ -35,7 +35,6 @@ class UpdateFileImport(object):
         self.monitor = appContext.MVMONITOR
         self.targetFilename = targetFilename
         self.database = pDatabase
-        self.use_xz = mvutils.find_xz() is not None
         self.count = 0
         self.insertCount = 0
         self.updateCount = 0

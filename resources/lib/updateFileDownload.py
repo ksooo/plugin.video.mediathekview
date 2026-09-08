@@ -9,16 +9,17 @@ SPDX-License-Identifier: MIT
 # -- Imports ------------------------------------------------
 import os
 import time
-import subprocess
 import resources.lib.appContext as appContext
 
 # pylint: disable=import-error
 try:
     # Python 3.x
     from urllib.error import URLError
+    from urllib.request import urlopen
 except ImportError:
     # Python 2.x
     from urllib2 import URLError
+    from urllib2 import urlopen
 
 from contextlib import closing
 from codecs import open
@@ -30,8 +31,15 @@ from resources.lib.backgroundWork import run_in_background
 from resources.lib.exceptions import ExitRequested
 
 # -- Unpacker support ---------------------------------------
+UPD_CAN_XZ = False
 UPD_CAN_BZ2 = False
 UPD_CAN_GZ = False
+
+try:
+    import lzma
+    UPD_CAN_XZ = True
+except ImportError:
+    pass
 
 try:
     import bz2
@@ -56,9 +64,48 @@ DATABASE_URL = 'https://liste.mediathekview.de/'
 # DATABASE_URL = 'http://192.168.137.100/content/test/'
 DATABASE_DBF = 'filmliste-v3.db'
 # DATABASE_AKT = 'filmliste-v2.db.update'
+# Read this much at a time. Every chunk boundary is a trip back into python,
+# and the interpreter lock is shared with the plugin the user is looking at.
+COPY_BUFFER_SIZE = 1024 * 1024
+# Write no faster than this. Unpacking bzip2 was slow enough to leave the
+# storage some room by accident - some 9 MB/s on a Shield - and asking for
+# gzip instead took that room away, which froze the interface for the whole
+# update. Now the room is made on purpose. A job that runs once a day can
+# afford to take twice as long.
+WRITE_BYTES_PER_SEC = 10 * 1024 * 1024
+# A result smaller than this is treated as truncated rather than as the real
+# thing, because a truncated one used to wipe the database.
+MINIMUM_SIZE = 200000000
 
 # -- Classes ------------------------------------------------
 # pylint: disable=bad-whitespace
+
+
+class _CountingReader(object):
+    """
+    Counts what the unpacker has read, so progress has a denominator.
+
+    The stream arrives from the network without a position of its own, and it
+    is the compressed side whose total size the server announces.
+    """
+
+    def __init__(self, stream):
+        self._stream = stream
+        self.count = 0
+
+    def read(self, size=-1):
+        data = self._stream.read(size)
+        self.count += len(data)
+        return data
+
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return False
+
+    def close(self):
+        pass
 
 
 class UpdateFileDownload(object):
@@ -70,59 +117,40 @@ class UpdateFileDownload(object):
         self.settings = appContext.MVSETTINGS
         self.monitor = appContext.MVMONITOR
         self.database = None
-        self.shownPercent = -1
-        self.use_xz = mvutils.find_xz() is not None
 
     def getTargetFilename(self):
         return self._filename
 
     def removeDownloads(self):
-        mvutils.file_remove(self._compressedFilename)
         mvutils.file_remove(self._filename)
 
     def downloadIncrementalUpdateFile(self):
-        #
-        ext = self._getExtension()
-        downloadUrl = FILMLISTE_URL + FILMLISTE_DIF + ext
-        self._compressedFilename = os.path.join(self.settings.getDatapath() , FILMLISTE_DIF + ext)
-        self._filename = os.path.join(self.settings.getDatapath() , FILMLISTE_DIF)
-        #
-        check = self._download(downloadUrl, self._compressedFilename, self._filename)
-        #
-        return check
+        self._filename = os.path.join(self.settings.getDatapath(), FILMLISTE_DIF)
+        return self._download(FILMLISTE_URL + FILMLISTE_DIF + self._getExtension(),
+                              self._filename)
 
     def downloadFullUpdateFile(self):
-        #
-        ext = self._getExtension()
-        downloadUrl = FILMLISTE_URL + FILMLISTE_AKT + ext
-        self._compressedFilename = os.path.join(self.settings.getDatapath() , FILMLISTE_AKT + ext)
-        self._filename = os.path.join(self.settings.getDatapath() , FILMLISTE_AKT)
-        #
-        check = self._download(downloadUrl, self._compressedFilename, self._filename)
-        #
+        self._filename = os.path.join(self.settings.getDatapath(), FILMLISTE_AKT)
+        check = self._download(FILMLISTE_URL + FILMLISTE_AKT + self._getExtension(),
+                               self._filename)
         if check:
-            filesize = mvutils.file_size(self._filename)
-            if filesize < 200000000:
-                raise Exception('FullUpdate file size {} smaller than allowed (200MB)'.format(filesize))
-        #
+            self._checkSize(self._filename)
         return check
 
     def downloadSqliteDb(self):
-        ext = self._getExtension()
-        downloadUrl = DATABASE_URL + DATABASE_DBF + ext
-        self._compressedFilename = os.path.join(self.settings.getDatapath() , 'tmp_' + DATABASE_DBF + ext)
-        self._filename = os.path.join(self.settings.getDatapath() , 'tmp_' + DATABASE_DBF)
-        self._Dbfilename = os.path.join(self.settings.getDatapath() , DATABASE_DBF)
-
-        #
-        check = self._download(downloadUrl, self._compressedFilename, self._filename)
-        #
+        self._filename = os.path.join(self.settings.getDatapath(), 'tmp_' + DATABASE_DBF)
+        self._Dbfilename = os.path.join(self.settings.getDatapath(), DATABASE_DBF)
+        check = self._download(DATABASE_URL + DATABASE_DBF + self._getExtension(),
+                               self._filename)
         if check:
-            filesize = mvutils.file_size(self._filename)
-            if filesize < 200000000:
-                raise Exception('FullUpdate file size {} smaller than allowed (200MB)'.format(filesize))
-        #
+            self._checkSize(self._filename)
         return check
+
+    def _checkSize(self, filename):
+        """ A truncated download used to wipe the database, so refuse a small one """
+        filesize = mvutils.file_size(filename)
+        if filesize < MINIMUM_SIZE:
+            raise Exception('FullUpdate file size {} smaller than allowed (200MB)'.format(filesize))
 
     def updateSqliteDb(self):
         start = time.time()
@@ -130,156 +158,103 @@ class UpdateFileDownload(object):
         self.logger.debug('renamed {} to {} in {} sec', self._filename, self._Dbfilename, (time.time() - start))
 
     def _getExtension(self):
-        ext = ""
-        if self.use_xz is True:
-            ext = '.xz'
-        elif UPD_CAN_BZ2 is True:
-            ext = '.bz2'
-        elif UPD_CAN_GZ is True:
-            ext = '.gz'
-        else:
-            self.logger.error('No suitable archive extractor available for this system')
-            self.notifier.show_missing_extractor_error()
-        return ext
-
-    def _download(self, url, compressedFilename, targetFilename):
-        # cleanup downloads
-        start = time.time()
-        self.logger.debug('Cleaning up old downloads...')
-        mvutils.file_remove(compressedFilename)
-        mvutils.file_remove(targetFilename)
+        # Ordered by what unpacking costs, not by download size. Unpacking is
+        # the part that competes with the interface, and measured on the real
+        # archives gzip decompresses eleven times faster than bzip2 and six
+        # times faster than xz. The archive is the largest of the three in
+        # exchange - 150 MB against 113 - and it never reaches the disk.
         #
-        # download filmliste
-        self.notifier.show_download_progress()
+        # This used to look for an `xz` executable, which Kodi does not ship
+        # while it does link liblzma, so every Kodi ended up on bzip2 - the
+        # slowest of the three.
+        if UPD_CAN_GZ is True:
+            return '.gz'
+        if UPD_CAN_XZ is True:
+            return '.xz'
+        if UPD_CAN_BZ2 is True:
+            return '.bz2'
+        self.logger.error('No suitable archive extractor available for this system')
+        self.notifier.show_missing_extractor_error()
+        return ""
 
+    def _getReader(self, extension):
+        """ The reader that unpacks the stream the given extension announces """
+        if extension == '.gz':
+            return lambda stream: gzip.GzipFile(fileobj=stream)
+        if extension == '.xz':
+            return lzma.LZMAFile
+        if extension == '.bz2':
+            return bz2.BZ2File
+        raise Exception('No suitable archive extractor available for this system')
+
+    def _download(self, url, targetFilename):
+        start = time.time()
+        mvutils.file_remove(targetFilename)
+        self.notifier.show_download_progress()
         # pylint: disable=broad-except
         try:
-            self.logger.debug('Trying to download {} from {}...',
-                             os.path.basename(compressedFilename), url)
+            self.logger.debug('Downloading and unpacking {}', url)
             self.notifier.update_download_progress(0, url)
-            run_in_background(lambda: mvutils.url_retrieve(
-                url,
-                filename=compressedFilename,
-                reporthook=self.notifier.hook_download_progress,
-                aborthook=self.monitor.abort_requested
-            ), name='Download')
-            self.logger.debug('downloaded {} in {} sec', compressedFilename, (time.time() - start))
+            written = run_in_background(
+                lambda: self._retrieveUnpacked(url, targetFilename), name='Update')
+            self.logger.debug('Wrote {} bytes in {} sec', written, (time.time() - start))
         except URLError as err:
             self.logger.error('Failure downloading {} - {}', url, err)
             self.notifier.close_download_progress()
             self.notifier.show_download_error(url, err)
             raise
         except ExitRequested as err:
-            self.logger.error(
-                'Immediate exit requested. Aborting download of {}', url)
+            self.logger.error('Immediate exit requested. Aborting download of {}', url)
             self.notifier.close_download_progress()
             self.notifier.show_download_error(url, err)
             raise
         except Exception as err:
-            self.logger.error('Failure writing {}', url)
+            self.logger.error('Failure downloading or unpacking {}: {}', url, err)
             self.notifier.close_download_progress()
             self.notifier.show_download_error(url, err)
             raise
-        # decompress filmliste
-        try:
-            retval = run_in_background(
-                lambda: self._decompress(compressedFilename, targetFilename, url),
-                name='Unpack')
-        except Exception as err:
-            self.logger.error('Failure decompress {}', err)
-            self.notifier.close_download_progress()
-            self.notifier.show_download_error('decompress failed', err)
-            raise
-
         self.notifier.close_download_progress()
-        return retval == 0 and mvutils.file_exists(targetFilename)
+        return mvutils.file_exists(targetFilename)
 
-    def _decompress(self, compressedFilename, targetFilename, sourceUrl=None):
-        """ Unpacks with the tool that matches what _getExtension() asked for """
+    def _retrieveUnpacked(self, url, destfile):
+        """
+        Downloads and unpacks in one pass, writing only the result.
+
+        Writing the archive out and reading it back cost the storage half again
+        as much as the result itself - 758 MB of traffic for a 532 MB database,
+        on the same flash the interface reads from. The archive therefore never
+        reaches the disk, and there is no second phase to wait through.
+
+        Progress is measured against the compressed side, which is the only
+        total the server announces.
+        """
+        reader = self._getReader(self._getExtension())
+        written = 0
         start = time.time()
-        self.shownPercent = -1
-        # The dialog keeps saying where the update came from; only the heading
-        # and the bar change. The name on disk is the download's own scratch
-        # file and means nothing to anybody.
-        self.notifier.show_unpack_progress(sourceUrl)
-        if self.use_xz is True:
-            self.logger.debug('Trying to decompress xz file...')
-            retval = subprocess.call([mvutils.find_xz(), '-d', compressedFilename])
-            self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
-        elif UPD_CAN_BZ2 is True:
-            self.logger.debug('Trying to decompress bz2 file...')
-            retval = self._decompress_bz2(compressedFilename, targetFilename)
-            self.logger.debug('decompress bz2 {} in {} sec', retval, (time.time() - start))
-        elif UPD_CAN_GZ is True:
-            self.logger.debug('Trying to decompress gz file...')
-            retval = self._decompress_gz(compressedFilename, targetFilename)
-            self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
-        else:
-            # _getExtension() has already reported this and asked for nothing,
-            # so there is nothing to unpack.
-            retval = 1
-        return retval
-
-    def _reportUnpackProgress(self, read, total):
-        """
-        Moves the bar, but only when the number on it changes.
-
-        The unpacking reads in 8 KB blocks, so a hundred megabytes would
-        otherwise ask for twelve thousand repaints.
-        """
-        if total <= 0:
-            return
-        percent = int(read * 100 / total)
-        if percent != self.shownPercent:
-            self.shownPercent = percent
-            self.notifier.update_unpack_progress(percent)
-
-    def _decompress_bz2(self, sourcefile, destfile):
-        blocksize = 8192
-        total = mvutils.file_size(sourcefile)
-        read = 0
-        try:
-            with open(destfile, 'wb') as dstfile, open(sourcefile, 'rb') as srcfile:
-                decompressor = bz2.BZ2Decompressor()
-                for data in iter(lambda: srcfile.read(blocksize), b''):
-                    dstfile.write(decompressor.decompress(data))
-                    read += len(data)
-                    self._reportUnpackProgress(read, total)
-                # pylint: disable=broad-except
-        except Exception as err:
-            self.logger.error('bz2 decompression failed: {}'.format(err))
-            raise
-        return 0
-
-    def _decompress_gz(self, sourcefile, destfile):
-        blocksize = 8192
-        total = mvutils.file_size(sourcefile)
-        # pylint: disable=broad-except
-
-        try:
-            # Read through a handle of our own: how far the compressed side
-            # has come is what the progress can be measured against.
-            with open(destfile, 'wb') as dstfile, open(sourcefile, 'rb') as rawfile:
-                with gzip.GzipFile(fileobj=rawfile) as srcfile:
-                    for data in iter(lambda: srcfile.read(blocksize), b''):
-                        dstfile.write(data)
-                        self._reportUnpackProgress(rawfile.tell(), total)
-        except Exception as err:
-            self.logger.error(
-                'gz decompression of "{}" to "{}" failed: {}', sourcefile, destfile, err)
-            if mvutils.find_gzip() is not None:
-                gzip_binary = mvutils.find_gzip()
-                self.logger.debug(
-                    'Trying to decompress gzip file "{}" using {}...', sourcefile, gzip_binary)
-                try:
-                    mvutils.file_remove(destfile)
-                    retval = subprocess.call([gzip_binary, '-d', sourcefile])
-                    self.logger.debug('Calling {} -d {} returned {}',
-                                     gzip_binary, sourcefile, retval)
-                    return retval
-                except Exception as err:
-                    self.logger.error(
-                        'gz commandline decompression of "{}" to "{}" failed: {}',
-                        sourcefile, destfile, err)
-            raise
-        return 0
+        with closing(urlopen(url)) as response:
+            counted = _CountingReader(response)
+            totalsize = int(response.headers.get('Content-Length') or 0)
+            with closing(reader(counted)) as srcfile, \
+                    closing(open(destfile, 'wb')) as dstfile:
+                shownPercent = -1
+                while True:
+                    if self.monitor.abort_requested():
+                        raise ExitRequested('Download interrupted.')
+                    data = srcfile.read(COPY_BUFFER_SIZE)
+                    if not data:
+                        break
+                    dstfile.write(data)
+                    written += len(data)
+                    if totalsize > 0:
+                        percent = int(counted.count * 100 / totalsize)
+                        if percent != shownPercent:
+                            shownPercent = percent
+                            self.notifier.update_download_progress(percent)
+                    # Hold the average down to the cap. Counting against
+                    # everything written so far corrects itself, so a device
+                    # slower than the cap never waits at all; waiting through
+                    # the monitor rather than sleeping keeps an abort instant.
+                    ahead = written / WRITE_BYTES_PER_SEC - (time.time() - start)
+                    if ahead > 0 and self.monitor.wait_for_abort(ahead):
+                        raise ExitRequested('Download interrupted.')
+        return written
