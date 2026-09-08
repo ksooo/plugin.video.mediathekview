@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+"""
+The context menu hook
+
+Copyright (c) 2017-2018, codingPF
+SPDX-License-Identifier: MIT
+"""
+
+# -- Imports ------------------------------------------------
+# pylint: disable=import-error
+import xbmc
+
+import resources.lib.mvutils as mvutils
+
+try:
+    # Python 3.x
+    from urllib.parse import urlencode
+except ImportError:
+    # Python 2.x
+    from urllib import urlencode
+
+
+# -- Functions ----------------------------------------------
+def open_search(search):
+    """ Opens the addon showing the results for the given search term """
+    params = {'mode': 'research', 'doNotSave': 'true', 'search': search}
+    utf_ensured_params = mvutils.dict_to_utf(params)
+    cmd = 'ActivateWindow(Videos,plugin://plugin.video.mediathekview.ksooo?' + \
+        urlencode(utf_ensured_params) + ')'
+    xbmc.executebuiltin(cmd)

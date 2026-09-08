@@ -4,21 +4,10 @@ Context Menu hook
 
 Copyright (c) 2017-2018, codingPF
 SPDX-License-Identifier: MIT
-
 """
 
 import sys
-import xbmc
-import resources.lib.mvutils as mvutils
-try:
-    # Python 3.x
-    from urllib.parse import urlencode
-except ImportError:
-    # Python 2.x
-    from urllib import urlencode
 
-if __name__ == '__main__':
-    params = {"mode":"research", "doNotSave":"true", "search" : sys.listitem.getLabel()}
-    utfEnsuredParams = mvutils.dict_to_utf(params)
-    cmd = 'ActivateWindow(Videos,plugin://plugin.video.mediathekview.ksooo?' + urlencode(utfEnsuredParams) + ")"
-    xbmc.executebuiltin(cmd)
+from resources.lib.main import run_context_menu
+
+run_context_menu(sys.listitem.getLabel())
