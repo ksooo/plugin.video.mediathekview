@@ -29,8 +29,15 @@ import resources.lib.mvutils as mvutils
 from resources.lib.exceptions import ExitRequested
 
 # -- Unpacker support ---------------------------------------
+UPD_CAN_XZ = False
 UPD_CAN_BZ2 = False
 UPD_CAN_GZ = False
+
+try:
+    import lzma
+    UPD_CAN_XZ = True
+except ImportError:
+    pass
 
 try:
     import bz2
@@ -54,6 +61,10 @@ DATABASE_URL = 'https://liste.mediathekview.de/'
 # DATABASE_URL = 'http://192.168.137.100/content/'
 # DATABASE_URL = 'http://192.168.137.100/content/test/'
 DATABASE_DBF = 'filmliste-v3.db'
+# Read this much at a time while unpacking. The archive runs to hundreds of
+# megabytes, and every chunk boundary is a trip back into Python, which holds
+# up the plugin the user is looking at.
+COPY_BUFFER_SIZE = 1024 * 1024
 # DATABASE_AKT = 'filmliste-v2.db.update'
 
 # -- Classes ------------------------------------------------
@@ -128,13 +139,18 @@ class UpdateFileDownload(object):
         self.logger.debug('renamed {} to {} in {} sec', self._filename, self._Dbfilename, (time.time() - start))
 
     def _getExtension(self):
+        # Ordered by what unpacking costs, not by download size. Unpacking is
+        # the part that runs while the user waits, so the largest archive of
+        # the three wins by being roughly ten times cheaper to unpack than
+        # bzip2 and six times cheaper than xz.
+        # Keep this in step with the chain in _download().
         ext = ""
-        if self.use_xz is True:
+        if UPD_CAN_GZ is True:
+            ext = '.gz'
+        elif self.use_xz is True or UPD_CAN_XZ is True:
             ext = '.xz'
         elif UPD_CAN_BZ2 is True:
             ext = '.bz2'
-        elif UPD_CAN_GZ is True:
-            ext = '.gz'
         else:
             self.logger.error('No suitable archive extractor available for this system')
             self.notifier.show_missing_extractor_error()
@@ -181,18 +197,24 @@ class UpdateFileDownload(object):
         # decompress filmliste
         start = time.time()
         try:
-            if self.use_xz is True:
+            # Mirrors the order in _getExtension(): whatever was asked for is
+            # what arrived, and it has to be unpacked with the matching tool.
+            if UPD_CAN_GZ is True:
+                self.logger.debug('Trying to decompress gz file...')
+                retval = self._decompress_gz(compressedFilename, targetFilename)
+                self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
+            elif self.use_xz is True:
                 self.logger.debug('Trying to decompress xz file...')
                 retval = subprocess.call([mvutils.find_xz(), '-d', compressedFilename])
+                self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
+            elif UPD_CAN_XZ is True:
+                self.logger.debug('Trying to decompress xz file...')
+                retval = self._decompress_xz(compressedFilename, targetFilename)
                 self.logger.debug('decompress xz {} in {} sec', retval, (time.time() - start))
             elif UPD_CAN_BZ2 is True:
                 self.logger.debug('Trying to decompress bz2 file...')
                 retval = self._decompress_bz2(compressedFilename, targetFilename)
                 self.logger.debug('decompress bz2 {} in {} sec', retval, (time.time() - start))
-            elif UPD_CAN_GZ is True:
-                self.logger.debug('Trying to decompress gz file...')
-                retval = self._decompress_gz(compressedFilename, targetFilename)
-                self.logger.debug('decompress gz {} in {} sec', retval, (time.time() - start))
             else:
                 # should never reach
                 pass
@@ -205,27 +227,56 @@ class UpdateFileDownload(object):
         self.notifier.close_download_progress()
         return retval == 0 and mvutils.file_exists(targetFilename)
 
-    def _decompress_bz2(self, sourcefile, destfile):
-        blocksize = 8192
-        try:
-            with open(destfile, 'wb') as dstfile, open(sourcefile, 'rb') as srcfile:
-                decompressor = bz2.BZ2Decompressor()
-                for data in iter(lambda: srcfile.read(blocksize), b''):
-                    dstfile.write(decompressor.decompress(data))
-                # pylint: disable=broad-except
-        except Exception as err:
-            self.logger.error('bz2 decompression failed: {}'.format(err))
-            raise
+    def _decompress_stream(self, sourcefile, destfile, wrap):
+        """
+        Unpacks an archive through the reader `wrap` puts around the raw file.
+
+        The compressed file is opened here rather than by the reader, so that
+        its position gives the progress against a size known up front, and so
+        that an abort is noticed once per buffer instead of only at the end.
+        """
+        totalsize = mvutils.file_size(sourcefile)
+        with closing(open(sourcefile, 'rb')) as rawfile:
+            with closing(wrap(rawfile)) as srcfile, closing(open(destfile, 'wb')) as dstfile:
+                while True:
+                    if self.monitor.abort_requested():
+                        raise ExitRequested('Decompression interrupted.')
+                    data = srcfile.read(COPY_BUFFER_SIZE)
+                    if not data:
+                        break
+                    dstfile.write(data)
+                    if totalsize > 0:
+                        self.notifier.update_download_progress(
+                            int(rawfile.tell() * 100 / totalsize))
         return 0
 
-    def _decompress_gz(self, sourcefile, destfile):
-        blocksize = 8192
+    def _decompress_xz(self, sourcefile, destfile):
         # pylint: disable=broad-except
-
         try:
-            with open(destfile, 'wb') as dstfile, gzip.open(sourcefile) as srcfile:
-                for data in iter(lambda: srcfile.read(blocksize), b''):
-                    dstfile.write(data)
+            return self._decompress_stream(sourcefile, destfile, lzma.LZMAFile)
+        except ExitRequested:
+            raise
+        except Exception as err:
+            self.logger.error('xz decompression failed: {}', err)
+            raise
+
+    def _decompress_bz2(self, sourcefile, destfile):
+        # pylint: disable=broad-except
+        try:
+            return self._decompress_stream(sourcefile, destfile, bz2.BZ2File)
+        except ExitRequested:
+            raise
+        except Exception as err:
+            self.logger.error('bz2 decompression failed: {}', err)
+            raise
+
+    def _decompress_gz(self, sourcefile, destfile):
+        # pylint: disable=broad-except
+        try:
+            return self._decompress_stream(
+                sourcefile, destfile, lambda raw: gzip.GzipFile(fileobj=raw))
+        except ExitRequested:
+            raise
         except Exception as err:
             self.logger.error(
                 'gz decompression of "{}" to "{}" failed: {}', sourcefile, destfile, err)

@@ -28,3 +28,13 @@ class MonitorKodi(MonitorInterface):
     def wait_for_abort(self, timeout=1):
         return self.xbmcMonitor.waitForAbort(timeout)
 
+    """ Seconds since the last user input anywhere in Kodi """
+
+    def get_idle_time(self):
+        return xbmc.getGlobalIdleTime()
+
+    """ True while Kodi is playing something """
+
+    def is_playing(self):
+        return xbmc.Player().isPlaying()
+

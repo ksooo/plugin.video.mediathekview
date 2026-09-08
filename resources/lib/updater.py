@@ -19,6 +19,12 @@ from resources.lib.storeMySqlSetup import StoreMySQLSetup
 from resources.lib.updateFileDownload import UpdateFileDownload
 from resources.lib.updateFileImport import UpdateFileImport
 
+# -- Constants ----------------------------------------------
+# How long Kodi has to have been left alone before an automatic update may
+# start. Updating is expensive enough to be felt, and it used to be triggered
+# by the very activity it then competed with.
+UNATTENDED_IDLE_SEC = 60
+
 # -- Classes ------------------------------------------------
 # pylint: disable=bad-whitespace
 
@@ -30,6 +36,7 @@ class MediathekViewUpdater(object):
         self.logger = appContext.MVLOGGER.get_new_logger('MediathekViewUpdater')
         self.notifier = appContext.MVNOTIFIER
         self.settings = appContext.MVSETTINGS
+        self.monitor = appContext.MVMONITOR
         self.database = None
         self.error = 0
         self.count = 0
@@ -57,6 +64,22 @@ class MediathekViewUpdater(object):
             self.database.exit()
             del self.database
             self.database = None
+
+    def isKodiUnattended(self):
+        """
+        Returns `True` while nobody is using Kodi.
+
+        Playback counts as use even though it produces no input, and is the
+        case where an update hurts most.
+        """
+        if self.monitor.is_playing():
+            self.logger.debug('Postponing the update, Kodi is playing')
+            return False
+        idle = self.monitor.get_idle_time()
+        if idle < UNATTENDED_IDLE_SEC:
+            self.logger.debug('Postponing the update, Kodi was used {} sec ago', idle)
+            return False
+        return True
 
     def doUpdate(self):
         """ "Disabled" / "Manual" / "On Start" / "Automatic" / "continuous" """
@@ -103,8 +126,9 @@ class MediathekViewUpdater(object):
             self.logger.debug('On Start update and no update today')
             doSomething = 1
         elif updateConfig == 3 and self.settings.is_user_alive() and outdated:
-            self.logger.debug('auto update')
-            doSomething = 1
+            if self.isKodiUnattended():
+                self.logger.debug('auto update')
+                doSomething = 1
         elif updateConfig == 4 and outdated:
             self.logger.debug('continuous update')
             doSomething = 1

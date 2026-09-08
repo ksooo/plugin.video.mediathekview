@@ -46,6 +46,22 @@ class Notifier(object):
         self.errors = []
         self.notifications = []
         self.limit_results = []
+        self.progress = []
+
+    def show_download_progress(self):
+        self.progress = []
+
+    def update_download_progress(self, percent, message=None):
+        self.progress.append(percent)
+
+    def hook_download_progress(self, blockcount, blocksize, totalsize):
+        pass
+
+    def close_download_progress(self):
+        pass
+
+    def show_download_error(self, url, err):
+        self.errors.append((url, err))
 
     def show_error(self, heading, message):
         self.errors.append((heading, message))
@@ -314,16 +330,23 @@ class _Dialog(object):
 
 
 class _DialogProgressBG(object):
-    """The xbmcgui.DialogProgressBG stub: accepts and forgets."""
+    """The xbmcgui.DialogProgressBG stub: records what it was told to show."""
+
+    instances = []
+
+    def __init__(self):
+        self.updates = []
+        self.closed = False
+        _DialogProgressBG.instances.append(self)
 
     def create(self, heading, message=''):
         pass
 
     def update(self, percent=0, heading=None, message=None):
-        pass
+        self.updates.append(percent)
 
     def close(self):
-        pass
+        self.closed = True
 
 
 class _Plugin(object):
@@ -419,12 +442,28 @@ def install_mysql_stub(connect):
     return connector
 
 
-def init_app_context(settings=None, notifier=None):
+class Monitor(object):
+    """Stands in for Kodi's monitor; never asks for an abort."""
+
+    def __init__(self, abort=False):
+        self.abort = abort
+
+    def abort_requested(self):
+        return self.abort
+
+    def wait_for_abort(self, seconds):
+        return self.abort
+
+
+def init_app_context(settings=None, notifier=None, monitor=None, addon=None):
     """Fills the global application context the addon modules read from."""
     install_kodi_stubs()
+    _DialogProgressBG.instances = []
     import resources.lib.appContext as app_context
     app_context.init()
+    app_context.initAddon(addon if addon is not None else Addon())
     app_context.initLogger(Logger())
     app_context.initSettings(settings if settings is not None else Settings())
     app_context.initNotifier(notifier if notifier is not None else Notifier())
+    app_context.initMonitor(monitor if monitor is not None else Monitor())
     return app_context
