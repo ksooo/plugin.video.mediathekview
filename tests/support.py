@@ -337,6 +337,23 @@ def install_kodi_stubs():
     return plugin
 
 
+def install_mysql_stub(connect):
+    """Registers a mysql.connector whose connect() is the given callable.
+
+    The addon imports it at module level, and the real package is not a
+    dependency of the tests.
+    """
+    package = sys.modules.setdefault('mysql', types.ModuleType('mysql'))
+    connector = types.ModuleType('mysql.connector')
+    connector.__version__ = '8.0.33'
+    connector.__version_info__ = (8, 0, 33)
+    connector.HAVE_CEXT = False
+    connector.connect = connect
+    sys.modules['mysql.connector'] = connector
+    package.connector = connector
+    return connector
+
+
 def init_app_context(settings=None, notifier=None):
     """Fills the global application context the addon modules read from."""
     install_kodi_stubs()

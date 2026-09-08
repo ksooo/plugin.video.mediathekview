@@ -55,6 +55,7 @@ SET GLOBAL MAX_EXECUTION_TIME=2000;
                 connectargs['use_pure'] = True
                 self.logger.debug('Forcefully disabling C extension')
             self.conn = mysql.connector.connect(**connectargs)
+            cursor = None
             try:
                 cursor = self.conn.cursor()
                 cursor.execute('SELECT VERSION()')
@@ -64,13 +65,17 @@ SET GLOBAL MAX_EXECUTION_TIME=2000;
             # pylint: disable=broad-except
             except Exception:
                 self.logger.debug('Connected to server {}', self.settings.getDatabaseHost())
+            finally:
+                if cursor is not None:
+                    cursor.close()
             # select database
             try:
                 self.conn.database = self.settings.getDatabaseSchema()
-            except Exception:
-                pass
-            #
-            cursor.close()
+            except Exception as err:
+                # Every later query would run against the wrong database and
+                # fail for a reason that does not name this
+                self.logger.error('Failed to select database {}: {}',
+                                  self.settings.getDatabaseSchema(), err)
         return self.conn
 
     def execute(self, aStmt, aParams=None):
