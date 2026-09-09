@@ -79,6 +79,10 @@ class SettingsKodi(SettingsInterface):
     def getHideAudioDescription(self):
         return self._addonClass.getSetting('hideaudiodescription') == 'true'
 
+    # self.hidesignlanguage
+    def getHideSignLanguage(self):
+        return self._addonClass.getSetting('hidesignlanguage') == 'true'
+
     # self.minlength
     def getMinLength(self):
         return self._getInt('minlength', 0)

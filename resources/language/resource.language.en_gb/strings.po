@@ -105,6 +105,14 @@ msgctxt "#30127"
 msgid "Hides a film marked as Audiodeskription where the same film is listed without it. A version that is the only one there is stays."
 msgstr "Hides a film marked as Audiodeskription where the same film is listed without it. A version that is the only one there is stays."
 
+msgctxt "#30128"
+msgid "Hide sign language duplicates"
+msgstr "Hide sign language duplicates"
+
+msgctxt "#30129"
+msgid "Hides a film marked as Gebärdensprache where the same film is listed without it. A version that is the only one there is stays."
+msgstr "Hides a film marked as Gebärdensprache where the same film is listed without it. A version that is the only one there is stays."
+
 msgctxt "#30130"
 msgid "Fetched %d shows and %d seasons"
 msgstr "Fetched %d shows and %d seasons"

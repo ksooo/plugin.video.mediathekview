@@ -23,6 +23,11 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="hidesignlanguage" type="boolean" label="30128" help="30129">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="minlength" type="integer" label="30113">
                     <level>0</level>
                     <default>0</default>

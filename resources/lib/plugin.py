@@ -421,7 +421,9 @@ class MediathekViewPlugin(KodiPlugin):
     def _withoutDuplicates(self, films):
         """ Applies the filters the user asked for to a list of films """
         if self.settings.getHideAudioDescription():
-            return Variants.withoutAudioDescription(films)
+            films = Variants.withoutAudioDescription(films)
+        if self.settings.getHideSignLanguage():
+            films = Variants.withoutSignLanguage(films)
         return films
 
     def _resolveFilmIdsFromParams(self, filmId, quickSearch, channelId, showId):

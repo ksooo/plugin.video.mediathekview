@@ -9,16 +9,20 @@ SPDX-License-Identifier: MIT
 import re
 
 # -- Constants ----------------------------------------------
-# How the broadcasters mark an audio-described version, always at the end of
-# the title. Of 715965 films 16625 are marked this way, 892 as "Hörfassung",
-# which is the same thing under an older name, and 80 as "(AD)" - that one
-# only in brackets, because a title could end in those two letters by
-# accident.
-AUDIO_DESCRIPTION = re.compile(
-    r'\s*[\(\[]?\s*(?:mit\s+)?(?:Audiodeskription|Hörfassung)\s*[\)\]]?\s*$', re.I)
-AUDIO_DESCRIPTION_SHORT = re.compile(r'\s*[\(\[]\s*AD\s*[\)\]]\s*$')
+# How the broadcasters mark a version, always at the end of the title. The
+# short forms are only accepted in brackets, since a title could end in two
+# capitals by accident. Counted over the 715965 films of one list: 16625 end
+# in "Audiodeskription", 892 in "Hörfassung", which is the same thing under
+# an older name, 80 in "(AD)", and 10826 mark sign language.
+AUDIO_DESCRIPTION = (
+    re.compile(r'\s*[\(\[]?\s*(?:mit\s+)?(?:Audiodeskription|Hörfassung)\s*[\)\]]?\s*$',
+               re.I),
+    re.compile(r'\s*[\(\[]\s*AD\s*[\)\]]\s*$'))
+SIGN_LANGUAGE = (
+    re.compile(r'\s*[\(\[]?\s*(?:mit\s+|in\s+)?Gebärdensprache\s*[\)\]]?\s*$', re.I),
+    re.compile(r'\s*[\(\[]\s*DGS\s*[\)\]]\s*$'))
 # Some titles hang the marker on with a separator - "Der Fall (1/2) -
-# Audiodeskription" - and leaving that behind hides 843 fewer films.
+# Audiodeskription" - and leaving that behind finds a thousand fewer twins.
 TRAILING_SEPARATOR = re.compile(r'[-–—|,:]\s*$')
 # Where the fields of a film query sit.
 TITLE = 1
@@ -27,28 +31,38 @@ CHANNEL = 3
 
 
 # -- Functions ----------------------------------------------
-def plainTitle(title):
-    """ The title without its audio description marker, or `None` """
-    for marker in (AUDIO_DESCRIPTION, AUDIO_DESCRIPTION_SHORT):
+def plainTitle(title, markers=AUDIO_DESCRIPTION):
+    """ The title without the marker of that version, or `None` """
+    for marker in markers:
         if marker.search(title or ''):
             plain = marker.sub('', title).strip()
             return TRAILING_SEPARATOR.sub('', plain).strip()
     return None
 
 
-def withoutAudioDescription(rows):
+def without(rows, markers):
     """
-    Drops the audio-described films that are listed beside the film itself.
+    Drops the marked films that are listed beside the film itself.
 
-    Of the 17597 films the current list marks, 16215 have such a twin. The
-    other 1382 are the only version there is and stay, whoever wants them.
-    The comparison is against the films of this listing, which is what
-    "beside" means.
+    A version that is the only one there is stays, whoever wants it. The
+    comparison is against the films of this listing, which is what "beside"
+    means. Of one list's 17597 films marked as audio described 16215 have
+    such a twin, and of the 10826 marked as sign language 8427 do.
     """
     present = set((row[CHANNEL], row[SHOWNAME], row[TITLE]) for row in rows)
     kept = []
     for row in rows:
-        plain = plainTitle(row[TITLE])
+        plain = plainTitle(row[TITLE], markers)
         if plain is None or (row[CHANNEL], row[SHOWNAME], plain) not in present:
             kept.append(row)
     return kept
+
+
+def withoutAudioDescription(rows):
+    """ Drops the audio described films listed beside the film itself """
+    return without(rows, AUDIO_DESCRIPTION)
+
+
+def withoutSignLanguage(rows):
+    """ Drops the sign language films listed beside the film itself """
+    return without(rows, SIGN_LANGUAGE)

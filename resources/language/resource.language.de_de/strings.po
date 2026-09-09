@@ -105,6 +105,14 @@ msgctxt "#30127"
 msgid "Hides a film marked as Audiodeskription where the same film is listed without it. A version that is the only one there is stays."
 msgstr "Blendet einen als Audiodeskription gekennzeichneten Film aus, wenn derselbe Film daneben ohne Audiodeskription steht. Gibt es nur die gekennzeichnete Fassung, bleibt sie stehen."
 
+msgctxt "#30128"
+msgid "Hide sign language duplicates"
+msgstr "Doppelte Gebärdensprache-Fassungen ausblenden"
+
+msgctxt "#30129"
+msgid "Hides a film marked as Gebärdensprache where the same film is listed without it. A version that is the only one there is stays."
+msgstr "Blendet einen als Gebärdensprache gekennzeichneten Film aus, wenn derselbe Film daneben ohne Gebärdensprache steht. Gibt es nur die gekennzeichnete Fassung, bleibt sie stehen."
+
 msgctxt "#30130"
 msgid "Fetched %d shows and %d seasons"
 msgstr "%d Sendungen und %d Staffeln geholt"

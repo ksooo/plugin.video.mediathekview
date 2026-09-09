@@ -91,6 +91,7 @@ class Settings(object):
         'autoSub': False,
         'noFutur': False,
         'hideAudioDescription': False,
+        'hideSignLanguage': False,
         'minLength': 0,
         'maxResults': 1000,
         'maxAge': 2 * 86400,
@@ -130,6 +131,9 @@ class Settings(object):
 
     def getHideAudioDescription(self):
         return self._values['hideAudioDescription']
+
+    def getHideSignLanguage(self):
+        return self._values['hideSignLanguage']
 
     def getMinLength(self):
         return self._values['minLength']

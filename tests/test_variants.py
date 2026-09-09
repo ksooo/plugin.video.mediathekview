@@ -11,7 +11,8 @@ from tests import support
 
 support.init_app_context()
 
-from resources.lib.variants import plainTitle, withoutAudioDescription
+from resources.lib.variants import (SIGN_LANGUAGE, plainTitle,
+                                    withoutAudioDescription, withoutSignLanguage)
 
 
 def _film(title, show='Doppelhaushälfte', channel='ZDFneo'):
@@ -58,6 +59,44 @@ class PlainTitleTest(unittest.TestCase):
         self.assertIsNone(plainTitle('Chancengleichheit'))
         self.assertIsNone(plainTitle(''))
         self.assertIsNone(plainTitle(None))
+
+
+class SignLanguageTest(unittest.TestCase):
+    """The other version the broadcasters mark, in the same three forms."""
+
+    def _plain(self, title):
+        return plainTitle(title, SIGN_LANGUAGE)
+
+    def test_the_forms_it_is_written_in(self):
+        for title in ('Westpol (Gebärdensprache)',
+                      'Tagesschau 18:00 Uhr - mit Gebärdensprache',
+                      'Die Sendung in Gebärdensprache',
+                      'Die Sendung (DGS)'):
+            self.assertIsNotNone(self._plain(title), title)
+
+    def test_the_short_form_needs_its_brackets(self):
+        self.assertIsNone(self._plain('Der Kanal DGS'))
+
+    def test_it_is_not_the_audio_described_marker(self):
+        self.assertIsNone(self._plain('Westpol (Audiodeskription)'))
+        self.assertIsNone(plainTitle('Westpol (Gebärdensprache)'))
+
+    def test_the_version_beside_the_film_is_dropped(self):
+        rows = [_film('Westpol'), _film('Westpol (Gebärdensprache)')]
+        self.assertEqual(_titles(withoutSignLanguage(rows)), ['Westpol'])
+
+    def test_the_only_version_there_is_stays(self):
+        # 2399 of the marked films have no twin.
+        rows = [_film('Westpol (Gebärdensprache)')]
+        self.assertEqual(len(withoutSignLanguage(rows)), 1)
+
+    def test_the_two_filters_do_not_touch_each_others_films(self):
+        rows = [_film('Westpol'), _film('Westpol (Gebärdensprache)'),
+                _film('Westpol (Audiodeskription)')]
+        self.assertEqual(_titles(withoutSignLanguage(rows)),
+                         ['Westpol', 'Westpol (Audiodeskription)'])
+        self.assertEqual(_titles(withoutAudioDescription(rows)),
+                         ['Westpol', 'Westpol (Gebärdensprache)'])
 
 
 class WithoutAudioDescriptionTest(unittest.TestCase):

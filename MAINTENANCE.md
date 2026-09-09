@@ -130,10 +130,11 @@ streams.
 
 `resources/lib/variants.py`
 
-The film list carries the audio described version of a film as a film of its
-own, marked at the end of the title. The setting *"Hide audio described
-duplicates"* drops such a film where the same film is listed without the
-marker - a version that is the only one there is stays.
+The film list carries the audio described and the sign language version of
+a film as films of their own, marked at the end of the title. Two settings,
+*"Hide audio described duplicates"* and *"Hide sign language duplicates"*,
+drop such a film where the same film is listed without the marker - a
+version that is the only one there is stays.
 
 The markers were counted rather than guessed. Of 715965 films, 16625 end in
 "Audiodeskription", 892 in "Hörfassung", which is the same thing under an
@@ -145,8 +146,10 @@ Fall (1/2) - Audiodeskription"), and eating that separator finds 843 twins
 that would otherwise be missed. All told 16215 of the 17597 marked films are
 hidden and 1382 stay.
 
-Sign language versions are marked the same way - 10812 films, 8258 of them
-with a twin - and nothing hides those yet.
+Sign language is written as "(Gebärdensprache)", "mit Gebärdensprache", "in
+Gebärdensprache" or "(DGS)": 10826 films at the end of the title, 8427 of
+them with a twin, and 349 more with the word somewhere inside a title, left
+alone like the audio described ones.
 
 The comparison is against the films of the listing at hand, not against the
 whole database: that is what "beside" means on screen, and it costs one pass
