@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 
 from resources.lib.kodi.kodiaddon import KodiService
 
+from resources.lib.metadataPrefetch import MetadataPrefetch
 from resources.lib.notifierKodi import NotifierKodi
 from resources.lib.updater import MediathekViewUpdater
 import resources.lib.appContext as appContext
@@ -29,6 +30,7 @@ class MediathekViewService(KodiService):
         self.notifier = appContext.MVNOTIFIER
         self.monitor = appContext.MVMONITOR
         self.updater = MediathekViewUpdater()
+        self.prefetch = MetadataPrefetch()
         self._lastDatabaseType = self.settings.getDatabaseType()
 
     def __del__(self):
@@ -74,6 +76,16 @@ class MediathekViewService(KodiService):
                 self.updater.exit()
                 self.settings.setDatabaseStatus('UNINIT');
                 self.errorCount = self.errorCount + 1
+            #
+            # A listing is built in the moment it is opened and cannot wait
+            # for a service on the internet, so the shows are looked up here
+            # and the listings find them already stored. Its own try: an
+            # external service is nothing to hold the film database against.
+            # pylint: disable=broad-except
+            try:
+                self.prefetch.run(self.updater.database)
+            except Exception as err:
+                self.logger.error('MetadataPrefetch {}', err)
             #
             self.updater.exit()
             # Sleep/wait for abort for 60 seconds

@@ -36,6 +36,13 @@ class GenerateTest(unittest.TestCase):
         FilmlistUi(self.plugin).generate(rows)
         return self.xbmcplugin.items
 
+    def test_it_says_what_the_listing_holds(self):
+        # Which layout a skin gives the rows hangs on this: with a content
+        # type it shows the watched state and no artwork in the row, with
+        # none a picture per row.
+        self._generate([row()])
+        self.assertEqual(self.xbmcplugin.content, 'episodes')
+
     def test_lists_a_film(self):
         items = self._generate([row(title='Tagesschau')])
         self.assertEqual(len(items), 1)

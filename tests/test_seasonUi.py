@@ -28,8 +28,12 @@ class SeasonItemTest(unittest.TestCase):
         support.install_kodi_stubs()
         self.plugin = support.Plugin(strings={SEASON: 'Staffel %d'})
 
-    def _items(self, seasons, channel='ARD', show='Doppelhaushälfte'):
-        return SeasonUi(self.plugin).generateItems(seasons, channel, show)
+    def _items(self, seasons, channel='ARD', show='a1b2c3d4',
+               showname='Doppelhaushälfte'):
+        # The url needs the show id, everything else the show name - they
+        # used to be the same argument, which put an md5 fragment into
+        # tvshowtitle.
+        return SeasonUi(self.plugin).generateItems(seasons, channel, show, showname)
 
     def test_one_folder_per_season(self):
         items = self._items([(5, [_row('Erben (S05/E02)')]),
@@ -48,7 +52,7 @@ class SeasonItemTest(unittest.TestCase):
         (url, _, _) = self._items([(5, [_row('Erben (S05/E02)')])])[0]
         self.assertIn('mode=films', url)
         self.assertIn('season=5', url)
-        self.assertIn('show=Doppelhaush', url)
+        self.assertIn('show=a1b2c3d4', url)
 
     def test_a_show_without_a_channel_of_its_own_still_leads_somewhere(self):
         # Shows can be grouped across channels, and then there is none.
@@ -74,7 +78,7 @@ class SeasonsAndFilmsTogetherTest(unittest.TestCase):
 
     def test_the_seasons_come_before_the_films(self):
         seasons = SeasonUi(self.plugin).generateItems(
-            [(5, [_row('Erben (S05/E02)')])], 'ARD', 'Sendung')
+            [(5, [_row('Erben (S05/E02)')])], 'ARD', 'a1b2c3d4', 'Sendung')
         FilmlistUi(self.plugin, pLongTitle=False).generate(
             [_row('Making of')], seasons)
         labels = [item[1].label for item in self.xbmcplugin.items]

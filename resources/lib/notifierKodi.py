@@ -81,6 +81,18 @@ class NotifierKodi(NotifierInterface):
         """ Hides the UI for a database update in progress """
         self.kodiUi.close_progress_dialog()
 
+    def show_metadata_progress(self):
+        """ Display UI for a metadata fetch in progress """
+        self.kodiUi.show_progress_dialog(30993)
+
+    def update_metadata_progress(self, percent, message):
+        """ Update UI odometer for a metadata fetch in progress """
+        self.kodiUi.update_progress_dialog(percent, message=message)
+
+    def close_metadata_progress(self):
+        """ Hides the UI for a metadata fetch in progress """
+        self.kodiUi.close_progress_dialog()
+
     def show_updating_scheme(self):
         """ SHow UI that the database schema is about to be updated """
         self.kodiUi.show_ok_dialog(30984, 30985)

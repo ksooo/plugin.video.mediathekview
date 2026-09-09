@@ -32,6 +32,11 @@ SUBTITLE_LANGUAGE = 'de'
 # What Kodi is told about a stream the film list calls HD. The list itself
 # gives no resolution; this is what those streams measure.
 HD_STREAM = {'width': 1920, 'height': 1080}
+# What the listing holds, which is what decides how a skin lays out its
+# rows: with a content type Kodi and Estuary show the watched state and no
+# artwork in the row and put the picture of an episode beside the list;
+# with none, every row carries a picture of its own.
+CONTENT_TYPE = 'episodes'
 
 
 class FilmlistUi(object):
@@ -72,18 +77,33 @@ class FilmlistUi(object):
             allSortMethods.insert(0, xbmcplugin.SORT_METHOD_EPISODE)
         self.sortmethods = allSortMethods
         self.labelMask = LABEL_MASK_LONG if pLongTitle else LABEL_MASK_SHORT
+        # What an external service knows about the shows of this listing, by
+        # name. Nothing here asks; the caller brings what is stored.
+        self.showMetadata = {}
+        # The picture of each episode on screen, by show, season and
+        # episode number, where the service had any.
+        self.stills = {}
+        # The poster of each season on screen, by show and season.
+        self.seasonPosters = {}
+        # The entry that refreshes metadata is only offered where metadata
+        # is shown: with the feature on, in the listing of a single show.
+        self.metadataEnabled = self.settings.getTmdbEnabled() and not pLongTitle
         #
         self.startTime = 0
 
-    def generate(self, databaseRs, pLeadingItems=None):
+    def generate(self, databaseRs, pLeadingItems=None, pShowMetadata=None, pStills=None,
+                 pSeasonPosters=None):
         #
         # 0 - idhash, 1 - title, 2 - showname, 3 - channel,
         # 4 - description, 5 - duration, 6 - aired,
         # 7- url_sub, 8- url_video, 9 - url_video_sd, 10 - url_video_hd
         #
         self.startTime = time.time()
+        self.showMetadata = pShowMetadata or {}
+        self.stills = pStills or {}
+        self.seasonPosters = pSeasonPosters or {}
         #
-        xbmcplugin.setContent(self.handle, self.settings.getContentType())
+        xbmcplugin.setContent(self.handle, CONTENT_TYPE)
         for method in self.sortmethods:
             xbmcplugin.addSortMethod(self.handle, method, self.labelMask)
         #
@@ -160,6 +180,15 @@ class FilmlistUi(object):
             'plot': pFilm.description
         }
 
+        record = self.showMetadata.get(pFilm.show)
+        if record:
+            # The show's, not the film's: a genre and an age rating belong to
+            # the programme. Its plot, rating and first broadcast do not - the
+            # film has its own description and its own airdate.
+            for (field, key) in (('genre', 'genres'), ('mpaa', 'mpaa')):
+                if record.get(key):
+                    info_labels[field] = record[key]
+
         if season is not None:
             info_labels['season'] = season
             info_labels['episode'] = episode
@@ -178,6 +207,11 @@ class FilmlistUi(object):
             info_labels['dateadded'] = airedstring
 
         (icon, fanart) = artFor(self.plugin.path, pFilm.channel)
+        still = (self.stills.get((pFilm.show, season, episode))
+                 if season is not None else None)
+        poster = (record or {}).get('poster')
+        if record:
+            fanart = record.get('fanart') or fanart
 
         #
         if self.plugin.get_kodi_version() > 17:
@@ -196,11 +230,26 @@ class FilmlistUi(object):
             # " (HD)" used to be appended to the title. Nothing is claimed for
             # the other streams: the film list does not say what they are.
             listitem.addStreamInfo('video', dict(HD_STREAM))
-        listitem.setArt({
-            'thumb': icon,
-            'icon': icon,
-            'fanart': fanart
-        })
+        # A film wears its own picture and nothing else, which is how a
+        # library episode is furnished too: the channel logo where the
+        # service had none, and no poster of the show. A skin shows the
+        # picture of an episode beside the list rather than in the row, and
+        # it takes the poster in preference to it wherever one is set -
+        # Estuary in ShiftThumbVar - so the show's poster would push the
+        # episode's own picture off the screen. It stays on the show and on
+        # the season, where it belongs.
+        art = {'thumb': still or icon, 'icon': icon, 'fanart': fanart}
+        # Under their own keys, not as `poster`, which a skin would show
+        # instead of the episode's own picture. This is where Kodi keeps the
+        # posters of a library episode and where the information dialog
+        # looks for them: it shows the season's poster, or the show's, with
+        # the episode's picture in front of it.
+        if poster:
+            art['tvshow.poster'] = poster
+        seasonPoster = self.seasonPosters.get((pFilm.show, season))
+        if seasonPoster:
+            art['season.poster'] = seasonPoster
+        listitem.setArt(art)
         return (videourl, listitem)
 
     def _generateContextMenu(self, pFilm):
@@ -237,5 +286,16 @@ class FilmlistUi(object):
                 })
             )
         ))
+        if self.metadataEnabled:
+            # Behind what the menu is mostly used for, which is downloading.
+            contextmenu.append((
+                self.plugin.language(30995),
+                'RunPlugin({})'.format(
+                    self.plugin.build_url({
+                        'mode': "refreshmetadata",
+                        'showname': pFilm.show
+                    })
+                )
+            ))
         return contextmenu
 

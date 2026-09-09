@@ -98,28 +98,12 @@ msgid "Blacklist"
 msgstr "Exclude from search"
 
 msgctxt "#30130"
-msgid "Content Type Movie list"
-msgstr "Content Type Movie list"
+msgid "Fetched %d shows and %d seasons"
+msgstr "Fetched %d shows and %d seasons"
 
 msgctxt "#30131"
-msgid "none"
-msgstr "none"
-
-msgctxt "#30132"
-msgid "videos"
-msgstr "videos"
-
-msgctxt "#30133"
-msgid "movies"
-msgstr "movies"
-
-msgctxt "#30134"
-msgid "episodes"
-msgstr "episodes"
-
-msgctxt "#30135"
-msgid "tvshows"
-msgstr "tvshows"
+msgid "Nothing left to fetch"
+msgstr "Nothing left to fetch"
 
 msgctxt "#30171"
 msgid "Aired Date"
@@ -246,7 +230,6 @@ msgstr "Basic NFO File"
 msgctxt "#30342"
 msgid "Enriched NFO File"
 msgstr "Enriched NFO File"
-
 
 msgctxt "#30344"
 msgid "DownloadActionOnExists"
@@ -499,3 +482,39 @@ msgstr "Cannot retrieve Movie Information"
 msgctxt "#30992"
 msgid "Season %d"
 msgstr "Season %d"
+
+msgctxt "#30990"
+msgid "Fetch metadata now"
+msgstr "Fetch metadata now"
+
+msgctxt "#30991"
+msgid "Shows: %d of %d"
+msgstr "Shows: %d of %d"
+
+msgctxt "#30999"
+msgid "Seasons: %d of %d"
+msgstr "Seasons: %d of %d"
+
+msgctxt "#30993"
+msgid "Fetch metadata from TMDB"
+msgstr "Fetch metadata from TMDB"
+
+msgctxt "#30994"
+msgid "API Read Access Token"
+msgstr "API Read Access Token"
+
+msgctxt "#30995"
+msgid "Refresh metadata"
+msgstr "Refresh metadata"
+
+msgctxt "#30996"
+msgid "Discard the stored metadata"
+msgstr "Discard the stored metadata"
+
+msgctxt "#30997"
+msgid "The stored metadata has been discarded"
+msgstr "The stored metadata has been discarded"
+
+msgctxt "#30998"
+msgid "Needs an API Read Access Token from your own themoviedb.org account. This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB."
+msgstr "Needs an API Read Access Token from your own themoviedb.org account. This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB."

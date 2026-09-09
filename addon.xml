@@ -28,6 +28,7 @@
 		<summary lang="en_GB">Public service video-platforms</summary>
 		<description lang="de_DE">Dieses Add-on basiert auf dem Code von https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>
 		<description lang="en_GB">This add-on is based on the code of https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>
+		<disclaimer>This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</disclaimer>
 		<news>v1.2.0
 - The add-on is now called MediathekView+. Only the name changed; your settings and your database stay where they are.
 - Kodi stays usable while the film database is updated.

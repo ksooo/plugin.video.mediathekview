@@ -357,6 +357,41 @@ class StoreQuery(object):
 
         return rs
 
+    def getAllShownames(self):
+        """ Every show that any listing could show, for the metadata prefetch """
+        self.logger.debug('getAllShownames')
+        #
+        try:
+            sql = "SELECT DISTINCT showname FROM film WHERE (1=1) "
+            sql += self.sql_cond_nofuture
+            sql += self.sql_cond_minlength
+            #
+            return self.execute(sql)
+        except Exception as err:
+            self.logger.error('Database error: {}', err)
+            raise
+
+    def getEpisodeTitles(self):
+        """
+        Show and title of every film whose title names an episode.
+
+        For the metadata prefetch, which needs the seasons the film list
+        actually has. The marker sits inside the title, so which films carry
+        one is decided by reading them; the LIKE only keeps the 57000 that
+        can possibly match out of 716000.
+        """
+        self.logger.debug('getEpisodeTitles')
+        #
+        try:
+            sql = "SELECT DISTINCT showname, title FROM film WHERE title LIKE '%(S%E%)%' "
+            sql += self.sql_cond_nofuture
+            sql += self.sql_cond_minlength
+            #
+            return self.execute(sql)
+        except Exception as err:
+            self.logger.error('Database error: {}', err)
+            raise
+
     def getShowsByChannnel(self, channelId):
         """ getShowsByChannnel for channel view """
         self.logger.debug('getShowsByChannnel')

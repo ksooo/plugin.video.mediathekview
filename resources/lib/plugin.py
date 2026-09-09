@@ -33,8 +33,14 @@ import resources.lib.ui.letterUi as LetterUi
 import resources.lib.ui.filmlistUi as FilmlistUi
 import resources.lib.ui.seasonUi as SeasonUi
 import resources.lib.seasons as Seasons
+from resources.lib.metadata import Metadata
+from resources.lib.metadataPrefetch import MetadataPrefetch
 
 import resources.lib.appContext as appContext
+
+# -- Constants ----------------------------------------------
+# Where the show's name sits in a row of the film query.
+SHOWNAME = 2
 
 # -- Classes ------------------------------------------------
 
@@ -56,6 +62,7 @@ class MediathekViewPlugin(KodiPlugin):
         else:
             self.logger.warn('Unknown Database driver selected')
             self.database = None
+        self.metadata = Metadata()
         #
         # self.database = Store()
 
@@ -127,8 +134,7 @@ class MediathekViewPlugin(KodiPlugin):
             self.new_search()
         elif mode == 'research':
             search = self.get_arg('search', '')
-            ui = FilmlistUi.FilmlistUi(self)
-            ui.generate(self.database.getQuickSearch(search))
+            self._generateFilms(self.database.getQuickSearch(search))
             if self.get_arg('doNotSave', 'false') == 'false':
                 RecentSearches(self).load().add(search).save()
             #
@@ -144,8 +150,7 @@ class MediathekViewPlugin(KodiPlugin):
         elif mode == 'recent':
             channel = self.get_arg('channel', "")
             channel = "" if channel == "0" else channel
-            ui = FilmlistUi.FilmlistUi(self)
-            ui.generate(self.database.getRecentFilms(channel))
+            self._generateFilms(self.database.getRecentFilms(channel))
             # self.database.get_recents(channel, FilmUI(self))
             #
         elif mode == 'recentchannels':
@@ -173,6 +178,16 @@ class MediathekViewPlugin(KodiPlugin):
             self.run_builtin("ActivateWindow(busydialognocancel)")
             self.show_db_info()
             self.run_builtin("Dialog.Close(busydialognocancel)")
+        elif mode == 'refreshmetadata':
+            # The only cure for a wrong match: forget this one show and ask
+            # again. Without a library there is no dialog to pick artwork in.
+            self.metadata.forget(self.get_arg('showname', ''))
+            self.run_builtin('Container.Refresh')
+        elif mode == 'fetchmetadata':
+            self._fetchMetadata()
+        elif mode == 'discardmetadata':
+            self.metadata.discardAll()
+            self.notifier.show_notification(30996, 30997)
         elif mode == 'action-dbupdate':
             self.settings.set_update_triggered('true')
             self.notifier.show_notification(30963, 30964)
@@ -187,9 +202,9 @@ class MediathekViewPlugin(KodiPlugin):
             # self.database.get_shows(channel, initial, ShowUI(self))
             ui = ShowUi.ShowUi(self)
             if initial == "":
-                ui.generate(self.database.getShowsByChannnel(channel))
+                ui.generate(self.database.getShowsByChannnel(channel), self.metadata)
             else:
-                ui.generate(self.database.getShowsByLetter(initial))
+                ui.generate(self.database.getShowsByLetter(initial), self.metadata)
         elif mode == 'films':
             show = self.get_arg('show', "")
             show = "" if show == "0" else show
@@ -197,15 +212,34 @@ class MediathekViewPlugin(KodiPlugin):
             channel = "" if channel == "0" else channel
             season = self.get_arg('season', "")
             films = self.database.getFilms(channel, show)
+            # Only where one show was asked for: without a show id the films
+            # come from many of them, and the first one's name would stand
+            # for all the others.
+            showname = films[0][2] if (films and show) else ''
+            # The one place that may ask the service: a listing about a
+            # single show is a single question, and it fills the store for
+            # every list the show turns up in afterwards.
+            record = self.metadata.forShow(showname, mayAsk=True)
+            records = {showname: record} if record else {}
             ui = FilmlistUi.FilmlistUi(self, pLongTitle=False)
             if season:
-                ui.generate(Seasons.ofSeason(films, int(season)))
+                films = Seasons.ofSeason(films, int(season))
+                leadingItems = None
             else:
                 # A show earns a season level or it does not; where it does
                 # not, this is the flat listing it has always been.
                 (seasons, loose) = Seasons.group(films)
-                ui.generate(loose, SeasonUi.SeasonUi(self).generateItems(
-                    seasons, channel, show))
+                leadingItems = SeasonUi.SeasonUi(self).generateItems(
+                    seasons, channel, show, showname, self.metadata)
+                films = loose
+            # One request brings the pictures of a whole season, which is
+            # worth asking for where the films listed are of one season - the
+            # prefetch has usually been there first.
+            self.metadata.episodesOf(
+                showname, Seasons.soleSeason(films), mayAsk=True)
+            stills = self.metadata.stillsOf([showname])
+            seasonPosters = self.metadata.seasonsOf([showname])
+            ui.generate(films, leadingItems, records, stills, seasonPosters)
             #
         elif mode == 'downloadmv':
             filmIdArray = self._resolveFilmIdsFromParams(
@@ -243,6 +277,7 @@ class MediathekViewPlugin(KodiPlugin):
     def exit(self):
         """ Shutdown of the application """
         self.database.exit()
+        self.metadata.exit()
 
     def show_db_info(self):
         """ Displays current information about the database """
@@ -326,17 +361,15 @@ class MediathekViewPlugin(KodiPlugin):
         search = self.get_setting(settingid)
         if search:
             # restore previous search
-            ui = FilmlistUi.FilmlistUi(self)
-            ui.generate(self.database.getQuickSearch(search))
+            self._generateFilms(self.database.getQuickSearch(search))
         else:
             # enter search term
             (search, confirmed) = self.notifier.get_entered_text('', headingid)
             if len(search) > 2 and confirmed is True:
                 RecentSearches(self).load().add(search).save()
                 #
-                ui = FilmlistUi.FilmlistUi(self)
                 rs = self.database.getQuickSearch(search)
-                ui.generate(rs)
+                self._generateFilms(rs)
                 if len(rs) > 0:
                     self.set_setting(settingid, search)
             else:
@@ -344,6 +377,44 @@ class MediathekViewPlugin(KodiPlugin):
                 self.logger.debug(
                     'The following ERROR can be ignored. It is caused by the architecture of the Kodi Plugin Engine')
                 self.end_of_directory(False, cache_to_disc=False)
+
+    def _generateFilms(self, films):
+        """
+        Lists films from many shows - a search, or what was added lately.
+
+        Each film is of another show here, so the show's poster is what tells
+        them apart. One query brings what is stored about all of them.
+        """
+        shownames = [row[SHOWNAME] for row in films]
+        FilmlistUi.FilmlistUi(self).generate(
+            films, pShowMetadata=self.metadata.forShows(shownames),
+            pStills=self.metadata.stillsOf(shownames),
+            pSeasonPosters=self.metadata.seasonsOf(shownames))
+
+    def _fetchMetadata(self):
+        """
+        Fetches what is missing right now, rather than waiting for the
+        service to get round to it, and reports how far it has come.
+        """
+        self.notifier.show_metadata_progress()
+        try:
+            (shows, seasons) = MetadataPrefetch().run(
+                self.database, progress=self._reportMetadata)
+        finally:
+            self.notifier.close_metadata_progress()
+        # Whatever came of it, it says so: with everything fetched already
+        # the bar is gone again within a second, and pressing a button that
+        # answers with nothing at all looks broken.
+        if shows or seasons:
+            self.notifier.show_notification(
+                30993, self.language(30130) % (shows, seasons))
+        else:
+            self.notifier.show_notification(30993, 30131)
+
+    def _reportMetadata(self, what, done, total):
+        message = self.language(30991 if what == 'shows' else 30999) % (done, total)
+        self.notifier.update_metadata_progress(
+            int(100.0 * done / total) if total else 100, message)
 
     def _resolveFilmIdsFromParams(self, filmId, quickSearch, channelId, showId):
         filmIdArray = []

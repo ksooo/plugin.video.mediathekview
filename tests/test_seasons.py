@@ -112,5 +112,25 @@ class OfSeasonTest(unittest.TestCase):
         self.assertEqual(ofSeason([_row('Tagesschau')], 1), [])
 
 
+class SoleSeasonTest(unittest.TestCase):
+    """Whether a listing is of one season, which is what can be asked about."""
+
+    def test_all_of_one_season(self):
+        self.assertEqual(seasons.soleSeason(
+            [_row('Erben (S24/E01)'), _row('Fehler (S24/E02)')]), 24)
+
+    def test_films_of_two_seasons(self):
+        self.assertIsNone(seasons.soleSeason(
+            [_row('Erben (S24/E01)'), _row('Fehler (S23/E02)')]))
+
+    def test_films_that_name_no_season_do_not_stand_in_the_way(self):
+        self.assertEqual(seasons.soleSeason(
+            [_row('Erben (S24/E01)'), _row('Ein Sonderfall')]), 24)
+
+    def test_no_season_at_all(self):
+        self.assertIsNone(seasons.soleSeason([_row('Ein Sonderfall')]))
+        self.assertIsNone(seasons.soleSeason([]))
+
+
 if __name__ == '__main__':
     unittest.main()

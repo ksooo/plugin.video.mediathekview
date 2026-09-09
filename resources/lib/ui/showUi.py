@@ -32,7 +32,7 @@ class ShowUi(object):
         self.handle = plugin.addon_handle
         self.startTime = 0
 
-    def generate(self, databaseRs):
+    def generate(self, databaseRs, pMetadata=None):
         #
         # 0 - showid
         # 1 - channelId
@@ -46,6 +46,8 @@ class ShowUi(object):
         #
         showModel = Show()
         listOfElements = []
+        # Read only: a channel can hold 1746 shows, so nothing here asks the
+        # service. What was looked up when a show was opened turns up here.
         for element in databaseRs:
             #
             showModel.init(element[0], element[1], element[2], element[3])
@@ -74,17 +76,32 @@ class ShowUi(object):
                 list_item = xbmcgui.ListItem(label=nameLabel)
             #
 
-            list_item.setArt({
-                'thumb': icon,
-                'icon': icon,
-                'fanart': fanart
-            })
-
             info_labels = {
                 'title': nameLabel,
-                'sorttitle': nameLabel.lower()
+                'sorttitle': nameLabel.lower(),
+                'tvshowtitle': element[2],
+                'mediatype': 'tvshow'
             }
+            record = pMetadata.forShow(element[2]) if pMetadata else None
+            poster = None
+            if record:
+                for (field, key) in (('plot', 'plot'), ('genre', 'genres'),
+                                     ('premiered', 'premiered'), ('mpaa', 'mpaa')):
+                    if record.get(key):
+                        info_labels[field] = record[key]
+                if record.get('rating'):
+                    info_labels['rating'] = record['rating']
+                    info_labels['votes'] = record.get('votes') or 0
+                poster = record.get('poster')
+                fanart = record.get('fanart') or fanart
+
+            art = {'thumb': poster or icon, 'icon': icon, 'fanart': fanart}
+            if poster:
+                art['poster'] = poster
+            list_item.setArt(art)
             list_item.setInfo(type='video', infoLabels=info_labels)
+            if record and record.get('imdbid'):
+                list_item.setUniqueIDs({'imdb': record['imdbid']}, 'imdb')
             #
             targetUrl = mvutils.build_url({
                 'mode': 'films',
@@ -114,6 +131,19 @@ class ShowUi(object):
                     })
                 )
             ))
+            if pMetadata is not None and pMetadata.enabled():
+                # The show is where a wrong poster is seen, so this is where
+                # asking again belongs. Behind what the menu is mostly used
+                # for, which is downloading.
+                contextmenu.append((
+                    self.plugin.language(30995),
+                    'RunPlugin({})'.format(
+                        self.plugin.build_url({
+                            'mode': "refreshmetadata",
+                            'showname': element[2]
+                        })
+                    )
+                ))
             #
             list_item.addContextMenuItems(contextmenu)
             #

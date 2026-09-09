@@ -45,8 +45,11 @@ class SettingsTest(unittest.TestCase):
 
     def test_every_setting_has_a_default(self):
         # Without one the first read comes back empty, which the int() calls
-        # in settingsKodi cannot survive either.
+        # in settingsKodi cannot survive either. An action holds no value and
+        # so has nothing to default to.
         for setting in _settings():
+            if setting.get('type') == 'action':
+                continue
             self.assertIsNotNone(setting.find('default'),
                                  '%s has no <default>' % setting.get('id'))
 
@@ -58,7 +61,8 @@ class SettingsTest(unittest.TestCase):
                          re.findall(r"self\._getInt\('([^']+)',\s*(-?\d+)\)", _source()))
         self.assertTrue(fallbacks, 'no fallbacks found - the pattern is wrong')
         declared = dict((setting.get('id'), (setting.find('default').text or '').strip())
-                        for setting in _settings())
+                        for setting in _settings()
+                        if setting.find('default') is not None)
         for (name, fallback) in sorted(fallbacks.items()):
             self.assertIn(name, declared, '%s is read but not declared' % name)
             self.assertEqual(

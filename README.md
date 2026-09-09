@@ -13,6 +13,7 @@ for this fork here as a [GitHub Issue][3] only, not to the original project.
 [4]: https://github.com/ksooo/plugin.video.mediathekview
 [5]: https://github.com/mediathekview/plugin.video.mediathekview
 [6]: https://github.com/mediathekview/kodi-repos
+[7]: https://www.themoviedb.org/
 
 About this Addon
 ----------------
@@ -42,6 +43,7 @@ Highlights
 * Amazing fast navigation and search
 * Download with subtitles and automatic NFO file generation
 * Internal standalone or shared MySQL database support
+* Optional artwork and metadata from TMDB
 * UI localised to German and English
 
 
@@ -93,6 +95,37 @@ therefore be installed side by side; in Kodi they show up as
 _"MediathekView"_ and _"MediathekView+"_. Settings and the local
 database are separate; an external MySQL database however is shared if both
 are configured to use the same server and database name.
+
+
+Artwork and metadata from TMDB
+------------------------------
+
+The MediathekView film list carries no artwork and no metadata beyond a
+title, a description, a duration and a broadcast date, which is why a film
+shows the logo of the channel it came from. Switching on _"Fetch metadata
+from TMDB"_ in the advanced settings adds posters, backgrounds, genres,
+ratings and age ratings from [themoviedb.org][7] for the shows it can find
+there. Where a season is opened, each episode gets its own picture from
+TMDB; a film TMDB has no picture for keeps the channel logo.
+
+It needs an account of your own: TMDB refuses every request without
+credentials, and this addon carries none. Register at themoviedb.org, take
+the **API Read Access Token** from your account settings, and paste it into
+the setting below the switch. The older v3 API key works too.
+
+The background service looks the shows up, a few at a time, and keeps what
+comes back in `metadata.db` next to the film database. After a fresh
+installation it takes a while before every show has its poster - the film
+list names some nine thousand of them - and after that only the shows a new
+film list adds are looked up. No listing ever waits on the network. A show
+that TMDB does not know keeps its channel logo. Where a show was matched with the wrong entry - which happens,
+since all we have to go on is the name MediathekView wrote - _"Refresh
+metadata"_ in the show's context menu asks again, and the settings hold two
+buttons: one that fetches everything still missing right away, with the
+progress in the corner of the screen, and one that discards the lot.
+
+This product uses TMDB and the TMDB APIs but is not endorsed, certified,
+or otherwise approved by TMDB.
 
 
 How the update methods work

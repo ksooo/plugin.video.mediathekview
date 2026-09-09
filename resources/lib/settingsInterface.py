@@ -49,10 +49,13 @@ class SettingsInterface(object):
     def getUpdateCheckIntervel(self):
         return 10
 
-    def getContentType(self):
+    def getBlacklist(self):
         return ''
 
-    def getBlacklist(self):
+    def getTmdbEnabled(self):
+        return False
+
+    def getTmdbToken(self):
         return ''
 
 

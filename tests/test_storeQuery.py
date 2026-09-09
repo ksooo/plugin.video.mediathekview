@@ -66,6 +66,52 @@ class GetStatusTest(unittest.TestCase):
                         'the reason has to reach the log')
 
 
+class AllShownamesTest(unittest.TestCase):
+    """What the metadata prefetch asks the film database for."""
+
+    def setUp(self):
+        support.init_app_context(settings=support.Settings(caching=False))
+
+    def test_returns_every_show(self):
+        (store, _) = _store(results=[[('Der Bergdoktor',), ('Tagesschau',)]])
+        self.assertEqual(store.getAllShownames(),
+                         [('Der Bergdoktor',), ('Tagesschau',)])
+
+    def test_asks_for_each_show_once(self):
+        (store, connection) = _store(results=[[]])
+        store.getAllShownames()
+        self.assertIn('DISTINCT showname', connection.statements[0])
+
+    def test_shows_nobody_can_list_are_left_out(self):
+        # The same conditions the listings use, so that no request is spent
+        # on a show that is filtered away anyhow.
+        support.init_app_context(settings=support.Settings(
+            caching=False, minLength=5, noFutur=True, lastUpdate=1757000000))
+        (store, connection) = _store(results=[[]])
+        store.getAllShownames()
+        statement = connection.statements[0]
+        self.assertIn('duration >= 300', statement)
+        self.assertIn('aired < 1757000000', statement)
+
+
+class EpisodeTitlesTest(unittest.TestCase):
+    """What the metadata prefetch reads the seasons from."""
+
+    def setUp(self):
+        support.init_app_context(settings=support.Settings(caching=False))
+
+    def test_returns_show_and_title(self):
+        (store, _) = _store(results=[[('Der Bergdoktor', 'Heimkehr (S18/E01)')]])
+        self.assertEqual(store.getEpisodeTitles(),
+                         [('Der Bergdoktor', 'Heimkehr (S18/E01)')])
+
+    def test_only_titles_that_can_carry_a_marker_are_read(self):
+        # 57000 of 716000 films, rather than all of them.
+        (store, connection) = _store(results=[[]])
+        store.getEpisodeTitles()
+        self.assertIn("title LIKE '%(S%E%)%'", connection.statements[0])
+
+
 class FilmOrderTest(unittest.TestCase):
     """What order the films come back in.
 

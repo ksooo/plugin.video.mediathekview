@@ -106,21 +106,14 @@ class SettingsKodi(SettingsInterface):
     def getDatabaseImportBatchSize(self):
         return self._getInt('updateBatchSize', 10000)
 
-    # self.contentType
-    def getContentType(self):
-        contentType = ''
-        if self._addonClass.getSetting('contentType') == '1':
-            contentType = 'videos'
-        elif self._addonClass.getSetting('contentType') == '2':
-            contentType = 'movies'
-        elif self._addonClass.getSetting('contentType') == '3':
-            contentType = 'episodes'
-        elif self._addonClass.getSetting('contentType') == '4':
-            contentType = 'tvshows'
-        return contentType
-
     def getBlacklist(self):
         return self._addonClass.getSetting('blacklist')
+
+    def getTmdbEnabled(self):
+        return self._addonClass.getSetting('tmdbEnabled') == 'true'
+
+    def getTmdbToken(self):
+        return self._addonClass.getSetting('tmdbToken').strip()
 
 
     # Database

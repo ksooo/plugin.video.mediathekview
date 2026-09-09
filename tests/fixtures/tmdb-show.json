@@ -1,0 +1,457 @@
+{
+ "adult": false,
+ "backdrop_path": "/uGbBFoxXNscnH9UZuF8v0ODrrve.jpg",
+ "created_by": [],
+ "episode_run_time": [
+  45
+ ],
+ "first_air_date": "1998-10-26",
+ "genres": [
+  {
+   "id": 10766,
+   "name": "Soap"
+  }
+ ],
+ "homepage": "http://mdr.de/in-aller-freundschaft",
+ "id": 14509,
+ "in_production": true,
+ "languages": [
+  "de"
+ ],
+ "last_air_date": "2026-03-24",
+ "last_episode_to_air": {
+  "id": 7782863,
+  "name": "Eins gegen Eins",
+  "overview": "",
+  "vote_average": 0.0,
+  "vote_count": 0,
+  "air_date": "2026-09-08",
+  "episode_number": 17,
+  "episode_type": "standard",
+  "production_code": "",
+  "runtime": null,
+  "season_number": 29,
+  "show_id": 14509,
+  "still_path": null
+ },
+ "name": "In aller Freundschaft",
+ "next_episode_to_air": {
+  "id": 7782865,
+  "name": "Nicht weit vom Stamm",
+  "overview": "",
+  "vote_average": 0.0,
+  "vote_count": 0,
+  "air_date": "2026-09-15",
+  "episode_number": 18,
+  "episode_type": "standard",
+  "production_code": "",
+  "runtime": null,
+  "season_number": 29,
+  "show_id": 14509,
+  "still_path": null
+ },
+ "networks": [
+  {
+   "id": 1118,
+   "logo_path": "/iIppR5wX7s2soFTHZsHV5mgQ9Or.png",
+   "name": "MDR Fernsehen",
+   "origin_country": "DE"
+  },
+  {
+   "id": 308,
+   "logo_path": "/nGl2dDGonksWY4fTzPPdkK3oNyq.png",
+   "name": "Das Erste",
+   "origin_country": "DE"
+  }
+ ],
+ "number_of_episodes": 1186,
+ "number_of_seasons": 29,
+ "origin_country": [
+  "DE"
+ ],
+ "original_language": "de",
+ "original_name": "In aller Freundschaft",
+ "overview": "Geschichten rund um die Belegschaft des fiktiven Krankenhauses Sachsenklinik in Leipzig.",
+ "popularity": 46.9621,
+ "poster_path": "/f8ZHSXNs5jyjMz3qg7mB2fqnTjP.jpg",
+ "production_companies": [
+  {
+   "id": 24109,
+   "logo_path": null,
+   "name": "Saxonia Media",
+   "origin_country": "DE"
+  },
+  {
+   "id": 986,
+   "logo_path": "/qDV8nLH9pjElZSnPmg29mzzNlTo.png",
+   "name": "ARD Degeto",
+   "origin_country": "DE"
+  }
+ ],
+ "production_countries": [
+  {
+   "iso_3166_1": "DE",
+   "name": "Germany"
+  }
+ ],
+ "seasons": [
+  {
+   "air_date": "2002-05-26",
+   "episode_count": 11,
+   "id": 369421,
+   "name": "Extras",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 0,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "1998-10-26",
+   "episode_count": 36,
+   "id": 25917,
+   "name": "Staffel 1",
+   "overview": "",
+   "poster_path": "/3oDVouZuXW6ipa9EqfdjacbrXxZ.jpg",
+   "season_number": 1,
+   "vote_average": 1.0
+  },
+  {
+   "air_date": "1999-08-16",
+   "episode_count": 33,
+   "id": 25918,
+   "name": "Staffel 2",
+   "overview": "",
+   "poster_path": "/rX16S3SziT6fwe6kZeXFTAgdbRM.jpg",
+   "season_number": 2,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2000-08-21",
+   "episode_count": 38,
+   "id": 25919,
+   "name": "Staffel 3",
+   "overview": "",
+   "poster_path": "/xXDVrToHGzoSqZjqdAEsvKKkXlI.jpg",
+   "season_number": 3,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2001-09-03",
+   "episode_count": 39,
+   "id": 25920,
+   "name": "Staffel 4",
+   "overview": "",
+   "poster_path": "/3b9t5AftoeO2yIkgVFfGFEujPGh.jpg",
+   "season_number": 4,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2002-08-20",
+   "episode_count": 41,
+   "id": 25921,
+   "name": "Staffel 5",
+   "overview": "",
+   "poster_path": "/5US81Y7rUNdUXR2Qtt4Jdtwk6kl.jpg",
+   "season_number": 5,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2003-01-07",
+   "episode_count": 43,
+   "id": 25922,
+   "name": "Staffel 6",
+   "overview": "",
+   "poster_path": "/wo4oYSbqKXmuH4m7HHa8i6zXNzt.jpg",
+   "season_number": 6,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2004-01-06",
+   "episode_count": 45,
+   "id": 25923,
+   "name": "Staffel 7",
+   "overview": "",
+   "poster_path": "/83SH1SO2olfUetktByrnAh56Bdv.jpg",
+   "season_number": 7,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2005-01-04",
+   "episode_count": 42,
+   "id": 25924,
+   "name": "Staffel 8",
+   "overview": "",
+   "poster_path": "/rBWHrKI1AAPkCrdneJ1lpU3VCX7.jpg",
+   "season_number": 8,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2006-01-03",
+   "episode_count": 49,
+   "id": 25925,
+   "name": "Staffel 9",
+   "overview": "",
+   "poster_path": "/mI4eiPyndQrmOPUYsgkDjZRAPpf.jpg",
+   "season_number": 9,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2007-01-16",
+   "episode_count": 44,
+   "id": 25926,
+   "name": "Staffel 10",
+   "overview": "",
+   "poster_path": "/rDdLd6PlxhLENQB0AsrxKyRIAwh.jpg",
+   "season_number": 10,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2007-12-11",
+   "episode_count": 42,
+   "id": 25915,
+   "name": "Staffel 11",
+   "overview": "",
+   "poster_path": "/A3ll0vRsfSFAtTZYoOOCJduYyLf.jpg",
+   "season_number": 11,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2009-01-06",
+   "episode_count": 42,
+   "id": 25927,
+   "name": "Staffel 12",
+   "overview": "",
+   "poster_path": "/vNuIPQauhqFVSZCHiqGRRHUdbTN.jpg",
+   "season_number": 12,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2010-01-12",
+   "episode_count": 50,
+   "id": 25928,
+   "name": "Staffel 13",
+   "overview": "",
+   "poster_path": "/6thKZWipvHD2zM16H2kwhgQJbPC.jpg",
+   "season_number": 13,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2011-01-11",
+   "episode_count": 43,
+   "id": 25929,
+   "name": "Staffel 14",
+   "overview": "",
+   "poster_path": "/43ZXmP3AHv67V31711QJJxsmbO8.jpg",
+   "season_number": 14,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2012-01-10",
+   "episode_count": 42,
+   "id": 25930,
+   "name": "Staffel 15",
+   "overview": "",
+   "poster_path": "/7mRSDUR9jo3BObXqfzXDsb2oRks.jpg",
+   "season_number": 15,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2013-01-08",
+   "episode_count": 43,
+   "id": 25931,
+   "name": "Staffel 16",
+   "overview": "",
+   "poster_path": "/xBy1TeEQKUjXMDFP4KRaxOOf7yV.jpg",
+   "season_number": 16,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2014-01-14",
+   "episode_count": 47,
+   "id": 66036,
+   "name": "Staffel 17",
+   "overview": "",
+   "poster_path": "/zZdEbTMJ2xue3ztVjJ4fFxMdJXw.jpg",
+   "season_number": 17,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2015-01-06",
+   "episode_count": 42,
+   "id": 66037,
+   "name": "Staffel 18",
+   "overview": "",
+   "poster_path": "/fgUqpi2LlQZPlzYaq7hhzX2q5PH.jpg",
+   "season_number": 18,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2016-01-05",
+   "episode_count": 42,
+   "id": 87878,
+   "name": "Staffel 19",
+   "overview": "",
+   "poster_path": "/xeEsNGOUOhVWdhvxZhXvBUOLWZR.jpg",
+   "season_number": 19,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2017-01-03",
+   "episode_count": 42,
+   "id": 87879,
+   "name": "Staffel 20",
+   "overview": "",
+   "poster_path": "/jJNEA9vZz2nXf1plTjJELv0PGCp.jpg",
+   "season_number": 20,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2018-01-02",
+   "episode_count": 42,
+   "id": 109017,
+   "name": "Staffel 21",
+   "overview": "",
+   "poster_path": "/gn35GD9SiIMy3A03WYYTOhNEFq1.jpg",
+   "season_number": 21,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2019-01-08",
+   "episode_count": 42,
+   "id": 180287,
+   "name": "Staffel 22",
+   "overview": "",
+   "poster_path": "/hhd6khKElQnhGYmeoN9UUhQj59F.jpg",
+   "season_number": 22,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2020-01-07",
+   "episode_count": 42,
+   "id": 180292,
+   "name": "Staffel 23",
+   "overview": "",
+   "poster_path": "/ayI3TItfKW7g6y3R9mZupoi1O8k.jpg",
+   "season_number": 23,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2021-03-23",
+   "episode_count": 42,
+   "id": 193044,
+   "name": "Staffel 24",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 24,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2022-03-15",
+   "episode_count": 42,
+   "id": 350196,
+   "name": "Staffel 25",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 25,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2023-03-28",
+   "episode_count": 42,
+   "id": 350197,
+   "name": "Staffel 26",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 26,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2024-04-09",
+   "episode_count": 41,
+   "id": 388841,
+   "name": "Staffel 27",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 27,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2025-04-01",
+   "episode_count": 42,
+   "id": 443596,
+   "name": "Staffel 28",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 28,
+   "vote_average": 0.0
+  },
+  {
+   "air_date": "2026-03-24",
+   "episode_count": 18,
+   "id": 506361,
+   "name": "Staffel 29",
+   "overview": "",
+   "poster_path": null,
+   "season_number": 29,
+   "vote_average": 0.0
+  }
+ ],
+ "softcore": false,
+ "spoken_languages": [
+  {
+   "english_name": "German",
+   "iso_639_1": "de",
+   "name": "Deutsch"
+  }
+ ],
+ "status": "Returning Series",
+ "tagline": "",
+ "type": "Scripted",
+ "vote_average": 6.286,
+ "vote_count": 7,
+ "content_ratings": {
+  "results": [
+   {
+    "descriptors": [],
+    "iso_3166_1": "TR",
+    "rating": "Genel İzleyici"
+   },
+   {
+    "descriptors": [],
+    "iso_3166_1": "ES",
+    "rating": "7"
+   },
+   {
+    "descriptors": [],
+    "iso_3166_1": "IT",
+    "rating": "T"
+   },
+   {
+    "descriptors": [],
+    "iso_3166_1": "DE",
+    "rating": "6"
+   },
+   {
+    "descriptors": [],
+    "iso_3166_1": "AT",
+    "rating": "14"
+   },
+   {
+    "descriptors": [],
+    "iso_3166_1": "CH",
+    "rating": "16"
+   }
+  ]
+ },
+ "external_ids": {
+  "imdb_id": "tt0178142",
+  "freebase_mid": "/m/02vqk2m",
+  "freebase_id": "/en/in_aller_freundschaft",
+  "tvdb_id": 147521,
+  "tvrage_id": null,
+  "wikidata_id": "Q464885",
+  "facebook_id": null,
+  "instagram_id": null,
+  "twitter_id": null
+ }
+}

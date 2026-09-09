@@ -75,6 +75,17 @@ def group(rows):
     return (sorted(seasons.items()), loose)
 
 
+def soleSeason(rows):
+    """
+    The season all the films that name one belong to, or `None`.
+
+    Says whether the episodes are worth asking about: one season can be
+    answered with a single request, a mixture of them cannot.
+    """
+    seasons = set(seasonOf(row) for row in rows) - set([None])
+    return seasons.pop() if len(seasons) == 1 else None
+
+
 def ofSeason(rows, season):
     """ The films of one season """
     return [row for row in rows if seasonOf(row) == season]

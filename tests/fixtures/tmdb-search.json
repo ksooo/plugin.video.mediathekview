@@ -1,0 +1,70 @@
+{
+ "page": 1,
+ "results": [
+  {
+   "adult": false,
+   "backdrop_path": "/uGbBFoxXNscnH9UZuF8v0ODrrve.jpg",
+   "genre_ids": [
+    10766
+   ],
+   "id": 14509,
+   "origin_country": [
+    "DE"
+   ],
+   "original_language": "de",
+   "original_name": "In aller Freundschaft",
+   "overview": "Geschichten rund um die Belegschaft des fiktiven Krankenhauses Sachsenklinik in Leipzig.",
+   "popularity": 46.9621,
+   "poster_path": "/f8ZHSXNs5jyjMz3qg7mB2fqnTjP.jpg",
+   "first_air_date": "1998-10-26",
+   "softcore": false,
+   "name": "In aller Freundschaft",
+   "vote_average": 6.286,
+   "vote_count": 7
+  },
+  {
+   "adult": false,
+   "backdrop_path": "/bnGFjtkk4EXXd7R7yNvJX5UOX3E.jpg",
+   "genre_ids": [
+    18
+   ],
+   "id": 63613,
+   "origin_country": [
+    "DE"
+   ],
+   "original_language": "de",
+   "original_name": "In aller Freundschaft - Die jungen Ärzte",
+   "overview": "Im Mittelpunkt der Geschichten steht ein junges Ärzteteam um den Oberarzt Dr. Niklas Ahrend im Johannes-Thal-Klinikum in Erfurt",
+   "popularity": 39.2043,
+   "poster_path": "/mNGHuwsxs6KlwymfgOdPKisfBBe.jpg",
+   "first_air_date": "2015-01-22",
+   "softcore": false,
+   "name": "In aller Freundschaft - Die jungen Ärzte",
+   "vote_average": 7.1,
+   "vote_count": 17
+  },
+  {
+   "adult": false,
+   "backdrop_path": null,
+   "genre_ids": [
+    18
+   ],
+   "id": 108364,
+   "origin_country": [
+    "DE"
+   ],
+   "original_language": "de",
+   "original_name": "In aller Freundschaft – Die Krankenschwestern",
+   "overview": "Im Mittelpunkt des „In aller Freundschaft“-Spin-Offs stehen fünf junge, angehende Krankenschwestern und -pfleger, die am fiktiven Volkmann-Klinikum in Halle ihre Ausbildung absolvieren.",
+   "popularity": 1.125,
+   "poster_path": "/aZoDNngWVuS2LFFBg71WEh7c8ES.jpg",
+   "first_air_date": "2018-11-01",
+   "softcore": false,
+   "name": "In aller Freundschaft – Die Krankenschwestern",
+   "vote_average": 0.0,
+   "vote_count": 0
+  }
+ ],
+ "total_pages": 1,
+ "total_results": 3
+}

@@ -1,0 +1,65 @@
+{
+ "_id": "66f295196c3b7a8d648e20a6",
+ "air_date": "2024-10-01",
+ "episodes": [
+  {
+   "air_date": "2024-10-01",
+   "episode_number": 1,
+   "episode_type": "standard",
+   "id": 5623002,
+   "name": "Jubiläum in Rosenheim",
+   "overview": "Im exklusiven Reitklub Hoheneck stehen Wahlen für das Amt des Präsidenten an. Da wird Hannes Kolbe, der Hufschmied des Klubs, erschlagen aufgefunden.",
+   "production_code": "",
+   "runtime": null,
+   "season_number": 24,
+   "show_id": 41149,
+   "still_path": "/uPz3mqBPWn81Q5qw0rrboIePOcg.jpg",
+   "vote_average": 0.0,
+   "vote_count": 0
+  },
+  {
+   "air_date": "2024-10-08",
+   "episode_number": 2,
+   "episode_type": "standard",
+   "id": 5623003,
+   "name": "Mord macht auch Mist",
+   "overview": "Der Bauer Alfred Kühbandner wurde von einem Pfeil, anscheinend aus einem Distanzinjektionsblasrohr, tödlich getroffen. Im Misthaufen werden Reste seines Testaments sichergestellt.",
+   "production_code": "",
+   "runtime": null,
+   "season_number": 24,
+   "show_id": 41149,
+   "still_path": "/nCcZZLbCHWBpcUkfAuui7fnfIJX.jpg",
+   "vote_average": 0.0,
+   "vote_count": 0
+  },
+  {
+   "air_date": "2024-10-15",
+   "episode_number": 3,
+   "episode_type": "standard",
+   "id": 5623004,
+   "name": "Stockls Verdacht",
+   "overview": "Firmenchef Ferdinand Lob wird in seiner Villa leblos aufgefunden. Alles deutet zunächst auf eine natürliche Todesursache hin.",
+   "production_code": "",
+   "runtime": null,
+   "season_number": 24,
+   "show_id": 41149,
+   "still_path": "/7FsS5zHFVfL8RSCUcLnD0mE3lrN.jpg",
+   "vote_average": 0.0,
+   "vote_count": 0
+  }
+ ],
+ "id": 420108,
+ "name": "Staffel 24",
+ "networks": [
+  {
+   "id": 31,
+   "logo_path": "/2OHAgbf6QUj4cWjmFkFKu4jIsq1.png",
+   "name": "ZDF",
+   "origin_country": "DE"
+  }
+ ],
+ "overview": "",
+ "poster_path": "/j80V4X89dhgv1AhvHtU5RaYiwre.jpg",
+ "season_number": 24,
+ "vote_average": 0.0
+}

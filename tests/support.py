@@ -95,7 +95,6 @@ class Settings(object):
         'maxAge': 2 * 86400,
         'recentMode': 0,
         'filmSortMethod': 0,
-        'contentType': '',
         'groupShow': True,
         'caching': True,
         'userAgentString': '',
@@ -105,6 +104,8 @@ class Settings(object):
         'databaseStatus': 'IDLE',
         'databaseVersion': 3,
         'databaseType': 0,
+        'tmdbEnabled': False,
+        'tmdbToken': '',
     }
 
     def __init__(self, **overrides):
@@ -140,9 +141,6 @@ class Settings(object):
 
     def getFilmSortMethod(self):
         return self._values['filmSortMethod']
-
-    def getContentType(self):
-        return self._values['contentType']
 
     def getGroupShow(self):
         return self._values['groupShow']
@@ -182,6 +180,12 @@ class Settings(object):
 
     def getDatabaseType(self):
         return self._values['databaseType']
+
+    def getTmdbEnabled(self):
+        return self._values['tmdbEnabled']
+
+    def getTmdbToken(self):
+        return self._values['tmdbToken']
 
 
 class Addon(object):
@@ -299,14 +303,27 @@ class ListItem(object):
         self.context_menu = []
         self.subtitles = []
         self.streams = []
+        self.unique_ids = {}
 
     def setInfo(self, type, infoLabels):
         self.info = infoLabels
+
+    def setUniqueIDs(self, values, defaultrating=''):
+        self.unique_ids = dict(values)
 
     def addStreamInfo(self, type, values):
         self.streams.append((type, values))
 
     def setArt(self, art):
+        # Kodi takes a map of strings to strings. A None slips through here
+        # and then fails in the SWIG conversion with "argument 2 of type
+        # 'XBMCAddon::Properties const &'", which is a listing that does not
+        # appear at all - so this stub is as strict as Kodi is.
+        for (key, value) in art.items():
+            if not isinstance(value, str):
+                raise TypeError(
+                    "in method 'ListItem_setArt', argument 2 of type "
+                    "'XBMCAddon::Properties const &' (%s is %r)" % (key, value))
         self.art = art
 
     def setProperty(self, key, value):
