@@ -97,6 +97,14 @@ msgctxt "#30125"
 msgid "Blacklist"
 msgstr "Exclude from search"
 
+msgctxt "#30126"
+msgid "Hide audio described duplicates"
+msgstr "Hide audio described duplicates"
+
+msgctxt "#30127"
+msgid "Hides a film marked as Audiodeskription where the same film is listed without it. A version that is the only one there is stays."
+msgstr "Hides a film marked as Audiodeskription where the same film is listed without it. A version that is the only one there is stays."
+
 msgctxt "#30130"
 msgid "Fetched %d shows and %d seasons"
 msgstr "Fetched %d shows and %d seasons"

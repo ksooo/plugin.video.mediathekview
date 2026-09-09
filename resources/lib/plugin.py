@@ -33,6 +33,7 @@ import resources.lib.ui.letterUi as LetterUi
 import resources.lib.ui.filmlistUi as FilmlistUi
 import resources.lib.ui.seasonUi as SeasonUi
 import resources.lib.seasons as Seasons
+import resources.lib.variants as Variants
 from resources.lib.metadata import Metadata
 from resources.lib.metadataPrefetch import MetadataPrefetch
 
@@ -211,7 +212,7 @@ class MediathekViewPlugin(KodiPlugin):
             channel = self.get_arg('channel', "")
             channel = "" if channel == "0" else channel
             season = self.get_arg('season', "")
-            films = self.database.getFilms(channel, show)
+            films = self._withoutDuplicates(self.database.getFilms(channel, show))
             # Only where one show was asked for: without a show id the films
             # come from many of them, and the first one's name would stand
             # for all the others.
@@ -385,6 +386,7 @@ class MediathekViewPlugin(KodiPlugin):
         Each film is of another show here, so the show's poster is what tells
         them apart. One query brings what is stored about all of them.
         """
+        films = self._withoutDuplicates(films)
         shownames = [row[SHOWNAME] for row in films]
         FilmlistUi.FilmlistUi(self).generate(
             films, pShowMetadata=self.metadata.forShows(shownames),
@@ -416,16 +418,22 @@ class MediathekViewPlugin(KodiPlugin):
         self.notifier.update_metadata_progress(
             int(100.0 * done / total) if total else 100, message)
 
+    def _withoutDuplicates(self, films):
+        """ Applies the filters the user asked for to a list of films """
+        if self.settings.getHideAudioDescription():
+            return Variants.withoutAudioDescription(films)
+        return films
+
     def _resolveFilmIdsFromParams(self, filmId, quickSearch, channelId, showId):
         filmIdArray = []
         if filmId is not None:
             filmIdArray.append(filmId)
         elif quickSearch is not None:
-            rs = self.database.getQuickSearch(quickSearch)
+            rs = self._withoutDuplicates(self.database.getQuickSearch(quickSearch))
             for id in rs:
                 filmIdArray.append(id[0])
         elif showId is not None:
-            rs = self.database.getFilms(channelId, showId)
+            rs = self._withoutDuplicates(self.database.getFilms(channelId, showId))
             for id in rs:
                 filmIdArray.append(id[0])
         return filmIdArray;

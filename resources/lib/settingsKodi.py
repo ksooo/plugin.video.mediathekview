@@ -75,6 +75,10 @@ class SettingsKodi(SettingsInterface):
     def getNoFutur(self):
         return self._addonClass.getSetting('nofuture') == 'true'
 
+    # self.hideaudiodescription
+    def getHideAudioDescription(self):
+        return self._addonClass.getSetting('hideaudiodescription') == 'true'
+
     # self.minlength
     def getMinLength(self):
         return self._getInt('minlength', 0)

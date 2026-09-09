@@ -90,6 +90,7 @@ class Settings(object):
         'preferHd': False,
         'autoSub': False,
         'noFutur': False,
+        'hideAudioDescription': False,
         'minLength': 0,
         'maxResults': 1000,
         'maxAge': 2 * 86400,
@@ -126,6 +127,9 @@ class Settings(object):
 
     def getNoFutur(self):
         return self._values['noFutur']
+
+    def getHideAudioDescription(self):
+        return self._values['hideAudioDescription']
 
     def getMinLength(self):
         return self._values['minLength']

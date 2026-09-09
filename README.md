@@ -44,6 +44,7 @@ Highlights
 * Download with subtitles and automatic NFO file generation
 * Internal standalone or shared MySQL database support
 * Optional artwork and metadata from TMDB
+* Audio described duplicates can be hidden
 * UI localised to German and English
 
 

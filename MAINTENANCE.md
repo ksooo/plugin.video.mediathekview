@@ -126,6 +126,33 @@ and `zdf.info` are the same logo under both rules.
 Livestreams work the same way from `resources/icons/livestream/`, covering 12
 streams.
 
+## Accessibility versions
+
+`resources/lib/variants.py`
+
+The film list carries the audio described version of a film as a film of its
+own, marked at the end of the title. The setting *"Hide audio described
+duplicates"* drops such a film where the same film is listed without the
+marker - a version that is the only one there is stays.
+
+The markers were counted rather than guessed. Of 715965 films, 16625 end in
+"Audiodeskription", 892 in "Hörfassung", which is the same thing under an
+older name, and 80 in "(AD)" - that one only accepted in brackets, since a
+title could end in those two letters by accident. 43 more carry
+"| Audiodeskription |" in the middle of the title and are left alone; none
+of them has a twin. Some titles hang the marker on with a separator ("Der
+Fall (1/2) - Audiodeskription"), and eating that separator finds 843 twins
+that would otherwise be missed. All told 16215 of the 17597 marked films are
+hidden and 1382 stay.
+
+Sign language versions are marked the same way - 10812 films, 8258 of them
+with a twin - and nothing hides those yet.
+
+The comparison is against the films of the listing at hand, not against the
+whole database: that is what "beside" means on screen, and it costs one pass
+over a list that is already in memory. It runs where a listing is built and
+where a download resolves its films, so both agree on what exists.
+
 ## Livestreams
 
 `storeQuery.getLivestreams()` selects films whose *Thema* is exactly
