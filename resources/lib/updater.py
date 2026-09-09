@@ -42,10 +42,8 @@ class MediathekViewUpdater(object):
         if self.database is not None:
             self.exit()
         if self.settings.getDatabaseType() == 0:
-            self.logger.debug('Database driver: Internal (sqlite)')
             self.database = StoreSQLite()
         elif self.settings.getDatabaseType() == 1:
-            self.logger.debug('Database driver: External (mysql)')
             self.database = StoreMySQL()
         else:
             self.logger.warn('Unknown Database driver selected')
@@ -70,15 +68,6 @@ class MediathekViewUpdater(object):
         sameDay = (currentDate.day == lastUpdateDatetime.day and
             currentDate.month == lastUpdateDatetime.month and
             currentDate.year == lastUpdateDatetime.year)
-        #
-        self.logger.debug('Last Update {}', datetime.fromtimestamp(databaseStatus['lastUpdate']))
-        self.logger.debug('Last Full Update {}', datetime.fromtimestamp(databaseStatus['lastFullUpdate']))
-        self.logger.debug('version {}', databaseStatus['version'])
-        self.logger.debug('status {}', databaseStatus['status'])
-        self.logger.debug('update interval {}', self.settings.getDatabaseUpdateInvterval())
-        #
-        updateConfigName = {0:"Disabled", 1:"Manual", 2:"On Start", 3:"Automatic", 4:"continuous"}
-        self.logger.debug('Update Mode "{}"', updateConfigName.get(updateConfig))
         #
         doSomething = 0
         if (int(databaseStatus['version']) != 3 or databaseStatus['status'] == 'UNINIT'):
@@ -112,9 +101,21 @@ class MediathekViewUpdater(object):
             self.logger.debug('mvupdate --full')
             doSomething = -1
         #
+        # The service asks this every half minute, so a cycle with nothing
+        # to do says nothing at all. Where there is something, the state it
+        # was decided from is worth having in the log.
         if (doSomething == 0):
-            self.logger.debug('nothing to do')
             return
+        #
+        updateConfigName = {0: "Disabled", 1: "Manual", 2: "On Start",
+                            3: "Automatic", 4: "continuous"}
+        self.logger.debug('Update mode "{}", interval {} sec',
+                          updateConfigName.get(updateConfig),
+                          self.settings.getDatabaseUpdateInvterval())
+        self.logger.debug('Database version {}, status {}, last update {}, last full update {}',
+                          databaseStatus['version'], databaseStatus['status'],
+                          datetime.fromtimestamp(databaseStatus['lastUpdate']),
+                          datetime.fromtimestamp(databaseStatus['lastFullUpdate']))
         #
         lastFullUpdate = datetime.fromtimestamp(databaseStatus['lastFullUpdate'])
         #
