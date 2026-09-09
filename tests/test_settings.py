@@ -80,8 +80,10 @@ class ChangelogTest(unittest.TestCase):
 
     <news> is what the add-on browser displays. The addon.xml schema allows
     exactly one of them - a second, language tagged one fails validation with
-    "/extension/news[2]" - so there is one, in English. changelog.txt is what
-    Kodi falls back to when <news> is empty and holds the same text.
+    "/extension/news[2]" - so there is one, in English, and it may hold no
+    more than 1500 characters. changelog.txt is what Kodi falls back to when
+    <news> is empty; it begins with the same text and keeps the history
+    behind it, which is longer than the schema allows.
     """
 
     def _addon(self):
@@ -97,10 +99,16 @@ class ChangelogTest(unittest.TestCase):
         self.assertIn('v' + version, self._news(),
                       'the news does not mention v%s' % version)
 
-    def test_the_changelog_file_repeats_the_news(self):
+    def test_the_news_fits_what_the_schema_allows(self):
+        self.assertLessEqual(len(self._news()), 1500,
+                             'the addon checker refuses a longer <news>')
+
+    def test_the_changelog_file_begins_with_the_news(self):
         with open(os.path.join(support.ADDON_PATH, 'changelog.txt'),
                   encoding='utf-8') as handle:
-            self.assertEqual(handle.read().strip(), self._news().strip())
+            changelog = handle.read().strip()
+        self.assertTrue(changelog.startswith(self._news().strip()),
+                        'changelog.txt does not begin with what <news> says')
 
 
 def _source():

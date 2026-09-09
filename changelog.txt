@@ -1,3 +1,8 @@
+v1.3.0
+- Posters and episode pictures from themoviedb.org, with genre and age rating. Off until you enter a token from your own free TMDB account.
+- Duplicate "Audiodeskription" and "Gebärdensprache" versions can be hidden. Both off by default.
+- Film lists show the watched state and a film's picture beside the list, as Kodi does with episodes.
+
 v1.2.0
 - The add-on is now called MediathekView+. Only the name changed; your settings and your database stay where they are.
 - Kodi stays usable while the film database is updated.
