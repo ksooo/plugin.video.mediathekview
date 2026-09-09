@@ -1,5 +1,5 @@
-Kodi Addon MediathekView (ksooo)
-================================
+Kodi Addon MediathekView+
+=========================
 
 **This add-on is based on the code of https://github.com/mediathekview/plugin.video.mediathekview.**
 It is a fork maintained by Kai Sommerfeld with its own add-on ID
@@ -90,7 +90,7 @@ The original addon is still offered through the [MediathekView
 repositories][6]. Both addons have different IDs
 (`plugin.video.mediathekview` and `plugin.video.mediathekview.ksooo`) and can
 therefore be installed side by side; in Kodi they show up as
-_"MediathekView"_ and _"MediathekView (ksooo)"_. Settings and the local
+_"MediathekView"_ and _"MediathekView+"_. Settings and the local
 database are separate; an external MySQL database however is shared if both
 are configured to use the same server and database name.
 

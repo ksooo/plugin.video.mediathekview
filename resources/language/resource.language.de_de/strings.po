@@ -1,10 +1,10 @@
 # Kodi Media Center language file
-# Addon Name: MediathekView (ksooo)
+# Addon Name: MediathekView+
 # Addon id: plugin.video.mediathekview.ksooo
 # Addon Provider: kai.sommerfeld@gmx.com
 msgid ""
 msgstr ""
-"Project-Id-Version: MediathekView (ksooo)\n"
+"Project-Id-Version: MediathekView+\n"
 "Report-Msgid-Bugs-To: kai.sommerfeld@gmx.com\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -33,8 +33,8 @@ msgid "Advanced Settings"
 msgstr "Erweitert"
 
 msgctxt "#30005"
-msgid "Search in MediathekView (ksooo)"
-msgstr "In MediathekView (ksooo) suchen"
+msgid "Search in MediathekView+"
+msgstr "In MediathekView+ suchen"
 
 # Settings Page 1
 msgctxt "#30110"

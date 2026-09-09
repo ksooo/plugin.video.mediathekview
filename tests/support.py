@@ -191,7 +191,7 @@ class Addon(object):
         self.strings = strings if strings is not None else {}
         self.info = info if info is not None else {
             'id': 'plugin.video.mediathekview.ksooo',
-            'name': 'MediathekView (ksooo)',
+            'name': 'MediathekView+',
             'version': '1.0.0',
             'path': ADDON_PATH,
             'profile': ADDON_PATH,
