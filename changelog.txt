@@ -1,3 +1,7 @@
+v1.4.0
+- Needs Kodi 20 (Nexus) or newer. On Kodi 19 the add-on stays at version 1.3.0.
+- Sorting a film list by date works now. The date never reached Kodi in a form it could read.
+
 v1.3.0
 - Posters and episode pictures from themoviedb.org, with genre and age rating. Off until you enter a token from your own free TMDB account.
 - Duplicate "Audiodeskription" and "Gebärdensprache" versions can be hidden. Both off by default.

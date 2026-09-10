@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.mediathekview.ksooo"
 	name="MediathekView+"
-	version="1.3.0"
+	version="1.4.0"
 	provider-name="MediathekView.de, Leo Moll, Kai Sommerfeld">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1"/>
@@ -29,10 +29,9 @@
 		<description lang="de_DE">Dieses Add-on basiert auf dem Code von https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>
 		<description lang="en_GB">This add-on is based on the code of https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>
 		<disclaimer lang="en_GB">This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</disclaimer>
-		<news>v1.3.0
-- Posters and episode pictures from themoviedb.org, with genre and age rating. Off until you enter a token from your own free TMDB account.
-- Duplicate "Audiodeskription" and "Gebärdensprache" versions can be hidden. Both off by default.
-- Film lists show the watched state and a film's picture beside the list, as Kodi does with episodes.
+		<news>v1.4.0
+- Needs Kodi 20 (Nexus) or newer. On Kodi 19 the add-on stays at version 1.3.0.
+- Sorting a film list by date works now. The date never reached Kodi in a form it could read.
 		</news>
 		<platform>all</platform>
 		<license>MIT</license>
