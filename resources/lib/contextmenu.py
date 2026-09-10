@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import xbmc
 
-import resources.lib.mvutils as mvutils
 
 try:
     # Python 3.x
@@ -24,7 +23,6 @@ except ImportError:
 def open_search(search):
     """ Opens the addon showing the results for the given search term """
     params = {'mode': 'research', 'doNotSave': 'true', 'search': search}
-    utf_ensured_params = mvutils.dict_to_utf(params)
     cmd = 'ActivateWindow(Videos,plugin://plugin.video.mediathekview.ksooo?' + \
-        urlencode(utf_ensured_params) + ')'
+        urlencode(params) + ')'
     xbmc.executebuiltin(cmd)

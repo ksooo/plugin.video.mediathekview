@@ -10,9 +10,11 @@ import time
 import os
 from datetime import datetime
 # pylint: disable=import-error
+import xbmc
 import xbmcgui
 import xbmcplugin
 import resources.lib.appContext as appContext
+import resources.lib.ui.videoInfo as videoInfo
 from resources.lib.ui.channelArt import artFor
 from resources.lib.model.film import Film
 from resources.lib.seasons import splitEpisode
@@ -202,7 +204,7 @@ class FilmlistUi(object):
         if pFilm.aired is not None and pFilm.aired != 0:
             ndate = datetime.fromtimestamp(pFilm.aired)
             airedstring = ndate.isoformat().replace('T', ' ')
-            info_labels['date'] = airedstring[:10]
+            info_labels['date'] = ndate.isoformat()
             info_labels['aired'] = airedstring[:10]
             info_labels['dateadded'] = airedstring
 
@@ -214,22 +216,21 @@ class FilmlistUi(object):
             fanart = record.get('fanart') or fanart
 
         #
-        if self.plugin.get_kodi_version() > 17:
-            listitem = xbmcgui.ListItem(label=resultingtitle, path=videourl, offscreen=True)
-        else:
-            listitem = xbmcgui.ListItem(label=resultingtitle, path=videourl)
+        listitem = xbmcgui.ListItem(label=resultingtitle, path=videourl, offscreen=True)
         #
-        listitem.setInfo(type='video', infoLabels=info_labels)
+        videoInfo.apply(listitem, info_labels)
         listitem.setProperty('IsPlayable', 'true')
         # That a subtitle exists was only findable in the context menu. As a
         # stream it becomes something a skin can put a flag on, and it is one
         # of the few things the film list tells us for certain.
         if pFilm.url_sub:
-            listitem.addStreamInfo('subtitle', {'language': SUBTITLE_LANGUAGE})
+            listitem.getVideoInfoTag().addSubtitleStream(
+                xbmc.SubtitleStreamDetail(SUBTITLE_LANGUAGE))
         if isHd:
             # " (HD)" used to be appended to the title. Nothing is claimed for
             # the other streams: the film list does not say what they are.
-            listitem.addStreamInfo('video', dict(HD_STREAM))
+            listitem.getVideoInfoTag().addVideoStream(
+                xbmc.VideoStreamDetail(**HD_STREAM))
         # A film wears its own picture and nothing else, which is how a
         # library episode is furnished too: the channel logo where the
         # service had none, and no poster of the show. A skin shows the

@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import time
 import resources.lib.appContext as appContext
+import resources.lib.ui.videoInfo as videoInfo
 from resources.lib.ui.channelArt import artFor
 import os
 import xbmcgui
@@ -70,10 +71,7 @@ class ShowUi(object):
                     'default2-f.png'
                 )
             #
-            if self.plugin.get_kodi_version() > 17:
-                list_item = xbmcgui.ListItem(label=nameLabel, offscreen=True)
-            else:
-                list_item = xbmcgui.ListItem(label=nameLabel)
+            list_item = xbmcgui.ListItem(label=nameLabel, offscreen=True)
             #
 
             info_labels = {
@@ -99,9 +97,10 @@ class ShowUi(object):
             if poster:
                 art['poster'] = poster
             list_item.setArt(art)
-            list_item.setInfo(type='video', infoLabels=info_labels)
+            videoInfo.apply(list_item, info_labels)
             if record and record.get('imdbid'):
-                list_item.setUniqueIDs({'imdb': record['imdbid']}, 'imdb')
+                list_item.getVideoInfoTag().setUniqueIDs(
+                    {'imdb': record['imdbid']}, 'imdb')
             #
             targetUrl = mvutils.build_url({
                 'mode': 'films',

@@ -298,6 +298,63 @@ class Plugin(object):
 
 
 
+class _StreamDetail(object):
+    """A stream as xbmc.VideoStreamDetail and its siblings take one."""
+
+    def __init__(self, **values):
+        self.values = values
+
+
+class _SubtitleStreamDetail(_StreamDetail):
+    """The subtitle one takes its language as the first argument."""
+
+    def __init__(self, language=''):
+        super(_SubtitleStreamDetail, self).__init__(language=language)
+
+
+class InfoTagVideo(object):
+    """The video info tag of a list item, as Kodi 20 wants it written.
+
+    It records into the same fields ListItem.setInfo used to fill, because
+    what a test cares about is what Kodi ends up knowing, not which method
+    said so.
+    """
+
+    _TEXT = {'setTitle': 'title', 'setSortTitle': 'sorttitle',
+             'setTvShowTitle': 'tvshowtitle', 'setPlot': 'plot',
+             'setMpaa': 'mpaa', 'setPremiered': 'premiered',
+             'setFirstAired': 'aired', 'setDateAdded': 'dateadded',
+             'setMediaType': 'mediatype', 'setSeason': 'season',
+             'setEpisode': 'episode', 'setDuration': 'duration',
+             'setGenres': 'genre', 'setStudios': 'studio'}
+
+    def __init__(self, item):
+        self._item = item
+
+    def __getattr__(self, name):
+        if name not in self._TEXT:
+            raise AttributeError('InfoTagVideo has no %s' % name)
+        def setter(value):
+            self._item.info[self._TEXT[name]] = value
+        return setter
+
+    def setRating(self, rating, votes=0, type='', isdefault=False):
+        self._item.info['rating'] = rating
+        self._item.info['votes'] = votes
+
+    def setUniqueIDs(self, values, defaultrating=''):
+        self._item.unique_ids = dict(values)
+
+    def addVideoStream(self, stream):
+        self._item.streams.append(('video', dict(stream.values)))
+
+    def addAudioStream(self, stream):
+        self._item.streams.append(('audio', dict(stream.values)))
+
+    def addSubtitleStream(self, stream):
+        self._item.streams.append(('subtitle', dict(stream.values)))
+
+
 class ListItem(object):
     """Records what the addon puts on a Kodi list item."""
 
@@ -312,15 +369,27 @@ class ListItem(object):
         self.subtitles = []
         self.streams = []
         self.unique_ids = {}
+        self.video_info_tag = InfoTagVideo(self)
+
+    def getVideoInfoTag(self):
+        return self.video_info_tag
+
+    def setDateTime(self, dateTime):
+        self.info['date'] = dateTime
 
     def setInfo(self, type, infoLabels):
-        self.info = infoLabels
+        # Deprecated since Kodi 20, and it warns once per item. Nothing may
+        # go back to it unnoticed.
+        raise AssertionError('ListItem.setInfo is deprecated,'
+                             ' use the video info tag')
 
     def setUniqueIDs(self, values, defaultrating=''):
-        self.unique_ids = dict(values)
+        raise AssertionError('ListItem.setUniqueIDs is deprecated,'
+                             ' use the video info tag')
 
     def addStreamInfo(self, type, values):
-        self.streams.append((type, values))
+        raise AssertionError('ListItem.addStreamInfo is deprecated,'
+                             ' use the video info tag')
 
     def setArt(self, art):
         # Kodi takes a map of strings to strings. A None slips through here
@@ -438,6 +507,9 @@ def install_kodi_stubs():
     xbmc.log = lambda *args, **kwargs: None
     xbmc.getInfoLabel = lambda label: '21.0'
     xbmc.executebuiltin = lambda command: None
+    xbmc.VideoStreamDetail = _StreamDetail
+    xbmc.AudioStreamDetail = _StreamDetail
+    xbmc.SubtitleStreamDetail = _SubtitleStreamDetail
 
     gui = sys.modules.setdefault('xbmcgui', types.ModuleType('xbmcgui'))
     gui.ListItem = ListItem

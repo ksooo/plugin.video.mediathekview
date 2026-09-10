@@ -36,7 +36,9 @@ SET GLOBAL MAX_EXECUTION_TIME=2000;
         if self.conn is None:
             self.logger.debug('Using MySQL connector version {}',
                              mysql.connector.__version__)
-            # TODO Kodi 19 - we can update to mysql connector which supports auth_plugin parameter
+            # TODO auth_plugin: the connector in script.module.myconnpy is too
+            # old to take it, and that is what Kodi ships - not something the
+            # addon can choose.
             connectargs = {
                 'host': self.settings.getDatabaseHost(),
                 'port': self.settings.getDatabasePort(),

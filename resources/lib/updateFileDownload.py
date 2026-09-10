@@ -11,15 +11,8 @@ import os
 import time
 import resources.lib.appContext as appContext
 
-# pylint: disable=import-error
-try:
-    # Python 3.x
-    from urllib.error import URLError
-    from urllib.request import urlopen
-except ImportError:
-    # Python 2.x
-    from urllib2 import URLError
-    from urllib2 import urlopen
+from urllib.error import URLError
+from urllib.request import urlopen
 
 from contextlib import closing
 from codecs import open

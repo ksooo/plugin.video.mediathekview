@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import xbmc
 import xbmcgui
-import resources.lib.mvutils as mvutils
 import resources.lib.appContext as appContext
 
 
@@ -67,9 +66,7 @@ class KodiUI(object):
         keyboard = xbmc.Keyboard(deftext, heading, 1 if hidden else 0)
         keyboard.doModal()
         if keyboard.isConfirmed():
-            enteredText = keyboard.getText();
-            enteredText = mvutils.py2_decode(enteredText);
-            return (enteredText, True, )
+            return (keyboard.getText(), True, )
         return (deftext, False, )
 
     def show_ok_dialog(self, heading=None, line1=None, line2=None, line3=None):

@@ -14,6 +14,7 @@ from datetime import timedelta
 import xbmcgui
 import xbmcplugin
 import resources.lib.appContext as appContext
+import resources.lib.ui.videoInfo as videoInfo
 from resources.lib.model.livestream import Livestream
 
 
@@ -72,12 +73,9 @@ class LivestreamUi(object):
             fanArt = self._findIconName(livestreamModel.channel, livestreamName) + '-f.png'
             icon = self._findIconName(livestreamModel.channel, livestreamName) + '-i.png'
             #
-            if self.plugin.get_kodi_version() > 17:
-                listitem = xbmcgui.ListItem(label=livestreamModel.name, path=videourl, offscreen=True)
-            else:
-                listitem = xbmcgui.ListItem(label=livestreamModel.name, path=videourl)
+            listitem = xbmcgui.ListItem(label=livestreamModel.name, path=videourl, offscreen=True)
             #
-            listitem.setInfo(type='video', infoLabels=info_labels)
+            videoInfo.apply(listitem, info_labels)
             listitem.setProperty('IsPlayable', 'true')
             listitem.setArt({
                 'thumb': icon,

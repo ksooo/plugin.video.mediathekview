@@ -6,9 +6,7 @@ Copyright 2017-2018, Leo Moll and Dominik Schlösser
 SPDX-License-Identifier: MIT
 """
 
-# -- Imports ------------------------------------------------
-from __future__ import unicode_literals  # ,absolute_import, division
-# from future import standard_library
+# -- Imports ------------------------------------------------# from future import standard_library
 # from builtins import *
 # standard_library.install_aliases()
 import os

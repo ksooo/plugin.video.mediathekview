@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import xbmcgui
 import resources.lib.appContext as appContext
+import resources.lib.ui.videoInfo as videoInfo
 from resources.lib.ui.channelArt import artFor
 
 # Where the channel sits in a row of the film query.
@@ -51,10 +52,7 @@ class SeasonUi(object):
 
     def _generateListItem(self, number, films, show):
         label = self.plugin.language(30992) % number
-        if self.plugin.get_kodi_version() > 17:
-            listitem = xbmcgui.ListItem(label=label, offscreen=True)
-        else:
-            listitem = xbmcgui.ListItem(label=label)
+        listitem = xbmcgui.ListItem(label=label, offscreen=True)
         info_labels = {
             'title': label,
             'sorttitle': label,
@@ -72,7 +70,7 @@ class SeasonUi(object):
             for (field, key) in (('genre', 'genres'), ('mpaa', 'mpaa')):
                 if self.showMetadata.get(key):
                     info_labels[field] = self.showMetadata[key]
-        listitem.setInfo(type='video', infoLabels=info_labels)
+        videoInfo.apply(listitem, info_labels)
         # The artwork of the channel the season was broadcast on, taken from
         # the films rather than from the listing: a show can run on more than
         # one channel.

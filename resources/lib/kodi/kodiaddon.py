@@ -13,7 +13,6 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import xbmcvfs
-import resources.lib.mvutils as mvutils
 import resources.lib.appContext as appContext
 
 try:
@@ -35,38 +34,11 @@ class KodiAddon(object):
         self.icon = self.addon.getAddonInfo('icon')
         self.fanart = self.addon.getAddonInfo('fanart')
         self.version = self.addon.getAddonInfo('version')
-        self.path = mvutils.py2_decode(self.addon.getAddonInfo('path'))
+        self.path = self.addon.getAddonInfo('path')
         #
-        if self.getKodiVersion() > 18:
-            self.datapath = mvutils.py2_decode(xbmcvfs.translatePath(self.addon.getAddonInfo('profile')))
-        else:
-            self.datapath = mvutils.py2_decode(xbmc.translatePath(self.addon.getAddonInfo('profile')))
+        self.datapath = xbmcvfs.translatePath(self.addon.getAddonInfo('profile'))
         #
         self.language = self.addon.getLocalizedString
-        self.kodiVersion = -1
-
-    def getKodiVersion(self):
-        """
-        Get Kodi major version
-        Returns:
-            int: Kodi major version (e.g. 18)
-        """
-        xbmc_version = xbmc.getInfoLabel("System.BuildVersion")
-        return int(xbmc_version.split('-')[0].split('.')[0])
-
-    # TODO REMOVE THIS - USE SETTINGS INSTEAD
-    def get_kodi_version(self):
-        """
-        Get Kodi major version
-    
-        Returns:
-            int: Kodi major version (e.g. 18)
-        """
-        if self.kodiVersion > 0:
-            return self.kodiVersion
-        xbmc_version = xbmc.getInfoLabel("System.BuildVersion")
-        self.kodiVersion = int(xbmc_version.split('-')[0].split('.')[0])
-        return self.kodiVersion
 
     def get_setting(self, setting_id):
         """
@@ -75,9 +47,7 @@ class KodiAddon(object):
         Args:
             setting_id(int): id number of the setting
         """
-        argument = self.addon.getSetting(setting_id)
-        argument = mvutils.py2_decode(argument)
-        return argument
+        return self.addon.getSetting(setting_id)
 
     def set_setting(self, setting_id, value):
         """
@@ -131,9 +101,7 @@ class KodiPlugin(KodiAddon):
                 parameter was specified
         """
         try:
-            argument = self.args[argname][0]
-            argument = mvutils.py2_decode(argument)
-            return argument
+            return self.args[argname][0]
         except TypeError:
             return default
         except KeyError:
@@ -147,9 +115,7 @@ class KodiPlugin(KodiAddon):
         Args:
             params(object): an object containing parameters
         """
-        # BUG in urlencode which is solved in python 3
-        utfEnsuredParams = mvutils.dict_to_utf(params)
-        return self.base_url + '?' + urlencode(utfEnsuredParams)
+        return self.base_url + '?' + urlencode(params)
 
     def run_plugin(self, params):
         """
@@ -235,10 +201,7 @@ class KodiPlugin(KodiAddon):
         if isinstance(name, int):
             name = self.language(name)
         #
-        if self.get_kodi_version() > 17:
-            list_item = xbmcgui.ListItem(label=name, offscreen=True)
-        else:
-            list_item = xbmcgui.ListItem(label=name)
+        list_item = xbmcgui.ListItem(label=name, offscreen=True)
         #
         if contextmenu is not None:
             list_item.addContextMenuItems(contextmenu)

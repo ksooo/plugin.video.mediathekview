@@ -6,8 +6,6 @@ Copyright (c) 2017-2019, Leo Moll
 SPDX-License-Identifier: MIT
 """
 
-from __future__ import unicode_literals
-
 import os
 import re
 import sys
@@ -19,14 +17,8 @@ from contextlib import closing
 from codecs import open
 from functools import reduce
 
-# pylint: disable=import-error
-try:
-    # Python 3.x
-    from urllib.parse import urlencode
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlencode
-    from urllib2 import urlopen
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 from contextlib import closing
 from resources.lib.exceptions import ExitRequested
@@ -38,62 +30,10 @@ try:
 except ImportError:
     IS_KODI = False
 
-PY2 = sys.version_info[0] == 2
-
 
 def coalesce(*arg):
   return reduce(lambda x, y: x if x is not None else y, arg)
 
-
-def py2_encode(s, encoding='utf-8'):
-   """
-   Encode Python 2 ``unicode`` to ``str``
-
-   In Python 3 the string is not changed.   
-   """
-   if PY2 and isinstance(s, unicode):
-       s = s.encode(encoding)
-   return s
-
-
-def py2_decode(s, encoding='utf-8'):
-   """
-   Decode Python 2 ``str`` to ``unicode``
-
-   In Python 3 the string is not changed.
-   """
-   if PY2 and isinstance(s, str):
-       s = s.decode(encoding)
-   return s
-
-
-def array_to_utf(a):
-    autf = []
-    i = 0
-    for v in a:
-        if PY2 and isinstance(v, unicode):
-            autf.append(py2_encode(v))
-        elif PY2 and isinstance(v, dict):
-            autf.append(dict_to_utf(v))
-        elif PY2 and isinstance(v, list):
-            autf.append(array_to_utf(v))
-        else:
-            autf.append(v)
-    return autf
-
-
-def dict_to_utf(d):
-    dutf = {}
-    for k, v in list(d.items()):
-        if PY2 and isinstance(v, unicode):
-            dutf[k] = py2_encode(v)
-        elif PY2 and isinstance(v, list):
-            dutf[k] = array_to_utf(v)
-        elif PY2 and isinstance(v, dict):
-            dutf[k] = dict_to_utf(v)
-        else:
-            dutf[k] = v
-    return dutf
 
 def unixtimestamp2iso(uxtimestamp):
     return datetime.datetime.fromtimestamp(uxtimestamp).strftime('%Y-%m-%d %H:%M:%S')
@@ -285,8 +225,7 @@ def build_url(query):
     Args:
         query(object): a query object
     """
-    utfEnsuredParams = dict_to_utf(query)
-    return sys.argv[0] + '?' + urlencode(utfEnsuredParams)
+    return sys.argv[0] + '?' + urlencode(query)
 
 
 def _chunked_url_copier(src, dst, reporthook, chunk_size, aborthook):

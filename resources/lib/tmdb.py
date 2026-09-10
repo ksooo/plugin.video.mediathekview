@@ -10,16 +10,9 @@ import json
 import re
 import unicodedata
 
-# pylint: disable=import-error
-try:
-    # Python 3.x
-    from urllib.error import HTTPError, URLError
-    from urllib.parse import quote
-    from urllib.request import Request, urlopen
-except ImportError:
-    # Python 2.x
-    from urllib2 import HTTPError, URLError, Request, urlopen
-    from urllib import quote
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 import resources.lib.appContext as appContext
 

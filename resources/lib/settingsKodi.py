@@ -11,7 +11,6 @@ import time
 # pylint: disable=import-error
 import xbmc
 import xbmcvfs
-import resources.lib.mvutils as mvutils
 from resources.lib.settingsInterface import SettingsInterface
 # -- Classes ------------------------------------------------
 
@@ -47,20 +46,8 @@ class SettingsKodi(SettingsInterface):
 
     # self.datapath
     def getDatapath(self):
-        if self.getKodiVersion() > 18:
-            return mvutils.py2_decode(xbmcvfs.translatePath(self._addonClass.getAddonInfo('profile')))
-        else:
-            return mvutils.py2_decode(xbmc.translatePath(self._addonClass.getAddonInfo('profile')))
+        return xbmcvfs.translatePath(self._addonClass.getAddonInfo('profile'))
 
-    def getKodiVersion(self):
-        """
-        Get Kodi major version
-        Returns:
-            int: Kodi major version (e.g. 18)
-        """
-        xbmc_version = xbmc.getInfoLabel("System.BuildVersion")
-
-        return int(xbmc_version.split('-')[0].split('.')[0])
 
     # General
     # self.preferhd
@@ -170,11 +157,11 @@ class SettingsKodi(SettingsInterface):
 
     # self.downloadpathep
     def getDownloadPathEpisode(self):
-        return mvutils.py2_decode(self._addonClass.getSetting('downloadpathep'))
+        return self._addonClass.getSetting('downloadpathep')
 
     # self.downloadpathmv
     def getDownloadPathMovie(self):
-        return mvutils.py2_decode(self._addonClass.getSetting('downloadpathmv'))
+        return self._addonClass.getSetting('downloadpathmv')
 
     # self.moviefolders
     def getUseMovieFolder(self):

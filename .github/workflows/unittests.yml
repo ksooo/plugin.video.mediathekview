@@ -14,9 +14,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The oldest Kodi that can run this addon carries Python 3.8; the
-        # newest carries 3.12. Both have to stay happy.
-        python-version: ['3.8', '3.12']
+        # The oldest Kodi that can run this addon carries Python 3.11 and
+        # the newest 3.14 (tools/depends/target/python3 in each release).
+        # Both have to stay happy.
+        python-version: ['3.11', '3.14']
     name: Python ${{ matrix.python-version }}
     steps:
       - name: Checkout

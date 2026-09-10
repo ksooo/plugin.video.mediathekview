@@ -320,10 +320,14 @@ covered three skins out of all of them, and overruled the view Kodi remembers
 for each path, so a view the user picked never survived going back. Kodi
 keeps that memory itself; leave it alone.
 
-`settingsKodi.py` and `kodiaddon.py` both branch on the Kodi major version to
-choose between `xbmc.translatePath` and `xbmcvfs.translatePath`. The first was
-removed in Kodi 20, so the branch is what keeps Kodi 19 working; it can go once
-Kodi 19 is no longer supported.
+The addon asks for `xbmc.python 3.0.1`, which is Kodi 20 and newer - Kodi 19
+declares 3.0.0 and cannot install it. That is what the Kodi 20 API costs:
+`ListItem.setInfo`, `addStreamInfo` and `setUniqueIDs` are deprecated since
+Kodi 20 and warn once per item, so a listing of 53 films wrote 106 warnings
+into the log. What replaces them - the setters of `InfoTagVideo` - does not
+exist in Kodi 19. `resources/lib/ui/videoInfo.py` holds the mapping from the
+fields the listings build to those setters; it refuses a field it does not
+know, where `setInfo` would have swallowed it.
 
 ## Subtitles
 

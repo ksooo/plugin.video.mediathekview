@@ -15,8 +15,6 @@ class SettingsInterface(object):
     def getDatapath(self):
         return ""
 
-    def getKodiVersion(self):
-        return 0
     # General
 
     def getPreferHd(self):

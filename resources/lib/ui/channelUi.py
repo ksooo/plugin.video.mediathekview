@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import time
 import resources.lib.appContext as appContext
+import resources.lib.ui.videoInfo as videoInfo
 from resources.lib.ui.channelArt import artFor
 import os
 import xbmcgui
@@ -56,10 +57,7 @@ class ChannelUi(object):
             if channelModel.count > 0:
                 labelname += ' (' + str(channelModel.count) + ')'
             #
-            if self.plugin.get_kodi_version() > 17:
-                list_item = xbmcgui.ListItem(label=labelname, offscreen=True)
-            else:
-                list_item = xbmcgui.ListItem(label=labelname)
+            list_item = xbmcgui.ListItem(label=labelname, offscreen=True)
             #
             (icon, fanart) = artFor(self.plugin.path, channelModel.channelId)
             list_item.setArt({
@@ -72,7 +70,7 @@ class ChannelUi(object):
                 'title': labelname,
                 'sorttitle': channelModel.channelCaption.lower()
             }
-            list_item.setInfo(type='video', infoLabels=info_labels)
+            videoInfo.apply(list_item, info_labels)
             #
             targetUrl = mvutils.build_url({
                 'mode': self.targetUrl,

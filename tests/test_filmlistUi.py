@@ -161,7 +161,7 @@ class GenerateListItemTest(unittest.TestCase):
         # It reached the screen only as an icon, which is no help to anyone
         # whose skin does not show one, and nothing to search or sort by.
         (_, item) = FilmlistUi(self.plugin)._generateListItem(_film(channel='ZDF'))
-        self.assertEqual(item.info['studio'], 'ZDF')
+        self.assertEqual(item.info['studio'], ['ZDF'])
 
     def test_a_subtitle_is_announced_as_a_stream(self):
         # Whether a film has subtitles was only findable by opening the
@@ -212,7 +212,7 @@ class AiredDateTest(unittest.TestCase):
         # 2024-07-01 00:30 CEST, half an hour into the day in Berlin.
         with _timezone('Europe/Berlin'):
             info = self._info(calendar.timegm((2024, 6, 30, 22, 30, 0, 0, 0, 0)))
-        self.assertEqual(info['date'], '2024-07-01')
+        self.assertEqual(info['date'], '2024-07-01T00:30:00')
         self.assertTrue(info['dateadded'].startswith('2024-07-01 00:30'),
                         info['dateadded'])
 
@@ -221,7 +221,7 @@ class AiredDateTest(unittest.TestCase):
         # 2024-01-15 13:00 CET.
         with _timezone('Europe/Berlin'):
             info = self._info(calendar.timegm((2024, 1, 15, 12, 0, 0, 0, 0, 0)))
-        self.assertEqual(info['date'], '2024-01-15')
+        self.assertEqual(info['date'], '2024-01-15T13:00:00')
         self.assertTrue(info['dateadded'].startswith('2024-01-15 13:00'),
                         info['dateadded'])
 

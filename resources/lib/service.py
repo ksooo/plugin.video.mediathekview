@@ -7,8 +7,6 @@ SPDX-License-Identifier: MIT
 """
 
 # -- Imports ------------------------------------------------
-from __future__ import unicode_literals
-
 from resources.lib.kodi.kodiaddon import KodiService
 
 from resources.lib.metadataPrefetch import MetadataPrefetch

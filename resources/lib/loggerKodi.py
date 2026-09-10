@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 # pylint: disable=import-error
 import xbmc
 
-import resources.lib.mvutils as mvutils
 from resources.lib.loggerInterface import LoggerInterface
 
 
@@ -53,10 +52,4 @@ class LoggerKodi(LoggerInterface):
         self._log(xbmc.LOGERROR, message, *args)
 
     def _log(self, level, message, *args):
-        parts = []
-        for arg in args:
-            part = arg
-            part = mvutils.py2_encode(part)
-            parts.append(part)
-        message = mvutils.py2_encode(message)
-        xbmc.log(self.prefix + message.format(*parts), level=level)
+        xbmc.log(self.prefix + message.format(*args), level=level)
