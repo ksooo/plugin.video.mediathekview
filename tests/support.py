@@ -537,6 +537,10 @@ def install_kodi_stubs():
     xbmc.log = lambda *args, **kwargs: None
     xbmc.Keyboard = _Keyboard
     xbmc.getInfoLabel = lambda label: '21.0'
+    # What Kodi's region settings say; the German ones, as a test machine
+    # has no say in it either way.
+    xbmc.getRegion = lambda name: {'dateshort': '%d.%m.%Y',
+                                   'time': '%H:%M:%S'}.get(name, '')
     xbmc.executebuiltin = lambda command: None
     xbmc.VideoStreamDetail = _StreamDetail
     xbmc.AudioStreamDetail = _StreamDetail

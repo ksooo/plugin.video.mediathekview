@@ -31,6 +31,9 @@ LABEL_MASK_SHORT = '[%H. ]%T'
 # The film list carries subtitles for German public service broadcasters, and
 # says nothing about their language.
 SUBTITLE_LANGUAGE = 'de'
+# What a broadcast time looks like where Kodi's region settings say nothing.
+DATE_FORMAT = '%d.%m.%Y'
+TIME_FORMAT = '%H:%M'
 # What Kodi is told about a stream the film list calls HD. The list itself
 # gives no resolution; this is what those streams measure.
 HD_STREAM = {'width': 1920, 'height': 1080}
@@ -212,6 +215,11 @@ class FilmlistUi(object):
             info_labels['date'] = ndate.isoformat()
             info_labels['aired'] = airedstring[:10]
             info_labels['dateadded'] = airedstring
+            # In front of the description, because that is the only text of
+            # ours a skin shows beside a listing. Kodi's own fields carry the
+            # broadcast as a date and drop the time of day.
+            info_labels['plot'] = _broadcast(
+                self.plugin.language(30136), ndate, pFilm.description)
 
         (icon, fanart) = artFor(self.plugin.path, pFilm.channel)
         still = (self.stills.get((pFilm.show, season, episode))
@@ -325,3 +333,20 @@ class FilmlistUi(object):
             ))
         return contextmenu
 
+
+def _broadcast(label, when, description):
+    """ The description with the broadcast time in front of it """
+    shown = label.format(when.strftime('%s %s' % (_region('dateshort', DATE_FORMAT),
+                                                  _region('time', TIME_FORMAT))))
+    return '%s\n\n%s' % (shown, description) if description else shown
+
+
+def _region(name, fallback):
+    """
+    How Kodi's settings say to write a date or a time, or ours.
+
+    The seconds go: a broadcast is announced to the minute, and Kodi's own
+    time format carries them.
+    """
+    fmt = xbmc.getRegion(name) or fallback
+    return fmt.replace(':%S', '').replace('%S', '').strip()

@@ -125,6 +125,10 @@ msgctxt "#30132"
 msgid "Go to show"
 msgstr "Zur Sendung springen"
 
+msgctxt "#30136"
+msgid "Broadcast: {}"
+msgstr "Sendetermin: {}"
+
 msgctxt "#30171"
 msgid "Aired Date"
 msgstr "Sendedatum"

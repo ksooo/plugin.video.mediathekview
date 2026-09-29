@@ -241,20 +241,45 @@ class AiredDateTest(unittest.TestCase):
 
     def setUp(self):
         support.install_kodi_stubs()
-        self.plugin = support.Plugin()
+        self.plugin = support.Plugin(strings={30136: 'Sendetermin: {}'})
 
     def _info(self, aired):
         (_, item) = FilmlistUi(self.plugin)._generateListItem(_film(aired=aired))
         return item.info
 
-    def test_the_plot_is_the_description_alone(self):
-        # The aired date used to be pasted in front of it in an ISO format,
-        # while date, aired and dateadded were carrying it as well.
-        info = self._info(1704110400)
-        self.assertEqual(info['plot'], '')
+    @unittest.skipUnless(hasattr(time, 'tzset'), 'needs a POSIX timezone')
+    def test_the_plot_says_when_it_was_broadcast(self):
+        # Kodi's own fields carry the broadcast as a date and drop the time
+        # of day, and the description is the only text of ours a skin shows
+        # beside a listing.
+        with _timezone('Europe/Berlin'):
+            (_, item) = FilmlistUi(self.plugin)._generateListItem(
+                _film(description='Worum es geht.',
+                      aired=calendar.timegm((2024, 1, 15, 12, 0, 0, 0, 0, 0))))
+        self.assertEqual(item.info['plot'], 'Sendetermin: 15.01.2024 13:00\n\nWorum es geht.')
+
+    @unittest.skipUnless(hasattr(time, 'tzset'), 'needs a POSIX timezone')
+    def test_a_film_without_a_description(self):
+        with _timezone('Europe/Berlin'):
+            info = self._info(calendar.timegm((2024, 1, 15, 12, 0, 0, 0, 0, 0)))
+        self.assertEqual(info['plot'], 'Sendetermin: 15.01.2024 13:00')
+
+    def test_a_film_without_a_broadcast_time(self):
         (_, item) = FilmlistUi(self.plugin)._generateListItem(
-            _film(description='Worum es geht.', aired=1704110400))
+            _film(description='Worum es geht.', aired=0))
         self.assertEqual(item.info['plot'], 'Worum es geht.')
+
+    @unittest.skipUnless(hasattr(time, 'tzset'), 'needs a POSIX timezone')
+    def test_the_region_settings_say_how_it_is_written(self):
+        # And the seconds go: a broadcast is announced to the minute, while
+        # Kodi's time format carries them.
+        import xbmc
+        self.addCleanup(setattr, xbmc, 'getRegion', xbmc.getRegion)
+        xbmc.getRegion = lambda name: {'dateshort': '%m/%d/%Y',
+                                       'time': '%I:%M:%S %p'}.get(name, '')
+        with _timezone('Europe/Berlin'):
+            info = self._info(calendar.timegm((2024, 1, 15, 12, 0, 0, 0, 0, 0)))
+        self.assertEqual(info['plot'], 'Sendetermin: 01/15/2024 01:00 PM')
 
     @unittest.skipUnless(hasattr(time, 'tzset'), 'needs a POSIX timezone')
     def test_summer_time_keeps_the_day(self):

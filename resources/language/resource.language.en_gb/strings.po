@@ -125,6 +125,10 @@ msgctxt "#30132"
 msgid "Go to show"
 msgstr "Go to show"
 
+msgctxt "#30136"
+msgid "Broadcast: {}"
+msgstr "Broadcast: {}"
+
 msgctxt "#30171"
 msgid "Aired Date"
 msgstr "Aired Date"

@@ -312,6 +312,22 @@ never used, and an item a plugin labels `..` itself becomes a parent folder
 item too. Walking through the show first would put it in the history, but
 that is a second listing opened for no other reason, which is not worth it.
 
+## The broadcast time
+
+`resources/lib/ui/filmlistUi.py`
+
+It stands in front of the description, which looks like something to tidy
+away and is not: Kodi's own fields carry a broadcast as a date and drop the
+time of day - `ListItem.Premiered`, which is what Estuary shows beside a
+listing, is a date. The time only reaches a skin through the item's own
+date-time, and video views do not show that one. The description is the only
+text of ours that a skin puts beside a listing, so that is where it goes -
+which is where the addon this one is forked from had it, too.
+
+It is written the way Kodi's region settings say (`xbmc.getRegion`), without
+the seconds those carry: a broadcast is announced to the minute. A label
+says what it is, which a date in front of a description does not.
+
 ## Which picture goes where
 
 `resources/lib/ui/filmlistUi.py`
