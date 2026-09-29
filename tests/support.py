@@ -45,7 +45,6 @@ class Notifier(object):
     def __init__(self):
         self.errors = []
         self.notifications = []
-        self.limit_results = []
         self.headings = []
         self.messages = []
         self.progress = []
@@ -74,9 +73,6 @@ class Notifier(object):
     def show_notification(self, heading, message):
         self.notifications.append((heading, message))
 
-    def show_limit_results(self, maxresults):
-        self.limit_results.append(maxresults)
-
 
 class Settings(object):
     """The addon settings with usable defaults.
@@ -93,7 +89,7 @@ class Settings(object):
         'hideAudioDescription': False,
         'hideSignLanguage': False,
         'minLength': 0,
-        'maxResults': 1000,
+        'pageSize': 250,
         'maxAge': 2 * 86400,
         'recentMode': 0,
         'filmSortMethod': 0,
@@ -138,8 +134,8 @@ class Settings(object):
     def getMinLength(self):
         return self._values['minLength']
 
-    def getMaxResults(self):
-        return self._values['maxResults']
+    def getPageSize(self):
+        return self._values['pageSize']
 
     def getMaxAge(self):
         return self._values['maxAge']

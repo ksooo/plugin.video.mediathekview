@@ -47,13 +47,13 @@ class GetIntTest(unittest.TestCase):
         return settings
 
     def test_reads_a_number(self):
-        self.assertEqual(self._settings(maxresults='2000').getMaxResults(), 2000)
+        self.assertEqual(self._settings(pagesize='500').getPageSize(), 500)
 
     def test_reads_a_number_written_as_a_decimal(self):
         self.assertEqual(self._settings(minlength='5.0').getMinLength(), 5)
 
     def test_an_empty_setting_falls_back(self):
-        self.assertEqual(self._settings(maxresults='').getMaxResults(), 1000)
+        self.assertEqual(self._settings(pagesize='').getPageSize(), 250)
 
     def test_a_missing_setting_falls_back(self):
         self.assertEqual(self._settings().getUpdateCheckIntervel(), 30)

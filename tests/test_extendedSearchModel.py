@@ -15,12 +15,35 @@ from resources.lib.extendedSearchModel import ExtendedSearchModel
 
 
 def _model(**fields):
-    support.init_app_context(settings=support.Settings(maxResults=0, minLength=0))
+    support.init_app_context(settings=support.Settings(minLength=0))
     model = ExtendedSearchModel('')
     model.reset()
     for (name, value) in fields.items():
         getattr(model, 'set' + name[0].upper() + name[1:])(value)
     return model
+
+
+class PageTest(unittest.TestCase):
+    """Which part of the result the database is asked for."""
+
+    def test_nothing_is_cut_without_a_limit(self):
+        self.assertEqual('', _model().generatePage())
+
+    def test_a_page_further_on(self):
+        model = _model()
+        model.setPage(500, 251)
+        self.assertEqual('LIMIT 251 OFFSET 500', model.generatePage())
+
+    def test_an_offset_before_the_start_is_the_start(self):
+        model = _model()
+        model.setPage(-250, 251)
+        self.assertEqual('LIMIT 251 OFFSET 0', model.generatePage())
+
+    def test_each_page_is_cached_on_its_own(self):
+        (first, second) = (_model(), _model())
+        first.setPage(0, 251)
+        second.setPage(250, 251)
+        self.assertNotEqual(first.getCacheKey(), second.getCacheKey())
 
 
 class MixedSearchTest(unittest.TestCase):

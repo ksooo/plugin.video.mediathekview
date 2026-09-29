@@ -35,10 +35,6 @@ class NotifierKodi(NotifierInterface):
         """ Disaplys UI for a missing extractor error """
         self.kodiUi.show_error(30952, 30954, time=10000)
 
-    def show_limit_results(self, maxresults):
-        """ Display UI for search result limited by configuration """
-        self.kodiUi.show_notification(30980, self.language(30981).format(maxresults))
-
     def show_outdated_unknown(self):
         """ Display UI for never updated database """
         self.kodiUi.show_warning(30982, 30966)

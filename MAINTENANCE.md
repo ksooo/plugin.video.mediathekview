@@ -312,6 +312,30 @@ never used, and an item a plugin labels `..` itself becomes a parent folder
 item too. Walking through the show first would put it in the history, but
 that is a second listing opened for no other reason, which is not worth it.
 
+## Pages
+
+`resources/lib/paging.py`
+
+A search can hold a thousand films and a channel's shows almost two, which
+is no listing. The film listings are cut into pages of *Films per page*,
+250 by default, and what did not fit is reached through an item at the end.
+Kodi offers nothing for this - a plugin hands it one listing, and that is
+the listing.
+
+Searches and the recently added films are cut by the database (`LIMIT ...
+OFFSET ...`): a search for a single letter would otherwise read half the
+database, and put it in the cache, for 250 films of it. The query asks for
+one film more than a page, which is only there to tell whether another page
+follows. A show's listing is cut after the query instead, since its seasons
+are worked out from all of its films.
+
+Two things follow from Kodi sorting the listing itself. The item that leads
+on is sorted to the bottom (`SpecialSort`) rather than added there, or the
+sorting would drop it among the films. And a page is cut where the *query*
+put the films, not where the screen would show them - a page is therefore
+not "the next 250 as sorted", which is also what lets `_gotoShow` work out
+the page a film is on before opening it.
+
 ## The broadcast time
 
 `resources/lib/ui/filmlistUi.py`

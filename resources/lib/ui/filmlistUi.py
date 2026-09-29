@@ -88,6 +88,8 @@ class FilmlistUi(object):
         # What an external service knows about the shows of this listing, by
         # name. Nothing here asks; the caller brings what is stored.
         self.showMetadata = {}
+        # Where the films that did not fit on this page are listed.
+        self.nextPage = None
         # The picture of each episode on screen, by show, season and
         # episode number, where the service had any.
         self.stills = {}
@@ -100,7 +102,7 @@ class FilmlistUi(object):
         self.startTime = 0
 
     def generate(self, databaseRs, pLeadingItems=None, pShowMetadata=None, pStills=None,
-                 pSeasonPosters=None):
+                 pSeasonPosters=None, pNextPage=None):
         #
         # 0 - idhash, 1 - title, 2 - showname, 3 - channel,
         # 4 - description, 5 - duration, 6 - aired,
@@ -119,6 +121,7 @@ class FilmlistUi(object):
         # Seasons, where the show has any, share the listing with the films
         # that name none. Kodi puts folders first by itself.
         listOfElements = list(pLeadingItems) if pLeadingItems else []
+        self.nextPage = pNextPage
         for element in databaseRs:
             #
             aFilm.init(element[0], element[1], element[2], element[3], element[4], element[5],
@@ -141,6 +144,9 @@ class FilmlistUi(object):
                 })
             #
             listOfElements.append((targetUrl, list_item, False))
+        #
+        if self.nextPage:
+            listOfElements.append(self._generateNextPage(self.nextPage))
         #
         xbmcplugin.addDirectoryItems(
             handle=self.handle,
@@ -267,6 +273,21 @@ class FilmlistUi(object):
             art['season.poster'] = seasonPoster
         listitem.setArt(art)
         return (videourl, listitem)
+
+    def _generateNextPage(self, url):
+        """
+        The way to the films that did not fit on this page.
+
+        Sorted to the bottom rather than placed there: Kodi sorts the
+        listing itself, and a film of this page has to stay in front of it.
+        """
+        label = self.plugin.language(30135)
+        listitem = xbmcgui.ListItem(label=label, offscreen=True)
+        videoInfo.apply(listitem, {'title': label, 'sorttitle': label})
+        listitem.setProperty('SpecialSort', 'bottom')
+        (icon, fanart) = artFor(self.plugin.path, '')
+        listitem.setArt({'thumb': icon, 'icon': icon, 'fanart': fanart})
+        return (url, listitem, True)
 
     def _generateContextMenu(self, pFilm, pShowId=''):
         contextmenu = []

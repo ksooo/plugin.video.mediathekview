@@ -131,6 +131,30 @@ class FilmOrderTest(unittest.TestCase):
         self.assertIn('ORDER BY aired DESC, showname ASC, title ASC', statement)
 
 
+class PagedQueryTest(unittest.TestCase):
+    """The listings that are cut into pages ask the database for one."""
+
+    def setUp(self):
+        support.init_app_context(settings=support.Settings(caching=False))
+
+    def test_a_search_asks_for_its_page(self):
+        (store, connection) = _store(results=[[]])
+        store.getQuickSearch('Tatort', 250, 251)
+        self.assertTrue(connection.statements[0].rstrip().endswith(
+            'ORDER BY aired DESC, showname ASC, title ASC LIMIT 251 OFFSET 250'))
+
+    def test_the_recent_films_ask_for_their_page(self):
+        (store, connection) = _store(results=[[]])
+        store.getRecentFilms('', 500, 251)
+        self.assertIn('LIMIT 251 OFFSET 500', connection.statements[0])
+
+    def test_a_search_without_a_limit_brings_everything(self):
+        # What downloading every film a search found relies on.
+        (store, connection) = _store(results=[[]])
+        store.getQuickSearch('Tatort')
+        self.assertNotIn('LIMIT', connection.statements[0])
+
+
 class RetrieveFilmInfoTest(unittest.TestCase):
 
     def setUp(self):

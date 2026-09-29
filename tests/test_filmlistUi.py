@@ -95,6 +95,37 @@ class GenerateTest(unittest.TestCase):
         self.assertTrue(self.xbmcplugin.ended)
 
 
+class NextPageTest(unittest.TestCase):
+    """The item that leads to the films which did not fit."""
+
+    NEXT = 'Nächste Seite'
+    URL = 'plugin://plugin.video.mediathekview.ksooo/?mode=recent&offset=250'
+
+    def setUp(self):
+        self.xbmcplugin = support.install_kodi_stubs()
+        self.plugin = support.Plugin(strings={30135: self.NEXT})
+
+    def _items(self, nextPage=None):
+        FilmlistUi(self.plugin).generate([row(title='Erben')], pNextPage=nextPage)
+        return self.xbmcplugin.items
+
+    def test_it_leads_to_the_next_page(self):
+        items = self._items(self.URL)
+        self.assertEqual(len(items), 2)
+        (url, item, isFolder) = items[-1]
+        self.assertEqual((url, item.label, isFolder), (self.URL, self.NEXT, True))
+
+    def test_it_stays_behind_the_films_whatever_the_sorting(self):
+        # Kodi sorts the listing itself, so being added last says nothing.
+        (_, item, _) = self._items(self.URL)[-1]
+        self.assertEqual(item.properties['SpecialSort'], 'bottom')
+
+    def test_a_listing_that_holds_everything_has_no_such_item(self):
+        items = self._items()
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0][1].label, 'Sendung: Erben')
+
+
 class GoToShowTest(unittest.TestCase):
     """The entry that leads from a search result to the show it is from."""
 

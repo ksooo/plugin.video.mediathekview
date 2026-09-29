@@ -22,9 +22,6 @@ class NotifierInterface(object):
     def show_missing_extractor_error(self):
         pass
 
-    def show_limit_results(self, maxresults):
-        pass
-
     def show_outdated_unknown(self):
         pass
 

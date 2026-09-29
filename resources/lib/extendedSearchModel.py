@@ -32,8 +32,8 @@ class ExtendedSearchModel(object):
         self.setMinLength((self.settings.getMinLength()))
         self.ignoreTrailer = 1
         self.setIgnoreTrailer(self.settings.getNoFutur())
-        self.maxResults = 0
-        self.setMaxResults(self.settings.getMaxResults())
+        self.offset = 0
+        self.limit = 0
         self.recentOnly = 0
         self.when = self.id
         #
@@ -52,7 +52,6 @@ class ExtendedSearchModel(object):
                     "excludeTitle" : ["bla"],
                     "minLength" : 60,
                     "ignoreTrailer" : 1,
-                    "maxResults" : 1000,
                     "exactMatchForShow" : 0
                     "recentOnly" : 0
                     "when" : 1312312
@@ -76,7 +75,8 @@ class ExtendedSearchModel(object):
         self.excludeTitle = []
         self.minLength = 0
         self.ignoreTrailer = 0
-        self.maxResults = 0
+        self.offset = 0
+        self.limit = 0
         self.recentOnly = 0
 
     ################
@@ -119,8 +119,16 @@ class ExtendedSearchModel(object):
     def isIgnoreTrailer(self):
         return self.ignoreTrailer == 1
 
-    def getMaxResults(self):
-        return self.maxResults
+    def setPage(self, offset, limit):
+        """ Which part of the result to ask the database for """
+        self.offset = max(0, int(offset or 0))
+        self.limit = max(0, int(limit or 0))
+
+    def getOffset(self):
+        return self.offset
+
+    def getLimit(self):
+        return self.limit
 
     def isExactMatchForShow(self):
         return self.exactMatchForShow == 1
@@ -168,8 +176,11 @@ class ExtendedSearchModel(object):
     def getIgnoreTrailerAsString(self):
         return str(self.ignoreTrailer)
 
-    def getMaxResultsAsString(self):
-        return str(self.maxResults)
+    def getOffsetAsString(self):
+        return str(self.offset)
+
+    def getLimitAsString(self):
+        return str(self.limit)
 
     def getExactMatchForShowAsString(self):
         return str(self.exactMatchForShow)
@@ -249,9 +260,6 @@ class ExtendedSearchModel(object):
     def setIgnoreTrailer(self, pValue):
         self.ignoreTrailer = 1 if self.convertToBoolean(pValue) else 0
 
-    def setMaxResults(self, pValue):
-        self.maxResults = self.convertToNumber(pValue)
-
     def setExactMatchForShow(self, pValue):
         self.exactMatchForShow = 1 if self.convertToBoolean(pValue) else 0
 
@@ -328,10 +336,17 @@ class ExtendedSearchModel(object):
         return sql
 
     #
-    def generateMaxRows(self):
+    def generatePage(self):
+        """
+        The page of the result the listing asked for.
+
+        Nothing where no limit was set: a download takes every film that
+        matches, not the page somebody is looking at.
+        """
         sql = ""
-        if (self.getMaxResults() > 0):
-            sql += 'LIMIT ' + self.getMaxResultsAsString()
+        if (self.getLimit() > 0):
+            sql += 'LIMIT ' + self.getLimitAsString()
+            sql += ' OFFSET ' + self.getOffsetAsString()
         return sql
 
     #
@@ -457,7 +472,8 @@ class ExtendedSearchModel(object):
             'E' + self.getExcludeTitleAsString() + \
             'L' + self.getMinLengthAsString() + \
             'F' + self.getIgnoreTrailerAsString() + \
-            'M' + self.getMaxResultsAsString() + \
+            'O' + self.getOffsetAsString() + \
+            'M' + self.getLimitAsString() + \
             'N' + self.getExactMatchForShowAsString() + \
             'R' + self.getRecentOnlyAsString()
 
@@ -474,7 +490,6 @@ class ExtendedSearchModel(object):
             "excludeTitle" : self.excludeTitle,
             "minLength" : self.minLength,
             "ignoreTrailer" : self.ignoreTrailer,
-            "maxResults" : self.maxResults,
             "exactMatchForShow" : self.exactMatchForShow,
             "recentOnly" : self.recentOnly,
             "when" : self.when
@@ -491,7 +506,6 @@ class ExtendedSearchModel(object):
         self.excludeTitle = aObject["excludeTitle"]
         self.minLength = aObject["minLength"]
         self.ignoreTrailer = aObject["ignoreTrailer"]
-        self.maxResults = aObject["maxResults"]
         self.exactMatchForShow = aObject["exactMatchForShow"]
         self.recentOnly = aObject["recentOnly"]
         self.when = aObject["when"]

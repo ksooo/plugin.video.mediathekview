@@ -57,10 +57,6 @@ msgctxt "#30114"
 msgid "Group shows of different channel"
 msgstr "Sendungen verschiedener Sender zusammenfassen"
 
-msgctxt "#30115"
-msgid "Limit search results"
-msgstr "Max. Treffer"
-
 msgctxt "#30116"
 msgid "Max age of recents in days"
 msgstr "Maximales Alter der Neuheiten in Tagen"
@@ -124,6 +120,18 @@ msgstr "Metadaten vollständig geladen"
 msgctxt "#30132"
 msgid "Go to show"
 msgstr "Zur Sendung springen"
+
+msgctxt "#30133"
+msgid "Films per page"
+msgstr "Filme pro Seite"
+
+msgctxt "#30134"
+msgid "How many films a listing shows before it leads to the next page."
+msgstr "Wie viele Filme eine Liste zeigt, bevor sie auf die nächste Seite führt."
+
+msgctxt "#30135"
+msgid "Next page"
+msgstr "Nächste Seite"
 
 msgctxt "#30136"
 msgid "Broadcast: {}"
@@ -462,14 +470,6 @@ msgstr "Untertitel werden heruntergeladen"
 msgctxt "#30979"
 msgid "Download path does not exist"
 msgstr "Download-Verzeichnis existiert nicht"
-
-msgctxt "#30980"
-msgid "Results Limited"
-msgstr "Ergebnisse beschränkt"
-
-msgctxt "#30981"
-msgid "Only the first {} results are shown."
-msgstr "Es werden nur die ersten {} Ergebnisse angezeigt."
 
 msgctxt "#30982"
 msgid "Database Outdated"

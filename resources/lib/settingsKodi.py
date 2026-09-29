@@ -78,9 +78,9 @@ class SettingsKodi(SettingsInterface):
     def getGroupShow(self):
         return self._addonClass.getSetting('groupshows') == 'true'
 
-    # self.maxresults
-    def getMaxResults(self):
-        return self._getInt('maxresults', 1000)
+    # self.pagesize
+    def getPageSize(self):
+        return self._getInt('pagesize', 250)
 
     # self.maxage
     def getMaxAge(self):

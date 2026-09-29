@@ -32,9 +32,6 @@ class SettingsInterface(object):
     def getGroupShow(self):
         return True
 
-    def getMaxResults(self):
-        return 1000
-
     def getMaxAge(self):
         return 84400
 

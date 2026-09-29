@@ -38,13 +38,13 @@
                     </constraints>
                     <control type="slider" format="integer"/>
                 </setting>
-                <setting id="maxresults" type="integer" label="30115">
+                <setting id="pagesize" type="integer" label="30133" help="30134">
                     <level>0</level>
-                    <default>1000</default>
+                    <default>250</default>
                     <constraints>
-                        <minimum>100</minimum>
-                        <step>100</step>
-                        <maximum>3000</maximum>
+                        <minimum>50</minimum>
+                        <step>50</step>
+                        <maximum>1000</maximum>
                     </constraints>
                     <control type="slider" format="integer"/>
                 </setting>

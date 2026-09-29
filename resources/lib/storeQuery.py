@@ -187,9 +187,9 @@ class StoreQuery(object):
         # to its audio described twin.
         sql += ' ORDER BY aired DESC, showname ASC, title ASC '
         #
-        maxRowsCondition = esModel.generateMaxRows()
-        if (maxRowsCondition != ''):
-             sql += maxRowsCondition
+        pageCondition = esModel.generatePage()
+        if (pageCondition != ''):
+             sql += pageCondition
         #
         #
         try:
@@ -202,7 +202,7 @@ class StoreQuery(object):
             raise
         return rs
 
-    def getQuickSearch(self, searchTerm):
+    def getQuickSearch(self, searchTerm, offset=0, limit=0):
         """
         Retrieve data for quick search
         We will check for search term to be (partially) present in showname or title
@@ -220,6 +220,7 @@ class StoreQuery(object):
         #
         esModel = ExtendedSearchModel.ExtendedSearchModel('')
         esModel.setMixedSearch(searchTerm)
+        esModel.setPage(offset, limit)
         #cacheKey = searchTerm + esModel.generateMinLength() + esModel.generateIgnoreTrailer() + esModel.generateMaxRows()
         cacheKey = esModel.getCacheKey()
         cached_data = self._cache.load_cache('quickSearch', cacheKey)
@@ -250,7 +251,7 @@ class StoreQuery(object):
         #
         return rs
 
-    def getRecentFilms(self, channelId=''):
+    def getRecentFilms(self, channelId='', offset=0, limit=0):
         """
         Retrieve data for recent films
         """
@@ -259,6 +260,7 @@ class StoreQuery(object):
         esModel = ExtendedSearchModel.ExtendedSearchModel('')
         esModel.setRecentOnly(1)
         esModel.setChannel(channelId)
+        esModel.setPage(offset, limit)
         #
         #cacheKey = channelId + esModel.generateMinLength() + esModel.generateIgnoreTrailer() + esModel.generateRecentCondition() + esModel.generateMaxRows()
         cacheKey = esModel.getCacheKey()
@@ -268,9 +270,6 @@ class StoreQuery(object):
         else:
             rs = self.extendedSearchQuery(esModel)
             self._cache.save_cache('recentFilms', cacheKey, rs)
-        #
-        if len(rs) >= self.settings.getMaxResults():
-            self.notifier.show_limit_results(self.settings.getMaxResults())
         #
         return rs
 
@@ -292,9 +291,6 @@ class StoreQuery(object):
         else:
             rs = self.extendedSearchQuery(esModel)
             self._cache.save_cache('films', cacheKey, rs)
-        #
-        if len(rs) >= self.settings.getMaxResults():
-            self.notifier.show_limit_results(self.settings.getMaxResults())
         #
         return rs
 

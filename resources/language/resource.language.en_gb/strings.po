@@ -57,10 +57,6 @@ msgctxt "#30114"
 msgid "Group shows of different channel"
 msgstr "Group shows of different channel"
 
-msgctxt "#30115"
-msgid "Limit search results"
-msgstr "Limit search results"
-
 msgctxt "#30116"
 msgid "Max age of recents in days"
 msgstr "Max age of recents in days"
@@ -124,6 +120,18 @@ msgstr "Nothing left to fetch"
 msgctxt "#30132"
 msgid "Go to show"
 msgstr "Go to show"
+
+msgctxt "#30133"
+msgid "Films per page"
+msgstr "Films per page"
+
+msgctxt "#30134"
+msgid "How many films a listing shows before it leads to the next page."
+msgstr "How many films a listing shows before it leads to the next page."
+
+msgctxt "#30135"
+msgid "Next page"
+msgstr "Next page"
 
 msgctxt "#30136"
 msgid "Broadcast: {}"
@@ -462,14 +470,6 @@ msgstr "Downloading Subtitles"
 msgctxt "#30979"
 msgid "Download path does not exist"
 msgstr "Download path does not exist"
-
-msgctxt "#30980"
-msgid "Results Limited"
-msgstr "Results Limited"
-
-msgctxt "#30981"
-msgid "Only the first {} results are shown."
-msgstr "Only the first {} results are shown."
 
 msgctxt "#30982"
 msgid "Database Outdated"

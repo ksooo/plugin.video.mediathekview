@@ -31,6 +31,7 @@ import resources.lib.ui.letterUi as LetterUi
 import resources.lib.ui.filmlistUi as FilmlistUi
 import resources.lib.ui.seasonUi as SeasonUi
 from resources.lib.ui.jump import Jump
+import resources.lib.paging as Paging
 import resources.lib.seasons as Seasons
 import resources.lib.variants as Variants
 from resources.lib.metadata import Metadata
@@ -134,7 +135,7 @@ class MediathekViewPlugin(KodiPlugin):
             self.new_search()
         elif mode == 'research':
             search = self.get_arg('search', '')
-            self._generateFilms(self.database.getQuickSearch(search))
+            self._generateSearch(search)
             if self.get_arg('doNotSave', 'false') == 'false':
                 RecentSearches(self).load().add(search).save()
             #
@@ -150,7 +151,9 @@ class MediathekViewPlugin(KodiPlugin):
         elif mode == 'recent':
             channel = self.get_arg('channel', "")
             channel = "" if channel == "0" else channel
-            self._generateFilms(self.database.getRecentFilms(channel))
+            self._generateFilms(
+                lambda offset, limit: self.database.getRecentFilms(channel, offset, limit),
+                {'mode': 'recent', 'channel': channel or '0'})
             # self.database.get_recents(channel, FilmUI(self))
             #
         elif mode == 'recentchannels':
@@ -242,7 +245,12 @@ class MediathekViewPlugin(KodiPlugin):
                 showname, Seasons.soleSeason(films), mayAsk=True)
             stills = self.metadata.stillsOf([showname])
             seasonPosters = self.metadata.seasonsOf([showname])
-            ui.generate(films, leadingItems, records, stills, seasonPosters)
+            params = {'mode': 'films', 'channel': channel or '0', 'show': show or '0'}
+            if season:
+                params['season'] = season
+            (films, nextPage) = self._page(films, params)
+            ui.generate(films, leadingItems, records, stills, seasonPosters,
+                        nextPage)
             #
         elif mode == 'downloadmv':
             filmIdArray = self._resolveFilmIdsFromParams(
@@ -364,15 +372,14 @@ class MediathekViewPlugin(KodiPlugin):
         search = self.get_setting(settingid)
         if search:
             # restore previous search
-            self._generateFilms(self.database.getQuickSearch(search))
+            self._generateSearch(search)
         else:
             # enter search term
             (search, confirmed) = self.notifier.get_entered_text('', headingid)
             if len(search) > 2 and confirmed is True:
                 RecentSearches(self).load().add(search).save()
                 #
-                rs = self.database.getQuickSearch(search)
-                self._generateFilms(rs)
+                rs = self._generateSearch(search)
                 if len(rs) > 0:
                     self.set_setting(settingid, search)
             else:
@@ -381,19 +388,74 @@ class MediathekViewPlugin(KodiPlugin):
                     'The following ERROR can be ignored. It is caused by the architecture of the Kodi Plugin Engine')
                 self.end_of_directory(False, cache_to_disc=False)
 
-    def _generateFilms(self, films):
+    def _generateFilms(self, fetch, params):
         """
         Lists films from many shows - a search, or what was added lately.
+
+        `fetch` is asked for part of the result, from an offset and at most
+        a limit of films. `params` are what this listing was reached by, so
+        that the next page is the same listing one page further.
 
         Each film is of another show here, so the show's poster is what tells
         them apart. One query brings what is stored about all of them.
         """
-        films = self._withoutDuplicates(films)
+        (films, following) = self._fill(fetch, self._offset(),
+                                        self.settings.getPageSize())
         shownames = [row[SHOWNAME] for row in films]
         FilmlistUi.FilmlistUi(self).generate(
             films, pShowMetadata=self.metadata.forShows(shownames),
             pStills=self.metadata.stillsOf(shownames),
-            pSeasonPosters=self.metadata.seasonsOf(shownames))
+            pSeasonPosters=self.metadata.seasonsOf(shownames),
+            pNextPage=None if following is None else self._nextPage(params, following))
+        return films
+
+    def _fill(self, fetch, offset, size):
+        """
+        The films of one page, and where in the result the next page starts.
+
+        The filters drop films after the query, so the page reads on until
+        it is full, and one film beyond tells whether another page follows.
+        The next page starts at that film, past the ones dropped before it:
+        read again there, they would lack the film that dropped them.
+        """
+        if size <= Paging.UNPAGED:
+            return (self._withoutDuplicates(fetch(0, 0)), None)
+        rows = []
+        while True:
+            chunk = fetch(offset + len(rows), size + 1)
+            rows.extend(chunk)
+            films = self._withoutDuplicates(rows)
+            if len(films) > size or len(chunk) <= size:
+                break
+        if len(films) <= size:
+            return (films, None)
+        return (films[:size], offset + rows.index(films[size]))
+
+    def _generateSearch(self, search):
+        """ Lists what a search found, and hands back the films it showed """
+        return self._generateFilms(
+            lambda offset, limit: self.database.getQuickSearch(search, offset, limit),
+            {'mode': 'research', 'search': search, 'doNotSave': 'true'})
+
+    def _offset(self):
+        return max(0, int(self.get_arg('offset', '0') or 0))
+
+    def _nextPage(self, params, offset):
+        return self.build_url(dict(params, offset=offset))
+
+    def _page(self, films, params):
+        """
+        The films of the page that was asked for, and the way to the next.
+
+        For a listing that cannot be cut in the query: a show's seasons are
+        worked out from all of its films, so they are all fetched anyway.
+        """
+        offset = self._offset()
+        size = self.settings.getPageSize()
+        (shown, following) = Paging.page(films, offset, size)
+        if following is None:
+            return (shown, None)
+        return (shown, self._nextPage(params, following))
 
     def _gotoShow(self, channel, show, filmId):
         """
@@ -407,7 +469,22 @@ class MediathekViewPlugin(KodiPlugin):
         params = {'mode': 'films', 'channel': channel or '0', 'show': show}
         if season is not None:
             params['season'] = season
+            films = Seasons.ofSeason(films, season)
+        else:
+            (_, films) = Seasons.group(films)
+        # The film may be several pages in: the listing is cut where the
+        # query put it, so this is the same arithmetic the listing does.
+        offset = Paging.pageOf(self._positionOf(films, filmId),
+                               self.settings.getPageSize())
+        if offset:
+            params['offset'] = offset
         Jump().toFilm(self.build_url(params), filmId)
+
+    def _positionOf(self, films, filmId):
+        for (index, row) in enumerate(films):
+            if row[0] == filmId:
+                return index
+        return 0
 
     def _fetchMetadata(self):
         """
