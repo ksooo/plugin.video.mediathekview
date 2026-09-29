@@ -405,13 +405,9 @@ class MediathekViewPlugin(KodiPlugin):
         films = self._withoutDuplicates(self.database.getFilms(channel, show))
         season = Seasons.seasonOfFilm(films, filmId)
         params = {'mode': 'films', 'channel': channel or '0', 'show': show}
-        urls = [self.build_url(params)]
         if season is not None:
-            # The show on the way, so that ".." leads to its seasons rather
-            # than back to where the jump started.
             params['season'] = season
-            urls.append(self.build_url(params))
-        Jump().toFilm(urls, filmId)
+        Jump().toFilm(self.build_url(params), filmId)
 
     def _fetchMetadata(self):
         """

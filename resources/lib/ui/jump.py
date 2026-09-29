@@ -20,6 +20,12 @@ import resources.lib.appContext as appContext
 # machine, not for a listing that never comes.
 WAIT_SECONDS = 10
 POLL_SECONDS = 0.1
+RETRY_SECONDS = 1.0
+# How long a listing that was asked for may stay away before it is asked for
+# again. Kodi sets the path of a listing when it opens the window and fetches
+# the items afterwards, so a listing asked for while another one is still
+# being fetched is lost when that one arrives - which is what happens on a
+# machine where the plugin takes its time.
 # The window the listing appears in.
 VIDEO_WINDOW = 10025
 
@@ -76,41 +82,49 @@ class Jump(object):
         self.logger = appContext.MVLOGGER.get_new_logger('Jump')
         self.container = container if container is not None else Container()
 
-    def toFilm(self, urls, filmId):
-        """
-        Opens the listings in turn and puts the cursor on the film.
+    def toFilm(self, url, filmId):
+        """ Opens the listing that holds the film and puts the cursor on it """
+        return self._select(url, filmId, time.time() + WAIT_SECONDS)
 
-        More than one where the film sits behind a season: Kodi's ".." walks
-        the listings that were shown, not the path, so the show has to be
-        opened on the way for ".." to lead to its seasons.
-        """
-        for url in urls[:-1]:
-            self.container.activate(url)
-            if not self._appeared(url):
-                return False
-        url = urls[-1]
-        self.container.activate(url)
-        if not self._appeared(url):
-            return False
-        viewId = self.container.viewId()
-        index = self._indexOf(viewId, filmId)
-        if index is None:
-            # The listing is the right one and the film is not in it, which
-            # a filter can do: leave the cursor where Kodi put it.
-            self.logger.debug('Film {} is not in {}', filmId, url)
-            return False
-        self.container.select(viewId, index)
-        return True
-
-    def _appeared(self, url):
-        """ Waits until that listing is the one on screen """
-        deadline = time.time() + WAIT_SECONDS
+    def _opened(self, url, deadline):
+        """ Waits for that listing, asking again while it does not come """
+        asked = 0.0
         while time.time() < deadline:
-            if self.container.waited(POLL_SECONDS):
-                return False
             if self.container.path() == url and not self.container.loading():
                 return True
+            if time.time() - asked >= RETRY_SECONDS:
+                self.container.activate(url)
+                asked = time.time()
+            if self.container.waited(POLL_SECONDS):
+                return False
         self.logger.warn('Listing {} did not appear', url)
+        return False
+
+    def _select(self, url, filmId, deadline):
+        """
+        Puts the cursor on the film once the listing holds it.
+
+        The path of a listing is Kodi's before its items are, so a listing
+        that does not hold the film yet is one to look at again rather than
+        one without it.
+        """
+        scanned = None
+        looked = 0.0
+        while time.time() < deadline:
+            if not self._opened(url, deadline):
+                return False
+            viewId = self.container.viewId()
+            count = self.container.count(viewId)
+            if count != scanned or time.time() - looked >= RETRY_SECONDS:
+                (scanned, looked) = (count, time.time())
+                index = self._indexOf(viewId, filmId)
+                if index is not None:
+                    self.container.select(viewId, index)
+                    return True
+            if self.container.waited(POLL_SECONDS):
+                return False
+        # A filter can hide the film: the cursor then stays where Kodi put it.
+        self.logger.debug('Film {} is not in {}', filmId, url)
         return False
 
     def _indexOf(self, viewId, filmId):
