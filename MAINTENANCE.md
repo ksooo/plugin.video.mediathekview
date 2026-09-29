@@ -277,6 +277,47 @@ the 96 shows of ZDFneo it costs 1.3 kilobytes per show including its
 seasons, so some 12 MB once the prefetch has been through all 9221 shows
 the current film list names.
 
+## Jumping from a search result to its show
+
+`resources/lib/ui/jump.py`
+
+Kodi cannot be asked for a listing with an item already selected, so the
+jump opens the listing and then waits for it: the plugin that fills it is a
+script of its own, and only once that has run does the item exist. The wait
+polls `Container.FolderPath` until it is the listing that was asked for.
+
+The position is read off the screen rather than worked out, because Kodi
+sorts the listing itself: `Container(id).ListItemAbsolute(n).Property(filmid)`
+walks the items in the order they are shown, and `Control.SetFocus(id, n,
+absolute)` selects one (`GUIBaseContainer.cpp`, `GUI_MSG_SETFOCUS` with a
+subitem). `filmid` is a property the film listing sets for this alone.
+
+Which listing holds the film is `seasons.seasonOfFilm`: a show with seasons
+keeps its episodes behind them, so the jump has to open the season rather
+than the show. It opens the show on the way there all the same, so that
+".." leads to the seasons rather than back to the search. That detour is
+the only way there is, which was looked into rather than assumed:
+
+* `..` never navigates to its own path. `OnClick` sees a parent folder item
+  and calls `GoParentFolder`, which pops `m_history` - the path the item
+  carries is decoration.
+* An item a plugin adds itself is no way round that: `CFileItem::SetLabel`
+  turns anything labelled `..` into a parent folder item, so it ends in the
+  same `GoParentFolder`, and Kodi's own `..` is added beside it.
+* Of the properties a plugin can set on its listing, the windows read four -
+  stacking, grouping, sorting and the database path. None of them is about
+  where the listing came from.
+* Kodi can build a parent chain out of a path (`SetHistoryForPath`), but
+  `URIUtils::GetParentPath` throws the query away for a `plugin://` url, so
+  the parent of any listing of ours is the addon's root. It is skipped for
+  an `ActivateWindow` with `return` anyway, which is what keeps "back"
+  leading out of the addon.
+
+What is left is `m_history`, which Kodi fills with every listing it shows
+(`GUIMediaWindow.cpp`, `m_history.AddPath` in `Update`), for file sources
+and plugins alike. Walking through the show is what navigating by hand does
+too; the jump only does it in one go.
+
 ## Which picture goes where
 
 `resources/lib/ui/filmlistUi.py`

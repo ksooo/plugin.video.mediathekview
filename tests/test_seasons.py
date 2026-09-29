@@ -112,6 +112,30 @@ class OfSeasonTest(unittest.TestCase):
         self.assertEqual(ofSeason([_row('Tagesschau')], 1), [])
 
 
+class SeasonOfFilmTest(unittest.TestCase):
+    """Which listing holds a film: the show's own, or one of its seasons."""
+
+    def _rows(self, *titles):
+        # Each film with an id of its own, as the database has it.
+        return [('id%d' % number,) + _row(title)[1:]
+                for (number, title) in enumerate(titles)]
+
+    def test_a_show_with_seasons_lists_the_film_under_its_own(self):
+        rows = self._rows('Erben (S24/E01)', 'Fehler (S23/E02)')
+        self.assertEqual(seasons.seasonOfFilm(rows, rows[1][0]), 23)
+
+    def test_a_show_without_seasons_lists_everything_itself(self):
+        rows = self._rows('Erben (S24/E01)', 'Ein Sonderfall')
+        self.assertIsNone(seasons.seasonOfFilm(rows, rows[0][0]))
+
+    def test_a_film_that_names_no_season_stays_with_the_show(self):
+        rows = self._rows('Erben (S24/E01)', 'Fehler (S23/E02)', 'Ein Sonderfall')
+        self.assertIsNone(seasons.seasonOfFilm(rows, rows[2][0]))
+
+    def test_a_film_that_is_not_there(self):
+        self.assertIsNone(seasons.seasonOfFilm(self._rows('Erben (S24/E01)'), 'weg'))
+
+
 class SoleSeasonTest(unittest.TestCase):
     """Whether a listing is of one season, which is what can be asked about."""
 

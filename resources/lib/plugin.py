@@ -30,6 +30,7 @@ import resources.lib.ui.showUi as ShowUi
 import resources.lib.ui.letterUi as LetterUi
 import resources.lib.ui.filmlistUi as FilmlistUi
 import resources.lib.ui.seasonUi as SeasonUi
+from resources.lib.ui.jump import Jump
 import resources.lib.seasons as Seasons
 import resources.lib.variants as Variants
 from resources.lib.metadata import Metadata
@@ -182,6 +183,9 @@ class MediathekViewPlugin(KodiPlugin):
             # again. Without a library there is no dialog to pick artwork in.
             self.metadata.forget(self.get_arg('showname', ''))
             self.run_builtin('Container.Refresh')
+        elif mode == 'gotoshow':
+            self._gotoShow(self.get_arg('channel', ''), self.get_arg('show', ''),
+                           self.get_arg('id', ''))
         elif mode == 'fetchmetadata':
             self._fetchMetadata()
         elif mode == 'discardmetadata':
@@ -390,6 +394,24 @@ class MediathekViewPlugin(KodiPlugin):
             films, pShowMetadata=self.metadata.forShows(shownames),
             pStills=self.metadata.stillsOf(shownames),
             pSeasonPosters=self.metadata.seasonsOf(shownames))
+
+    def _gotoShow(self, channel, show, filmId):
+        """
+        Opens the listing the film is in and puts the cursor on it.
+
+        Which listing that is the show decides: one with seasons keeps its
+        episodes behind them, so the film is in the listing of its season.
+        """
+        films = self._withoutDuplicates(self.database.getFilms(channel, show))
+        season = Seasons.seasonOfFilm(films, filmId)
+        params = {'mode': 'films', 'channel': channel or '0', 'show': show}
+        urls = [self.build_url(params)]
+        if season is not None:
+            # The show on the way, so that ".." leads to its seasons rather
+            # than back to where the jump started.
+            params['season'] = season
+            urls.append(self.build_url(params))
+        Jump().toFilm(urls, filmId)
 
     def _fetchMetadata(self):
         """

@@ -26,7 +26,8 @@ EPISODE_MARKER = re.compile(r'\s*\(\s*S(\d{1,4})\s*/?\s*E(\d{1,4})\s*\)\s*', re.
 # Rosenheim-Cops, Der Bergdoktor, Löwenzahn.
 MINIMUM_SEASONS = 2
 MINIMUM_MARKED_SHARE = 0.8
-# Where the title sits in a row of the film query.
+# Where the fields sit in a row of the film query.
+FILMID = 0
 TITLE = 1
 
 
@@ -84,6 +85,22 @@ def soleSeason(rows):
     """
     seasons = set(seasonOf(row) for row in rows) - set([None])
     return seasons.pop() if len(seasons) == 1 else None
+
+
+def seasonOfFilm(rows, filmId):
+    """
+    The season whose listing holds that film, or `None` for the show's own.
+
+    A show that earns no season level lists all its films itself, and so
+    does it for a film that names no season.
+    """
+    (seasons, _) = group(rows)
+    if not seasons:
+        return None
+    for row in rows:
+        if row[FILMID] == filmId:
+            return seasonOf(row)
+    return None
 
 
 def ofSeason(rows, season):

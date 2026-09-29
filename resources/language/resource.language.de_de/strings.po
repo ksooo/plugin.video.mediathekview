@@ -121,6 +121,10 @@ msgctxt "#30131"
 msgid "Nothing left to fetch"
 msgstr "Metadaten vollständig geladen"
 
+msgctxt "#30132"
+msgid "Go to show"
+msgstr "Zur Sendung springen"
+
 msgctxt "#30171"
 msgid "Aired Date"
 msgstr "Sendedatum"

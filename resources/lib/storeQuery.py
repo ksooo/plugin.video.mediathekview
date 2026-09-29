@@ -22,7 +22,7 @@ class StoreQuery(object):
         self.notifier = appContext.MVNOTIFIER
         self.settings = appContext.MVSETTINGS
         self._cache = StoreCache()
-        self.sql_query_films = "SELECT idhash, title, showname, channel, description, duration, aired, url_sub, url_video, url_video_sd, url_video_hd FROM film"
+        self.sql_query_films = "SELECT idhash, title, showname, channel, description, duration, aired, url_sub, url_video, url_video_sd, url_video_hd, showid FROM film"
         self.sql_cond_recent = "({} > {})".format("aired" if self.settings.getRecentMode() == 0 else "dtCreated",(self.settings.getLastUpdate()-self.settings.getMaxAge()))
         self.sql_cond_nofuture = " AND ( aired < {} )".format(self.settings.getLastUpdate()) if self.settings.getNoFutur() else ""
         self.sql_cond_minlength = " AND ( duration >= %d )" % (self.settings.getMinLength() * 60) if self.settings.getMinLength() > 0 else ""

@@ -34,6 +34,9 @@ SUBTITLE_LANGUAGE = 'de'
 # What Kodi is told about a stream the film list calls HD. The list itself
 # gives no resolution; this is what those streams measure.
 HD_STREAM = {'width': 1920, 'height': 1080}
+# Where the show's id sits in a row of the film query. A jump to the show
+# needs it; nothing else on the item does.
+SHOWID = 11
 # What the listing holds, which is what decides how a skin lays out its
 # rows: with a content type Kodi and Estuary show the watched state and no
 # artwork in the row and put the picture of an episode beside the list;
@@ -118,13 +121,15 @@ class FilmlistUi(object):
             aFilm.init(element[0], element[1], element[2], element[3], element[4], element[5],
                         element[6], element[7], element[8], element[9], element[10])
             #
-            (targetUrl, list_item) = self._generateListItem(aFilm)
+            (targetUrl, list_item) = self._generateListItem(
+                aFilm, element[SHOWID] if len(element) > SHOWID else '')
             #
             if list_item is None:
                 self.logger.warn('Skipping film without video url: {} - {}', aFilm.channel, aFilm.title)
                 continue
             #
-            list_item.addContextMenuItems(self._generateContextMenu(aFilm))
+            list_item.addContextMenuItems(self._generateContextMenu(
+                aFilm, element[SHOWID] if len(element) > SHOWID else ''))
             #
             if self.settings.getAutoSub() and aFilm.url_sub:
                 targetUrl = self.plugin.build_url({
@@ -144,7 +149,7 @@ class FilmlistUi(object):
         #
         self.logger.debug('generated: {} sec', time.time() - self.startTime)
 
-    def _generateListItem(self, pFilm):
+    def _generateListItem(self, pFilm, pShowId=''):
         #
         isHd = False
         if (pFilm.url_video_hd != "" and self.settings.getPreferHd()):
@@ -220,6 +225,8 @@ class FilmlistUi(object):
         #
         videoInfo.apply(listitem, info_labels)
         listitem.setProperty('IsPlayable', 'true')
+        # What a jump to this film looks for once the listing is on screen.
+        listitem.setProperty('filmid', pFilm.filmid)
         # That a subtitle exists was only findable in the context menu. As a
         # stream it becomes something a skin can put a flag on, and it is one
         # of the few things the film list tells us for certain.
@@ -253,8 +260,26 @@ class FilmlistUi(object):
         listitem.setArt(art)
         return (videourl, listitem)
 
-    def _generateContextMenu(self, pFilm):
+    def _generateContextMenu(self, pFilm, pShowId=''):
         contextmenu = []
+
+        (_, season, _) = splitEpisode(pFilm.title)
+        if self.useLongTitle and season is not None and pShowId:
+            # Only where the listing spans shows, and only for a film that
+            # names an episode: in the listing of a show the entry would
+            # lead where the user already is, and a film that is no episode
+            # has no place of its own to be shown in.
+            contextmenu.append((
+                self.plugin.language(30132),
+                'RunPlugin({})'.format(
+                    self.plugin.build_url({
+                        'mode': "gotoshow",
+                        'channel': pFilm.channel,
+                        'show': pShowId,
+                        'id': pFilm.filmid
+                    })
+                )
+            ))
 
         if pFilm.url_sub != '':
             contextmenu.append((

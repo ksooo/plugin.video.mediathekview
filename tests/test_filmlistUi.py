@@ -21,9 +21,10 @@ from resources.lib.ui.filmlistUi import (FilmlistUi, LABEL_MASK_LONG,
 
 def row(idhash='hash', title='Titel', show='Sendung', channel='ARD',
         description='', seconds=60, aired=0, url_sub='',
-        url_video='https://example.org/a.mp4', url_video_sd='', url_video_hd=''):
+        url_video='https://example.org/a.mp4', url_video_sd='', url_video_hd='',
+        showid='a1b2c3d4'):
     return (idhash, title, show, channel, description, seconds, aired,
-            url_sub, url_video, url_video_sd, url_video_hd)
+            url_sub, url_video, url_video_sd, url_video_hd, showid)
 
 
 class GenerateTest(unittest.TestCase):
@@ -92,6 +93,54 @@ class GenerateTest(unittest.TestCase):
         items = self._generate([row(url_video='')])
         self.assertEqual(items, [])
         self.assertTrue(self.xbmcplugin.ended)
+
+
+class GoToShowTest(unittest.TestCase):
+    """The entry that leads from a search result to the show it is from."""
+
+    GO_TO_SHOW = 'Zur Sendung springen'
+
+    def setUp(self):
+        self.xbmcplugin = support.install_kodi_stubs()
+        self.plugin = support.Plugin(strings={30132: self.GO_TO_SHOW})
+
+    def _entries(self, longTitle=True, **fields):
+        FilmlistUi(self.plugin, pLongTitle=longTitle).generate([row(**fields)])
+        item = self.xbmcplugin.items[0][1]
+        return ([entry[0] for entry in item.context_menu], item)
+
+    def test_a_search_result_of_a_series_leads_to_its_show(self):
+        (entries, _) = self._entries(title='Erben (S24/E02)')
+        self.assertIn(self.GO_TO_SHOW, entries)
+
+    def test_the_entry_names_the_show_and_the_film(self):
+        (_, item) = self._entries(title='Erben (S24/E02)', channel='ZDF',
+                                  showid='1c6953ff', idhash='deadbeef')
+        command = [entry[1] for entry in item.context_menu
+                   if entry[0] == self.GO_TO_SHOW][0]
+        for expected in ('mode=gotoshow', 'channel=ZDF', 'show=1c6953ff',
+                         'id=deadbeef'):
+            self.assertIn(expected, command)
+
+    def test_a_film_that_names_no_episode_has_nowhere_to_jump_to(self):
+        (entries, _) = self._entries(title='Ein Sonderfall')
+        self.assertNotIn(self.GO_TO_SHOW, entries)
+
+    def test_the_listing_of_a_show_does_not_offer_it(self):
+        # It would lead where the user already is.
+        (entries, _) = self._entries(longTitle=False, title='Erben (S24/E02)')
+        self.assertNotIn(self.GO_TO_SHOW, entries)
+
+    def test_a_film_list_that_names_no_show(self):
+        # Rows of the old shape, eleven columns, carry no show id.
+        FilmlistUi(self.plugin).generate([row(title='Erben (S24/E02)')[:11]])
+        entries = [entry[0] for entry in self.xbmcplugin.items[0][1].context_menu]
+        self.assertNotIn(self.GO_TO_SHOW, entries)
+
+    def test_the_film_says_which_one_it_is(self):
+        # What the jump looks for once the listing is on screen.
+        (_, item) = self._entries(idhash='deadbeef')
+        self.assertEqual(item.properties['filmid'], 'deadbeef')
 
 
 class GenerateListItemTest(unittest.TestCase):
@@ -244,7 +293,8 @@ def _timezone(name):
 def _film(**kwargs):
     from resources.lib.model.film import Film
     film = Film()
-    film.init(*row(**kwargs))
+    # The show id is the row's last field and no part of the film itself.
+    film.init(*row(**kwargs)[:11])
     return film
 
 
