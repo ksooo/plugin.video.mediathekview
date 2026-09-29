@@ -1,3 +1,7 @@
+v1.5.0
+- A search result that is an episode leads to its show: "Go to show" in its context menu opens the show and puts the cursor on the film.
+- A new search opens its keyboard again instead of ending in an error.
+
 v1.4.0
 - Needs Kodi 20 (Nexus) or newer. On Kodi 19 the add-on stays at version 1.3.0.
 - Sorting a film list by date works now. The date never reached Kodi in a form it could read.
