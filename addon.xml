@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.mediathekview.ksooo"
 	name="MediathekView+"
-	version="1.5.0"
+	version="1.6.0"
 	provider-name="MediathekView.de, Leo Moll, Kai Sommerfeld">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1"/>
@@ -29,9 +29,11 @@
 		<description lang="de_DE">Dieses Add-on basiert auf dem Code von https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>
 		<description lang="en_GB">This add-on is based on the code of https://github.com/mediathekview/plugin.video.mediathekview[CR][CR]Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>
 		<disclaimer lang="en_GB">This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</disclaimer>
-		<news>v1.5.0
-- A search result that is an episode leads to its show: "Go to show" in its context menu opens the show and puts the cursor on the film.
-- A new search opens its keyboard again instead of ending in an error.
+		<news>v1.6.0
+- Long listings are split into pages. How many films a page shows can be set in the settings; this replaces the limit on search results.
+- The detail panel next to a listing shows the date and time a film was broadcast.
+- "Go to show" works on Android too. It opened the show's listing instead of the film there.
+- From the listing it opens, ".." leads back to the search.
 		</news>
 		<platform>all</platform>
 		<license>MIT</license>

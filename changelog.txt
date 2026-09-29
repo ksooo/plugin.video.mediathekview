@@ -1,3 +1,9 @@
+v1.6.0
+- Long listings are split into pages. How many films a page shows can be set in the settings; this replaces the limit on search results.
+- The detail panel next to a listing shows the date and time a film was broadcast.
+- "Go to show" works on Android too. It opened the show's listing instead of the film there.
+- From the listing it opens, ".." leads back to the search.
+
 v1.5.0
 - A search result that is an episode leads to its show: "Go to show" in its context menu opens the show and puts the cursor on the film.
 - A new search opens its keyboard again instead of ending in an error.
