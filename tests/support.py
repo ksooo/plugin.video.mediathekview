@@ -298,6 +298,36 @@ class Plugin(object):
 
 
 
+class _Keyboard(object):
+    """Kodi's keyboard, as strict about its arguments as Kodi is.
+
+    ``hidden`` is typed bool, and an int fails in the SWIG conversion with
+    "in method 'new_Keyboard', argument 3 of type 'bool'" - a search that
+    ends in an error notification rather than a keyboard.
+    """
+
+    entered = None
+    calls = []
+
+    def __init__(self, line='', heading='', hidden=False):
+        if not isinstance(hidden, bool):
+            raise TypeError("in method 'new_Keyboard',"
+                            " argument 3 of type 'bool'")
+        self.line = line
+        self.heading = heading
+        self.hidden = hidden
+        _Keyboard.calls.append((line, heading, hidden))
+
+    def doModal(self, autoclose=0):
+        pass
+
+    def isConfirmed(self):
+        return _Keyboard.entered is not None
+
+    def getText(self):
+        return _Keyboard.entered or ''
+
+
 class _StreamDetail(object):
     """A stream as xbmc.VideoStreamDetail and its siblings take one."""
 
@@ -505,6 +535,7 @@ def install_kodi_stubs():
     xbmc.LOGERROR = 3
     xbmc.LOGFATAL = 4
     xbmc.log = lambda *args, **kwargs: None
+    xbmc.Keyboard = _Keyboard
     xbmc.getInfoLabel = lambda label: '21.0'
     xbmc.executebuiltin = lambda command: None
     xbmc.VideoStreamDetail = _StreamDetail

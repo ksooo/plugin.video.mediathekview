@@ -11,10 +11,39 @@ from tests import support
 
 support.init_app_context()
 
-from resources.lib.kodi.kodiui import KodiProgressDialog
+from resources.lib.kodi.kodiui import KodiProgressDialog, KodiUI
 
 DOWNLOAD = 30955
 UPDATE = 30956
+
+
+class EnteredTextTest(unittest.TestCase):
+    """The keyboard a search opens."""
+
+    def setUp(self):
+        support.install_kodi_stubs()
+        import tests.support as module
+        self.keyboard = module._Keyboard
+        self.keyboard.calls = []
+        self.keyboard.entered = None
+        self.addCleanup(setattr, self.keyboard, 'entered', None)
+        self.ui = KodiUI()
+
+    def test_it_asks_for_a_search_term(self):
+        self.keyboard.entered = 'Rosenheim'
+        self.assertEqual(self.ui.get_entered_text('', 'Suche'),
+                         ('Rosenheim', True))
+
+    def test_nothing_entered_keeps_what_was_there(self):
+        self.assertEqual(self.ui.get_entered_text('Bergdoktor', 'Suche'),
+                         ('Bergdoktor', False))
+
+    def test_whether_the_text_is_hidden_is_a_bool(self):
+        # Kodi types it bool and refuses an int, which ended a new search in
+        # an error notification instead of a keyboard.
+        self.ui.get_entered_text('', 'Suche')
+        self.ui.get_entered_text('', 'Passwort', hidden=True)
+        self.assertEqual([call[2] for call in self.keyboard.calls], [False, True])
 
 
 class ProgressDialogTest(unittest.TestCase):
