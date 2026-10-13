@@ -128,7 +128,7 @@ class JumpTest(unittest.TestCase):
     def test_a_listing_that_never_comes(self):
         self.addCleanup(setattr, jump, 'WAIT_SECONDS', jump.WAIT_SECONDS)
         jump.WAIT_SECONDS = 0.2
-        container = Container(appears=10 ** 6)
+        container = Container(appears=float('inf'))
         self.assertFalse(Jump(container).toFilm(URL, 'a'))
         self.assertEqual(container.selected, [])
 
